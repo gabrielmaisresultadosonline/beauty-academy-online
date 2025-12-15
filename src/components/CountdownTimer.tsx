@@ -34,24 +34,24 @@ const CountdownTimer = () => {
   return (
     <div className="flex items-center justify-center gap-2">
       <div className="flex flex-col items-center">
-        <span className="text-3xl md:text-4xl font-bold text-primary font-heading">
+        <span className="text-3xl md:text-4xl font-bold text-primary-foreground font-heading">
           {formatNumber(timeLeft.hours)}
         </span>
-        <span className="text-xs text-muted-foreground uppercase tracking-wider">Horas</span>
+        <span className="text-xs text-primary-foreground/70 uppercase tracking-wider">Horas</span>
       </div>
-      <span className="text-3xl font-bold text-primary">:</span>
+      <span className="text-3xl font-bold text-primary-foreground">:</span>
       <div className="flex flex-col items-center">
-        <span className="text-3xl md:text-4xl font-bold text-primary font-heading">
+        <span className="text-3xl md:text-4xl font-bold text-primary-foreground font-heading">
           {formatNumber(timeLeft.minutes)}
         </span>
-        <span className="text-xs text-muted-foreground uppercase tracking-wider">Min</span>
+        <span className="text-xs text-primary-foreground/70 uppercase tracking-wider">Min</span>
       </div>
-      <span className="text-3xl font-bold text-primary">:</span>
+      <span className="text-3xl font-bold text-primary-foreground">:</span>
       <div className="flex flex-col items-center">
-        <span className="text-3xl md:text-4xl font-bold text-primary font-heading">
+        <span className="text-3xl md:text-4xl font-bold text-primary-foreground font-heading">
           {formatNumber(timeLeft.seconds)}
         </span>
-        <span className="text-xs text-muted-foreground uppercase tracking-wider">Seg</span>
+        <span className="text-xs text-primary-foreground/70 uppercase tracking-wider">Seg</span>
       </div>
     </div>
   );
