@@ -106,12 +106,12 @@ const genres = [
 ];
 
 const features = [
-  { icon: Music2, title: '+15.000 Músicas', description: 'Biblioteca completa com todos os hits' },
-  { icon: RefreshCw, title: 'Atualização Semanal', description: 'Novidades toda semana no seu acervo' },
-  { icon: Download, title: 'Download Ilimitado', description: 'Baixe e ouça offline onde quiser' },
+  { icon: Music2, title: '+15.000 Músicas', description: 'Todas as músicas das principais plataformas' },
+  { icon: RefreshCw, title: 'Atualização Semanal', description: 'Seu streaming atualizado toda semana' },
+  { icon: Users, title: 'Comunidade da Música', description: 'Faça parte da maior comunidade musical' },
   { icon: Infinity, title: 'Acesso Vitalício', description: 'Pague uma vez, use para sempre' },
   { icon: Smartphone, title: 'Multiplataforma', description: 'Celular, PC, carro, TV, qualquer lugar' },
-  { icon: ListMusic, title: 'Organizado', description: 'Músicas separadas por gênero e artista' },
+  { icon: ListMusic, title: 'Tudo Organizado', description: 'Músicas separadas por gênero e artista' },
 ];
 
 const testimonials = [
@@ -188,7 +188,7 @@ const ComunidadeMusica = () => {
                   <h2 className="text-3xl font-black text-white tracking-tight">
                     Spot<span className="text-amber-400">Music</span>
                   </h2>
-                  <p className="text-zinc-500 text-sm">Seu pendrive digital</p>
+                  <p className="text-zinc-500 text-sm">Comunidade da Música</p>
                 </div>
               </div>
 
@@ -202,9 +202,44 @@ const ComunidadeMusica = () => {
               </h1>
 
               <p className="text-lg text-zinc-400 max-w-lg">
-                Atualizações semanais, download ilimitado e acesso vitalício. 
-                Mais barato que 2 meses de qualquer streaming!
+                Todas as músicas do Spotify, YouTube Music, Deezer e Apple Music em um só lugar. 
+                Seu streaming atualizado toda semana por um preço único e vitalício!
               </p>
+
+              {/* Platform Logos */}
+              <div className="flex flex-wrap items-center gap-4 py-4">
+                <span className="text-zinc-500 text-sm">Músicas de:</span>
+                <div className="flex items-center gap-3">
+                  {/* Spotify */}
+                  <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1.5">
+                    <div className="w-5 h-5 bg-[#1DB954] rounded-full flex items-center justify-center">
+                      <Music className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-xs text-zinc-400">Spotify</span>
+                  </div>
+                  {/* YouTube Music */}
+                  <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1.5">
+                    <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
+                      <PlayCircle className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-xs text-zinc-400">YouTube</span>
+                  </div>
+                  {/* Deezer */}
+                  <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1.5">
+                    <div className="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+                      <Headphones className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-xs text-zinc-400">Deezer</span>
+                  </div>
+                  {/* Apple Music */}
+                  <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1.5">
+                    <div className="w-5 h-5 bg-gradient-to-br from-pink-500 to-red-500 rounded-full flex items-center justify-center">
+                      <Music2 className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-xs text-zinc-400">Apple</span>
+                  </div>
+                </div>
+              </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
@@ -317,11 +352,52 @@ const ComunidadeMusica = () => {
           <div className="text-center mb-12">
             <span className="inline-flex items-center gap-2 bg-amber-500/10 text-amber-400 px-4 py-2 rounded-full text-sm font-medium border border-amber-500/20 mb-4">
               <Sparkles className="w-4 h-4" />
-              COMPARATIVO
+              TODAS AS PLATAFORMAS EM UMA SÓ
             </span>
             <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
-              Por que SpotMusic é a <span className="text-amber-400">melhor escolha</span>?
+              Todas as músicas em <span className="text-amber-400">um lugar só</span>
             </h2>
+            <p className="text-zinc-400 max-w-2xl mx-auto">
+              Spotify + YouTube Music + Deezer + Apple Music = SpotMusic. Pague uma vez, tenha tudo para sempre!
+            </p>
+          </div>
+
+          {/* All Platforms Logos */}
+          <div className="flex flex-wrap justify-center items-center gap-6 mb-12">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 bg-[#1DB954] rounded-2xl flex items-center justify-center">
+                <Music className="w-8 h-8 text-white" />
+              </div>
+              <span className="text-zinc-500 text-xs">Spotify</span>
+            </div>
+            <span className="text-3xl text-zinc-600">+</span>
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 bg-red-600 rounded-2xl flex items-center justify-center">
+                <PlayCircle className="w-8 h-8 text-white" />
+              </div>
+              <span className="text-zinc-500 text-xs">YouTube Music</span>
+            </div>
+            <span className="text-3xl text-zinc-600">+</span>
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center">
+                <Headphones className="w-8 h-8 text-white" />
+              </div>
+              <span className="text-zinc-500 text-xs">Deezer</span>
+            </div>
+            <span className="text-3xl text-zinc-600">+</span>
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-red-500 rounded-2xl flex items-center justify-center">
+                <Music2 className="w-8 h-8 text-white" />
+              </div>
+              <span className="text-zinc-500 text-xs">Apple Music</span>
+            </div>
+            <span className="text-3xl text-amber-400">=</span>
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center">
+                <Disc3 className="w-8 h-8 text-zinc-900" />
+              </div>
+              <span className="text-amber-400 text-xs font-bold">SpotMusic</span>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -489,10 +565,10 @@ const ComunidadeMusica = () => {
 
               <div className="space-y-3 mb-8">
                 {[
+                  'Músicas do Spotify, YouTube, Deezer e Apple Music',
                   '+15.000 músicas em alta qualidade',
-                  'Atualizações semanais grátis',
-                  'Download ilimitado',
-                  'Funciona 100% offline',
+                  'Atualizações semanais grátis para sempre',
+                  'Comunidade exclusiva de membros',
                   'Suporte exclusivo via WhatsApp',
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-3 text-zinc-300">
@@ -576,10 +652,10 @@ const ComunidadeMusica = () => {
             </div>
             <div className="relative">
               <h2 className="text-3xl md:text-5xl font-black text-zinc-900 mb-4">
-                Pare de Pagar Mensalidade!
+                Todas as músicas. Um só lugar. Um só preço!
               </h2>
               <p className="text-zinc-800 mb-8 max-w-2xl mx-auto text-lg">
-                Entre agora para o SpotMusic e tenha +15.000 músicas para sempre por apenas R$47
+                Entre para a Comunidade da Música! Spotify + YouTube + Deezer + Apple Music = +15.000 músicas por apenas R$47 (pagamento único)
               </p>
               <Button 
                 className="bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-lg h-14 px-10 rounded-xl shadow-lg hover:scale-105 transition-all"
@@ -605,7 +681,7 @@ const ComunidadeMusica = () => {
               </div>
               <div>
                 <h3 className="font-bold text-white">SpotMusic</h3>
-                <p className="text-xs text-zinc-500">Seu pendrive digital</p>
+                <p className="text-xs text-zinc-500">Comunidade da Música • Seu streaming atualizado toda semana</p>
               </div>
             </div>
             <div className="text-center md:text-right">
