@@ -31,7 +31,18 @@ import {
   ListMusic,
   Heart,
   Sparkles,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
+
+// Album covers
+import album1 from '@/assets/album-1.png';
+import album2 from '@/assets/album-2.png';
+import album3 from '@/assets/album-3.png';
+import album4 from '@/assets/album-4.png';
+import album5 from '@/assets/album-5.png';
+
+const albumCovers = [album1, album2, album3, album4, album5];
 
 const KIWIFY_LINK = 'https://pay.kiwify.com.br/AFMNBej';
 
@@ -137,6 +148,16 @@ const testimonials = [
 
 const ComunidadeMusica = () => {
   const [isPlaying, setIsPlaying] = useState(true);
+  const [currentAlbum, setCurrentAlbum] = useState(0);
+
+  // Auto-slide album covers
+  useEffect(() => {
+    if (!isPlaying) return;
+    const interval = setInterval(() => {
+      setCurrentAlbum((prev) => (prev + 1) % albumCovers.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   return (
     <div className="min-h-screen bg-zinc-950 font-body overflow-hidden">
@@ -274,15 +295,66 @@ const ComunidadeMusica = () => {
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-blue-500/20 rounded-3xl blur-2xl" />
               <div className="relative bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
-                {/* Album Art */}
+                {/* Album Art Carousel */}
                 <div className="aspect-square bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl mb-6 relative overflow-hidden group">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Disc3 className="w-32 h-32 text-zinc-700 animate-spin" style={{ animationDuration: '8s' }} />
+                  {/* CD Stack Effect */}
+                  <div className="absolute inset-0">
+                    {albumCovers.map((cover, index) => {
+                      const offset = ((index - currentAlbum + albumCovers.length) % albumCovers.length);
+                      const isActive = offset === 0;
+                      const scale = isActive ? 1 : 0.85 - (offset * 0.05);
+                      const translateX = isActive ? 0 : (offset * 15);
+                      const opacity = isActive ? 1 : Math.max(0.3, 0.7 - (offset * 0.15));
+                      const zIndex = albumCovers.length - offset;
+                      
+                      return (
+                        <div
+                          key={index}
+                          className="absolute inset-0 transition-all duration-700 ease-out"
+                          style={{
+                            transform: `translateX(${translateX}px) scale(${scale})`,
+                            opacity,
+                            zIndex,
+                          }}
+                        >
+                          <img
+                            src={cover}
+                            alt={`Album ${index + 1}`}
+                            className="w-full h-full object-cover rounded-2xl shadow-2xl"
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
+                  
+                  {/* CD Vinyl Effect Overlay */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-zinc-900/50 border-4 border-zinc-700/30" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-zinc-800/80" />
+                  </div>
+                  
+                  {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4">
+                  
+                  {/* Album Info */}
+                  <div className="absolute bottom-4 left-4 right-4 z-20">
                     <p className="text-white font-bold text-lg">Hits do Momento</p>
-                    <p className="text-zinc-500 text-sm">+15.000 músicas disponíveis</p>
+                    <p className="text-zinc-400 text-sm">+15.000 músicas disponíveis</p>
+                  </div>
+                  
+                  {/* Carousel Dots */}
+                  <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+                    {albumCovers.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentAlbum(index)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          index === currentAlbum 
+                            ? 'bg-amber-400 w-4' 
+                            : 'bg-zinc-600 hover:bg-zinc-500'
+                        }`}
+                      />
+                    ))}
                   </div>
                 </div>
 
