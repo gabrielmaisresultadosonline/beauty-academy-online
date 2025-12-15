@@ -1,12 +1,368 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Button } from '@/components/ui/button';
+import CountdownTimer from '@/components/CountdownTimer';
+import WhatsAppProof from '@/components/WhatsAppProof';
+import FeatureCard from '@/components/FeatureCard';
+import TestimonialCard from '@/components/TestimonialCard';
+import BenefitItem from '@/components/BenefitItem';
+import instrutoras from '@/assets/instrutoras.png';
+import {
+  BookOpen,
+  FileText,
+  Users,
+  ShoppingBag,
+  Award,
+  Infinity,
+  Scissors,
+  Heart,
+  TrendingUp,
+  Palette,
+  Sparkles,
+  Headphones,
+  Clock,
+  Shield,
+  CheckCircle2,
+  ArrowRight,
+  MessageCircle,
+} from 'lucide-react';
+
+const KIWIFY_LINK = 'https://pay.kiwify.com.br/4QUnghd';
+
+const whatsappProofs = [
+  {
+    name: 'Fernanda Lima',
+    message: 'Gente, acabei de fazer minha primeira cliente sozinha! O módulo de colorimetria me salvou muito 😍 Obrigada Alessandra!',
+    time: '10:32',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
+  },
+  {
+    name: 'Patricia Santos',
+    message: 'Meninas, já recuperei o valor do curso no primeiro mês! Melhor investimento que fiz 💰✨',
+    time: '14:15',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+  },
+  {
+    name: 'Camila Rodrigues',
+    message: 'Os PDFs são incríveis! Imprimi tudo e virou meu guia no salão. Super organizados 📚',
+    time: '09:48',
+    avatar: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face',
+  },
+  {
+    name: 'Juliana Mendes',
+    message: 'Nunca pensei que aprenderia corte degradê tão rápido! As aulas são muito didáticas 💇‍♀️',
+    time: '16:22',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
+  },
+  {
+    name: 'Amanda Costa',
+    message: 'Grupo de alunas é show! Sempre tem alguém pra ajudar, me sinto acolhida 🥰',
+    time: '11:05',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
+  },
+];
+
+const features = [
+  { icon: BookOpen, title: '160 Aulas em Full HD', description: 'Conteúdo completo e detalhado em alta qualidade para você aprender no seu ritmo' },
+  { icon: FileText, title: 'Materiais em PDF', description: 'Apostilas e guias práticos para complementar seu aprendizado' },
+  { icon: Users, title: 'Grupo de Alunas Apoio', description: 'Comunidade ativa para tirar dúvidas e trocar experiências' },
+  { icon: ShoppingBag, title: 'Lista de Fornecedores', description: 'Acesso a fornecedores confiáveis para insumos profissionais' },
+  { icon: Award, title: 'Certificado Incluso', description: 'Certificado reconhecido ao final do curso para sua carreira' },
+  { icon: Infinity, title: 'Acesso Vitalício', description: 'Assista quantas vezes quiser, quando quiser, para sempre' },
+];
+
+const benefits = [
+  { title: 'Técnicas Profissionais', description: 'Aprenda as técnicas mais modernas e procuradas do mercado' },
+  { title: 'Atendimento ao Cliente', description: 'Dicas para fidelizar clientes e aumentar sua renda' },
+  { title: 'Gestão de Negócio', description: 'Como gerenciar seu próprio salão ou trabalhar como autônoma' },
+  { title: 'Colorimetria Completa', description: 'Domine a arte de escolher as melhores cores para cada cliente' },
+  { title: 'Penteados Modernos', description: 'Tendências atuais em penteados para qualquer ocasião' },
+  { title: 'Suporte Contínuo', description: 'Acesso a mentoria e suporte durante todo seu aprendizado' },
+];
+
+const testimonials = [
+  {
+    name: 'Maria Silva',
+    role: 'Cabeleireira Autônoma',
+    content: 'Curso excelente! Aprendi tudo que precisava para abrir meu próprio salão. As aulas são muito bem estruturadas e o suporte é ótimo!',
+    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop&crop=face',
+  },
+  {
+    name: 'Ana Costa',
+    role: 'Cabeleireira Profissional',
+    content: 'Já tinha experiência, mas o curso me atualizou com as tendências mais novas. Meus clientes adoraram as novas técnicas!',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=face',
+  },
+  {
+    name: 'Juliana Oliveira',
+    role: 'Iniciante no Ramo',
+    content: 'Melhor investimento que fiz! O preço é ótimo e o conteúdo é de qualidade profissional. Recomendo para todas!',
+    avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=100&h=100&fit=crop&crop=face',
+  },
+];
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background font-body">
+      {/* Header Badge */}
+      <div className="gradient-primary py-2 text-center">
+        <p className="text-primary-foreground text-sm font-medium flex items-center justify-center gap-2">
+          <CheckCircle2 className="w-4 h-4" />
+          RECONHECIDO PELO MEC
+        </p>
       </div>
+
+      {/* Hero Section */}
+      <section className="gradient-hero py-12 md:py-20">
+        <div className="container">
+          <div className="grid lg:grid-cols-2 gap-10 items-center">
+            <div className="space-y-6 animate-fade-in">
+              <span className="inline-block bg-accent text-accent-foreground px-4 py-2 rounded-full text-sm font-medium">
+                CURSO COMPLETO ONLINE
+              </span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-foreground leading-tight">
+                Cabeleireira{' '}
+                <span className="text-gradient">Completo</span> Online
+              </h1>
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+                Tudo que você precisa para se tornar uma profissional de sucesso na área de cabeleiraria. Aprenda com especialistas e comece sua transformação hoje!
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button variant="cta" size="xl" asChild>
+                  <a href={KIWIFY_LINK} target="_blank" rel="noopener noreferrer">
+                    QUERO ME INSCREVER
+                    <ArrowRight className="w-5 h-5" />
+                  </a>
+                </Button>
+              </div>
+              <div className="flex items-center gap-6 pt-4">
+                <div className="flex -space-x-3">
+                  {[1, 2, 3, 4].map((i) => (
+                    <img
+                      key={i}
+                      src={`https://i.pravatar.cc/40?img=${i + 10}`}
+                      alt="Aluna"
+                      className="w-10 h-10 rounded-full border-2 border-background"
+                    />
+                  ))}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-semibold text-foreground">+2.500</span> alunas transformadas
+                </p>
+              </div>
+            </div>
+            <div className="relative animate-scale-in">
+              <div className="absolute -inset-4 gradient-primary opacity-20 blur-3xl rounded-full"></div>
+              <img
+                src={instrutoras}
+                alt="Alessandra Linhares - Instrutoras do Curso"
+                className="relative w-full max-w-lg mx-auto drop-shadow-2xl"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 md:py-24 bg-muted/30">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-4">
+              O QUE VOCÊ VAI APRENDER
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Conteúdo completo e atualizado para você dominar todas as técnicas
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, index) => (
+              <div key={index} style={{ animationDelay: `${index * 100}ms` }} className="animate-slide-up">
+                <FeatureCard {...feature} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-16 md:py-24">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-4">
+              TUDO INCLUSO NO CURSO
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {benefits.map((benefit, index) => (
+              <BenefitItem key={index} {...benefit} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WhatsApp Social Proof */}
+      <section className="py-16 md:py-24 bg-muted/30">
+        <div className="container">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-success/10 text-success px-4 py-2 rounded-full mb-4">
+              <MessageCircle className="w-5 h-5" />
+              <span className="font-medium">Mensagens Reais das Alunas</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-4">
+              Veja o que estão falando no grupo
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+            {whatsappProofs.map((proof, index) => (
+              <div key={index} style={{ animationDelay: `${index * 150}ms` }}>
+                <WhatsAppProof {...proof} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Urgency Section */}
+      <section className="py-16 md:py-24 gradient-primary text-primary-foreground">
+        <div className="container">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div className="space-y-6">
+              <div className="flex items-center gap-2">
+                <Clock className="w-6 h-6" />
+                <span className="text-lg font-semibold">OFERTA LIMITADA</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold font-heading">
+                Vagas Limitadas
+              </h2>
+              <p className="text-primary-foreground/80 text-lg">
+                Apenas <span className="font-bold text-secondary">50 vagas</span> disponíveis neste preço especial
+              </p>
+              <div className="bg-primary-foreground/10 rounded-2xl p-6 backdrop-blur">
+                <p className="text-center mb-4 font-medium">Vagas restantes:</p>
+                <div className="flex justify-center gap-2 mb-4">
+                  {[1, 2].map((i) => (
+                    <span key={i} className="text-5xl font-bold font-heading bg-primary-foreground text-primary w-16 h-20 flex items-center justify-center rounded-lg">
+                      {i === 1 ? '1' : '2'}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="space-y-6">
+              <div className="flex items-center gap-2">
+                <Shield className="w-6 h-6" />
+                <span className="text-lg font-semibold">Tempo Limitado</span>
+              </div>
+              <p className="text-primary-foreground/80">
+                Oferta válida por apenas 48 horas
+              </p>
+              <div className="bg-primary-foreground/10 rounded-2xl p-6 backdrop-blur">
+                <CountdownTimer />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-16 md:py-24" id="preco">
+        <div className="container">
+          <div className="max-w-xl mx-auto text-center">
+            <span className="inline-block bg-destructive/10 text-destructive px-4 py-2 rounded-full text-sm font-bold mb-6 animate-pulse-slow">
+              DESCONTO DE 87%
+            </span>
+            <div className="bg-card rounded-3xl p-8 md:p-12 shadow-card border border-border/50">
+              <h3 className="text-2xl font-heading font-bold text-foreground mb-2">INVESTIMENTO</h3>
+              <p className="text-muted-foreground line-through text-lg mb-2">De R$ 197,00</p>
+              <div className="flex items-baseline justify-center gap-2 mb-2">
+                <span className="text-2xl font-bold text-foreground">R$</span>
+                <span className="text-7xl font-bold font-heading text-primary">25</span>
+                <span className="text-2xl font-bold text-foreground">,00</span>
+              </div>
+              <p className="text-muted-foreground mb-8">
+                Pagamento único. Acesso vitalício a todo o conteúdo.
+              </p>
+              <Button variant="cta" size="xl" className="w-full" asChild>
+                <a href={KIWIFY_LINK} target="_blank" rel="noopener noreferrer">
+                  COMPRAR POR R$25
+                  <ArrowRight className="w-5 h-5" />
+                </a>
+              </Button>
+              <div className="flex items-center justify-center gap-4 mt-6 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Shield className="w-4 h-4 text-success" />
+                  Compra segura
+                </span>
+                <span className="flex items-center gap-1">
+                  <CheckCircle2 className="w-4 h-4 text-success" />
+                  Acesso imediato
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-16 md:py-24 bg-muted/30">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold font-heading text-foreground mb-4">
+              O QUE DIZEM NOSSAS ALUNAS
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {testimonials.map((testimonial, index) => (
+              <TestimonialCard key={index} {...testimonial} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-16 md:py-24">
+        <div className="container">
+          <div className="gradient-primary rounded-3xl p-8 md:p-16 text-center text-primary-foreground">
+            <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">
+              Comece Sua Transformação Agora
+            </h2>
+            <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto text-lg">
+              Não perca mais tempo. Milhares de mulheres já transformaram suas vidas com o nosso curso. Agora é a sua vez!
+            </p>
+            <Button variant="secondary" size="xl" className="text-foreground" asChild>
+              <a href={KIWIFY_LINK} target="_blank" rel="noopener noreferrer">
+                GARANTIR MINHA VAGA
+                <ArrowRight className="w-5 h-5" />
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-10 border-t border-border">
+        <div className="container">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h3 className="font-heading font-bold text-lg text-foreground">Beleza Liso Perfeito</h3>
+              <p className="text-sm text-muted-foreground">
+                Aprenda cabeleiraria profissional com os melhores especialistas
+              </p>
+            </div>
+            <div className="text-center md:text-right">
+              <p className="text-sm text-muted-foreground">
+                Email: contato@belezalisoperfeito.online
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Suporte 24/7 disponível
+              </p>
+            </div>
+          </div>
+          <div className="mt-8 pt-6 border-t border-border text-center">
+            <p className="text-xs text-muted-foreground">
+              © 2024 Curso Cabeleireira Completo. Todos os direitos reservados.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
