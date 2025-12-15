@@ -58,6 +58,30 @@ const whatsappProofs = [
     time: '11:05',
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
   },
+  {
+    name: 'Beatriz Almeida',
+    message: 'Fiz o curso achando que já sabia tudo, mas aprendi técnicas que nem imaginava! Vale cada centavo 💯',
+    time: '15:42',
+    avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop&crop=face',
+  },
+  {
+    name: 'Larissa Ferreira',
+    message: 'Minha clientela triplicou depois que apliquei as técnicas do curso! Estou muito feliz 🙏✨',
+    time: '08:17',
+    avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=100&h=100&fit=crop&crop=face',
+  },
+  {
+    name: 'Gabriela Souza',
+    message: 'O suporte é incrível! Mandei uma dúvida às 22h e responderam na hora. Nunca vi isso! 👏',
+    time: '22:35',
+    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&h=100&fit=crop&crop=face',
+  },
+  {
+    name: 'Renata Martins',
+    message: 'Saí do zero e hoje tenho meu próprio salão! Tudo graças a esse curso maravilhoso 💖💇‍♀️',
+    time: '13:28',
+    avatar: 'https://images.unsplash.com/photo-1499557354967-2b2d8910bcca?w=100&h=100&fit=crop&crop=face',
+  },
 ];
 
 const features = [
