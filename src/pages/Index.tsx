@@ -1,4 +1,4 @@
-import { ArrowRight, Sparkles, TrendingUp, Zap } from 'lucide-react';
+import { ArrowRight, Sparkles, TrendingUp, Zap, Music, Scissors } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Index = () => {
@@ -47,13 +47,22 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Featured Link */}
-        <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+        {/* Featured Links */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: '0.6s' }}>
           <Link 
             to="/belezalisoperfeito"
-            className="group inline-flex items-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_hsl(340,82%,52%,0.4)]"
+            className="group inline-flex items-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-4 rounded-xl font-semibold text-base transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_hsl(340,82%,52%,0.4)]"
           >
-            <span>Curso Cabeleireira Completo</span>
+            <Scissors className="w-5 h-5" />
+            <span>Curso Cabeleireira</span>
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <Link 
+            to="/comunidademusica"
+            className="group inline-flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-secondary-foreground px-6 py-4 rounded-xl font-semibold text-base transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_hsl(45,93%,47%,0.4)]"
+          >
+            <Music className="w-5 h-5" />
+            <span>Comunidade da Música</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
