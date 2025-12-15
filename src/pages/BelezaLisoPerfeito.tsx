@@ -25,7 +25,14 @@ import {
   MessageCircle,
 } from 'lucide-react';
 
-const KIWIFY_LINK = 'https://pay.kiwify.com.br/4QUnghd';
+const KIWIFY_LINK = 'https://pay.kiwify.com.br/AFMNBej';
+
+const scrollToPrice = () => {
+  const priceSection = document.getElementById('preco');
+  if (priceSection) {
+    priceSection.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 
 const whatsappProofs = [
   {
@@ -150,11 +157,9 @@ const Index = () => {
                 Tudo que você precisa para se tornar uma profissional de sucesso na área de cabeleiraria. Aprenda com especialistas e comece sua transformação hoje!
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="cta" size="xl" asChild>
-                  <a href={KIWIFY_LINK} target="_blank" rel="noopener noreferrer">
-                    QUERO ME INSCREVER
-                    <ArrowRight className="w-5 h-5" />
-                  </a>
+                <Button variant="cta" size="xl" onClick={scrollToPrice}>
+                  QUERO ME INSCREVER
+                  <ArrowRight className="w-5 h-5" />
                 </Button>
               </div>
               <div className="flex items-center gap-6 pt-4">
@@ -298,7 +303,7 @@ const Index = () => {
               <p className="text-muted-foreground line-through text-lg mb-2">De R$ 197,00</p>
               <div className="flex items-baseline justify-center gap-2 mb-2">
                 <span className="text-2xl font-bold text-foreground">R$</span>
-                <span className="text-7xl font-bold font-heading text-primary">25</span>
+                <span className="text-7xl font-bold font-heading text-primary">47</span>
                 <span className="text-2xl font-bold text-foreground">,00</span>
               </div>
               <p className="text-muted-foreground mb-8">
@@ -306,7 +311,7 @@ const Index = () => {
               </p>
               <Button variant="cta" size="xl" className="w-full" asChild>
                 <a href={KIWIFY_LINK} target="_blank" rel="noopener noreferrer">
-                  COMPRAR POR R$25
+                  COMPRAR POR R$47
                   <ArrowRight className="w-5 h-5" />
                 </a>
               </Button>
