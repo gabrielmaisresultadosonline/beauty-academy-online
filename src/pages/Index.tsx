@@ -59,10 +59,10 @@ const Index = () => {
           </Link>
           <Link 
             to="/comunidademusica"
-            className="group inline-flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-secondary-foreground px-6 py-4 rounded-xl font-semibold text-base transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_hsl(45,93%,47%,0.4)]"
+            className="group inline-flex items-center gap-3 bg-[#1DB954] hover:bg-[#1DB954]/90 text-white px-6 py-4 rounded-xl font-semibold text-base transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(29,185,84,0.4)]"
           >
             <Music className="w-5 h-5" />
-            <span>Comunidade da Música</span>
+            <span>SpotMusic</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

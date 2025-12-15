@@ -88,8 +88,8 @@ const ComunidadeMusica = () => {
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold font-heading text-background leading-tight animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              Comunidade da{' '}
-              <span className="text-primary">Música</span>
+              <span className="text-[#1DB954]">Spot</span>
+              <span className="text-background">Music</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-background/80 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
@@ -178,11 +178,11 @@ const ComunidadeMusica = () => {
                 </span>
               </div>
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center">
-                  <Music className="w-6 h-6 text-primary-foreground" />
+                <div className="w-12 h-12 bg-[#1DB954] rounded-full flex items-center justify-center">
+                  <Music className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg text-foreground">Comunidade da Música</h3>
+                  <h3 className="font-bold text-lg text-foreground">SpotMusic</h3>
                   <p className="text-muted-foreground text-sm">Pagamento único</p>
                 </div>
               </div>
@@ -367,7 +367,7 @@ const ComunidadeMusica = () => {
               Pare de Pagar Mensalidade!
             </h2>
             <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto text-lg">
-              Entre agora para a Comunidade da Música e tenha acesso a mais de 15.000 músicas para sempre. Pagamento único de R$47!
+              Entre agora para o SpotMusic e tenha acesso a mais de 15.000 músicas para sempre. Pagamento único de R$47!
             </p>
             <Button variant="secondary" size="xl" className="text-foreground" asChild>
               <a href={KIWIFY_LINK} target="_blank" rel="noopener noreferrer">
@@ -383,12 +383,15 @@ const ComunidadeMusica = () => {
       <footer className="py-10 border-t border-border bg-foreground">
         <div className="container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <h3 className="font-heading font-bold text-lg text-background">Comunidade da Música</h3>
-              <p className="text-sm text-background/60">
-                Seu pendrive digital com +15.000 músicas
-              </p>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-[#1DB954] rounded-full flex items-center justify-center">
+                <Music className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="font-heading font-bold text-lg text-background">SpotMusic</h3>
             </div>
+            <p className="text-sm text-background/60 mt-1">
+              Seu pendrive digital com +15.000 músicas
+            </p>
             <div className="text-center md:text-right">
               <p className="text-sm text-background/60">
                 Email: contato@acessar.click
@@ -400,7 +403,7 @@ const ComunidadeMusica = () => {
           </div>
           <div className="mt-8 pt-6 border-t border-background/20 text-center">
             <p className="text-xs text-background/40">
-              © 2024 Comunidade da Música. Todos os direitos reservados.
+              © 2024 SpotMusic. Todos os direitos reservados.
             </p>
           </div>
         </div>
