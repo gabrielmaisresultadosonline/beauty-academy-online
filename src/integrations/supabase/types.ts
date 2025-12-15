@@ -14,16 +14,177 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      albums: {
+        Row: {
+          artist: string
+          cover_url: string | null
+          created_at: string | null
+          created_by: string | null
+          genre: string | null
+          id: string
+          release_year: number | null
+          title: string
+        }
+        Insert: {
+          artist: string
+          cover_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          genre?: string | null
+          id?: string
+          release_year?: number | null
+          title: string
+        }
+        Update: {
+          artist?: string
+          cover_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          genre?: string | null
+          id?: string
+          release_year?: number | null
+          title?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          payment_provider: string | null
+          payment_reference: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          payment_provider?: string | null
+          payment_reference?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          payment_provider?: string | null
+          payment_reference?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          is_premium: boolean | null
+          premium_activated_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          is_premium?: boolean | null
+          premium_activated_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          is_premium?: boolean | null
+          premium_activated_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tracks: {
+        Row: {
+          album_id: string | null
+          artist: string
+          audio_url: string
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          title: string
+          track_number: number | null
+        }
+        Insert: {
+          album_id?: string | null
+          artist: string
+          audio_url: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          title: string
+          track_number?: number | null
+        }
+        Update: {
+          album_id?: string | null
+          artist?: string
+          audio_url?: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          title?: string
+          track_number?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tracks_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "albums"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_premium: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +311,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
