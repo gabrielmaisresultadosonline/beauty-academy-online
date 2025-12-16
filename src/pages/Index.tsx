@@ -17,11 +17,14 @@ import {
   Calculator,
   DollarSign,
   Palette,
-  BarChart3
+  BarChart3,
+  Sparkles,
+  BadgeCheck
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [productPrice, setProductPrice] = useState(97);
   const [salesCount, setSalesCount] = useState(100);
 
@@ -48,151 +51,170 @@ const Index = () => {
   const acessarNet = totalRevenue;
   const maxSavings = Math.max(kiwifyFees, hotmartFees, eduzzFees, monetizzeFees);
 
-  const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%20ANUAL","price":99700,"quantity":1}]&redirect_url=https://acessar.click/onboarding`;
-
   const activeProducts = [
     { name: "Beleza Liso Perfeito", description: "Curso completo de alisamento", price: "R$ 47", link: "/belezalisoperfeito" },
     { name: "SpotMusic", description: "Comunidade de música", price: "R$ 47", link: "/comunidademusica" }
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-zinc-950 text-white overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
-        <div className="absolute inset-0 bg-gradient-to-br from-green-950/50 via-black to-emerald-950/30" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl animate-pulse delay-1000" />
+      <section className="relative min-h-screen flex items-center justify-center px-4 py-16">
+        {/* Background Effects */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#00D26A]/15 rounded-full blur-[150px] animate-pulse" />
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#00D26A]/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 opacity-[0.02]">
+          <div className="h-full w-full" style={{
+            backgroundImage: 'linear-gradient(rgba(0,210,106,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(0,210,106,0.5) 1px, transparent 1px)',
+            backgroundSize: '80px 80px'
+          }} />
+        </div>
         
         <div className="relative z-10 max-w-6xl mx-auto text-center">
-          {/* Logos */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
-            <div className="bg-white/5 backdrop-blur-sm px-6 py-3 rounded-xl border border-white/10">
-              <span className="text-xl font-black tracking-tight">acessar<span className="text-green-400">.click</span></span>
+          {/* Header */}
+          <header className="flex flex-wrap items-center justify-center gap-4 mb-12">
+            <div className="flex items-center gap-3 bg-zinc-900/80 border border-zinc-800 px-5 py-3 rounded-2xl">
+              <div className="w-9 h-9 bg-[#00D26A] rounded-lg flex items-center justify-center">
+                <Zap className="w-5 h-5 text-zinc-950" />
+              </div>
+              <span className="text-xl font-bold">acessar<span className="text-[#00D26A]">.</span>click</span>
             </div>
-            <span className="text-white/30 text-xl">+</span>
-            <div className="bg-white/5 backdrop-blur-sm px-5 py-3 rounded-xl border border-white/10 flex items-center gap-2">
+            <span className="text-zinc-600">+</span>
+            <div className="flex items-center gap-2 bg-zinc-900/80 border border-zinc-800 px-5 py-3 rounded-2xl">
               <div className="w-8 h-8 bg-[#00D26A] rounded-lg flex items-center justify-center">
-                <CreditCard className="w-4 h-4 text-black" />
+                <CreditCard className="w-4 h-4 text-zinc-950" />
               </div>
               <span className="font-bold text-[#00D26A]">InfinitePay</span>
             </div>
-            <span className="text-white/30 text-xl">+</span>
-            <div className="bg-white/5 backdrop-blur-sm px-5 py-3 rounded-xl border border-white/10 flex items-center gap-2">
+            <span className="text-zinc-600">+</span>
+            <div className="flex items-center gap-2 bg-zinc-900/80 border border-zinc-800 px-5 py-3 rounded-2xl">
               <svg viewBox="0 0 24 24" className="w-7 h-7 fill-blue-500">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
-              <span className="font-bold text-sm text-white">Meta Pixel</span>
+              <span className="font-semibold text-sm">Meta Pixel</span>
             </div>
+          </header>
+
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 bg-[#00D26A]/10 border border-[#00D26A]/30 rounded-full px-5 py-2 mb-8">
+            <BadgeCheck className="w-5 h-5 text-[#00D26A]" />
+            <span className="text-sm text-[#00D26A] font-semibold">Venda sem taxas • Receba na hora</span>
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-none tracking-tighter uppercase">
-            <span className="text-white">VENDA SEM</span>
-            <br />
-            <span className="text-green-400 relative inline-block">
-              TAXA
-              <span className="absolute -right-6 -top-2 text-xs bg-green-500 text-black px-2 py-1 rounded-full font-black">0%</span>
-            </span>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+            Sua <span className="text-[#00D26A]">Área de Membros</span>
+            <br />sem taxas por venda
           </h1>
 
+          <p className="text-xl text-zinc-400 mb-8 max-w-3xl mx-auto leading-relaxed">
+            Receba <span className="text-white font-semibold">100% de cada venda</span> direto na sua conta InfinitePay.
+            <br />Criamos seu site de vendas completo em até 24 horas.
+          </p>
+
           {/* Instant Payment Badge */}
-          <div className="inline-flex items-center gap-4 bg-gradient-to-r from-yellow-500/10 to-green-500/10 border-2 border-yellow-400/50 px-8 py-5 rounded-2xl mb-10">
+          <div className="inline-flex items-center gap-4 bg-gradient-to-r from-yellow-500/10 to-[#00D26A]/10 border border-yellow-500/30 px-8 py-4 rounded-2xl mb-10">
             <div className="relative">
-              <Zap className="w-10 h-10 text-yellow-400" />
-              <div className="absolute inset-0 w-10 h-10 bg-yellow-400/50 rounded-full blur-xl animate-pulse" />
+              <Zap className="w-8 h-8 text-yellow-400" />
+              <div className="absolute inset-0 bg-yellow-400/40 rounded-full blur-xl animate-pulse" />
             </div>
             <div className="text-left">
-              <p className="text-yellow-400 font-black text-2xl tracking-tight">RECEBA EM 8 SEGUNDOS</p>
-              <p className="text-white/60 text-sm font-semibold">Direto na sua conta InfinitePay Nitro</p>
+              <p className="text-yellow-400 font-bold text-lg">Infinit Nitro: 8 segundos</p>
+              <p className="text-zinc-400 text-sm">Receba instantaneamente na sua conta</p>
             </div>
           </div>
-
-          <p className="text-lg md:text-xl text-white/70 mb-10 max-w-3xl mx-auto font-medium leading-relaxed">
-            Sistema completo: <strong className="text-green-400">área de membros</strong> + <strong className="text-green-400">página de vendas</strong> + <strong className="text-green-400">Facebook Pixel</strong>
-            <br />Nós criamos tudo. Você só adiciona seu conteúdo.
-          </p>
 
           {/* Price */}
           <div className="mb-10">
             <div className="flex items-center justify-center gap-4 mb-3">
-              <span className="text-2xl text-white/40 line-through font-bold">R$ 2.000</span>
-              <span className="bg-red-500 text-white px-4 py-1.5 rounded-full text-sm font-black animate-pulse">-50% OFF</span>
+              <span className="text-xl text-zinc-500 line-through">R$ 2.000</span>
+              <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">-50%</span>
             </div>
-            <div className="flex items-baseline justify-center gap-1">
-              <span className="text-green-400 text-4xl font-black">R$</span>
-              <span className="text-8xl md:text-9xl font-black text-white tracking-tighter">997</span>
-              <span className="text-white/50 text-xl font-bold">/ano</span>
+            <div className="flex items-baseline justify-center gap-2">
+              <span className="text-[#00D26A] text-3xl font-bold">R$</span>
+              <span className="text-7xl md:text-8xl font-bold text-white">997</span>
+              <span className="text-zinc-500 text-xl">/ano</span>
             </div>
-            <p className="text-white/50 mt-3 font-bold text-lg">VENDAS ILIMITADAS • 100% DO LUCRO É SEU</p>
+            <p className="text-zinc-500 mt-3 font-medium">12x de R$83,08 • Vendas ilimitadas</p>
           </div>
 
-          <a href={paymentLink} target="_blank" rel="noopener noreferrer">
-            <Button 
-              size="lg" 
-              className="bg-green-500 hover:bg-green-400 text-black font-black text-xl px-14 py-8 rounded-2xl shadow-2xl shadow-green-500/40 transform hover:scale-105 transition-all duration-300 uppercase tracking-wide"
-            >
-              QUERO COMEÇAR AGORA
-              <ArrowRight className="ml-3 w-6 h-6" />
-            </Button>
-          </a>
+          {/* CTA Button */}
+          <Button 
+            onClick={() => navigate('/cliente/auth')}
+            size="lg" 
+            className="bg-[#00D26A] hover:bg-[#00D26A]/90 text-zinc-950 px-10 py-7 text-xl font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-[0_0_60px_rgba(0,210,106,0.3)]"
+          >
+            <Sparkles className="w-6 h-6 mr-2" />
+            Criar Minha Área de Membros
+            <ArrowRight className="w-6 h-6 ml-2" />
+          </Button>
 
-          <p className="mt-8 text-white/40 text-sm font-semibold tracking-wide">
-            ✓ ÁREA PRONTA EM 24H • ✓ SUPORTE INCLUÍDO • ✓ AUTOMAÇÃO COMPLETA
-          </p>
+          <div className="flex flex-wrap justify-center gap-6 mt-8 text-zinc-400 text-sm">
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-[#00D26A]" />
+              <span>Site de vendas incluso</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-[#00D26A]" />
+              <span>Pronto em 24h</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-[#00D26A]" />
+              <span>Zero taxas por venda</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Interactive Calculator Section */}
-      <section className="py-24 px-4 bg-gradient-to-b from-black via-zinc-950 to-black">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-5 py-2.5 rounded-full mb-6">
-              <Calculator className="w-5 h-5 text-green-400" />
-              <span className="text-green-400 font-black text-sm tracking-wide uppercase">SIMULADOR DE ECONOMIA</span>
+      {/* Calculator Section */}
+      <section className="py-20 bg-zinc-900/50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-[#00D26A]/10 border border-[#00D26A]/30 px-4 py-2 rounded-full mb-6">
+              <Calculator className="w-5 h-5 text-[#00D26A]" />
+              <span className="text-[#00D26A] font-semibold text-sm">SIMULADOR DE ECONOMIA</span>
             </div>
-            <h2 className="text-4xl md:text-6xl font-black mb-4 tracking-tighter uppercase">
-              CALCULE <span className="text-red-500">QUANTO VOCÊ PERDE</span>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              Compare e <span className="text-[#00D26A]">economize milhares</span>
             </h2>
-            <p className="text-lg text-white/50 font-semibold">
-              Nas outras plataformas vs Acessar.click
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+              Veja quanto você perde em taxas nas outras plataformas
             </p>
           </div>
 
           {/* Calculator Inputs */}
-          <Card className="bg-zinc-900/80 border-2 border-green-500/40 mb-12 max-w-2xl mx-auto">
-            <CardContent className="p-8">
-              <div className="grid md:grid-cols-2 gap-8">
+          <Card className="bg-zinc-900 border border-zinc-800 mb-10 max-w-xl mx-auto">
+            <CardContent className="p-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <Label className="text-white font-black text-base mb-3 block uppercase tracking-wide">
-                    <DollarSign className="w-4 h-4 inline mr-2 text-green-400" />
-                    Preço do Produto
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-black">R$</span>
+                  <Label className="text-white font-medium">Preço do Produto</Label>
+                  <div className="relative mt-2">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">R$</span>
                     <Input
                       type="number"
                       value={productPrice}
                       onChange={(e) => setProductPrice(Number(e.target.value) || 0)}
-                      className="bg-black border-2 border-white/20 text-white text-2xl font-black pl-12 h-16 rounded-xl focus:border-green-500"
+                      className="bg-zinc-800 border-zinc-700 text-white text-xl font-semibold pl-10 h-14"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-white font-black text-base mb-3 block uppercase tracking-wide">
-                    <TrendingUp className="w-4 h-4 inline mr-2 text-green-400" />
-                    Quantidade de Vendas
-                  </Label>
+                  <Label className="text-white font-medium">Quantidade de Vendas</Label>
                   <Input
                     type="number"
                     value={salesCount}
                     onChange={(e) => setSalesCount(Number(e.target.value) || 0)}
-                    className="bg-black border-2 border-white/20 text-white text-2xl font-black h-16 rounded-xl focus:border-green-500"
+                    className="bg-zinc-800 border-zinc-700 text-white text-xl font-semibold h-14 mt-2"
                   />
                 </div>
               </div>
-              <div className="mt-6 p-6 bg-black/60 rounded-xl border border-white/10">
-                <p className="text-white/50 font-bold uppercase text-sm tracking-wide">Faturamento Total:</p>
-                <p className="text-5xl font-black text-white tracking-tight">
+              <div className="mt-4 p-4 bg-zinc-800/50 rounded-xl">
+                <p className="text-zinc-400 text-sm">Faturamento Total</p>
+                <p className="text-3xl font-bold text-white">
                   R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
@@ -202,93 +224,93 @@ const Index = () => {
           {/* Comparison Cards */}
           <div className="grid md:grid-cols-5 gap-3">
             {/* Kiwify */}
-            <Card className="bg-zinc-900/60 border border-red-500/40 hover:border-red-500/70 transition-all">
-              <CardContent className="p-5">
-                <h3 className="text-white font-black text-base mb-1">Kiwify</h3>
-                <p className="text-red-400 text-xs font-bold mb-4">8.99% + R$2.49/venda + R$3.50 saque</p>
-                <div className="space-y-3">
+            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/30 transition-all">
+              <CardContent className="p-4">
+                <h3 className="text-white font-bold mb-1">Kiwify</h3>
+                <p className="text-red-400 text-xs mb-3">8.99% + R$2.49 + saque</p>
+                <div className="space-y-2">
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase">Taxas</p>
-                    <p className="text-red-400 font-black text-xl">-R$ {kiwifyFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-zinc-500 text-xs">Taxas</p>
+                    <p className="text-red-400 font-bold">-R$ {kiwifyFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase">Você Recebe</p>
-                    <p className="text-white font-black text-lg">R$ {kiwifyNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-zinc-500 text-xs">Você recebe</p>
+                    <p className="text-white font-semibold">R$ {kiwifyNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Hotmart */}
-            <Card className="bg-zinc-900/60 border border-red-500/40 hover:border-red-500/70 transition-all">
-              <CardContent className="p-5">
-                <h3 className="text-white font-black text-base mb-1">Hotmart</h3>
-                <p className="text-red-400 text-xs font-bold mb-4">9.9% + R$1/venda</p>
-                <div className="space-y-3">
+            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/30 transition-all">
+              <CardContent className="p-4">
+                <h3 className="text-white font-bold mb-1">Hotmart</h3>
+                <p className="text-red-400 text-xs mb-3">9.9% + R$1/venda</p>
+                <div className="space-y-2">
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase">Taxas</p>
-                    <p className="text-red-400 font-black text-xl">-R$ {hotmartFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-zinc-500 text-xs">Taxas</p>
+                    <p className="text-red-400 font-bold">-R$ {hotmartFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase">Você Recebe</p>
-                    <p className="text-white font-black text-lg">R$ {hotmartNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-zinc-500 text-xs">Você recebe</p>
+                    <p className="text-white font-semibold">R$ {hotmartNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Eduzz */}
-            <Card className="bg-zinc-900/60 border border-red-500/40 hover:border-red-500/70 transition-all">
-              <CardContent className="p-5">
-                <h3 className="text-white font-black text-base mb-1">Eduzz</h3>
-                <p className="text-red-400 text-xs font-bold mb-4">9.9% + R$1/venda + saque</p>
-                <div className="space-y-3">
+            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/30 transition-all">
+              <CardContent className="p-4">
+                <h3 className="text-white font-bold mb-1">Eduzz</h3>
+                <p className="text-red-400 text-xs mb-3">9.9% + R$1 + saque</p>
+                <div className="space-y-2">
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase">Taxas</p>
-                    <p className="text-red-400 font-black text-xl">-R$ {eduzzFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-zinc-500 text-xs">Taxas</p>
+                    <p className="text-red-400 font-bold">-R$ {eduzzFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase">Você Recebe</p>
-                    <p className="text-white font-black text-lg">R$ {eduzzNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-zinc-500 text-xs">Você recebe</p>
+                    <p className="text-white font-semibold">R$ {eduzzNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Monetizze */}
-            <Card className="bg-zinc-900/60 border border-red-500/40 hover:border-red-500/70 transition-all">
-              <CardContent className="p-5">
-                <h3 className="text-white font-black text-base mb-1">Monetizze</h3>
-                <p className="text-red-400 text-xs font-bold mb-4">9.9% por venda</p>
-                <div className="space-y-3">
+            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/30 transition-all">
+              <CardContent className="p-4">
+                <h3 className="text-white font-bold mb-1">Monetizze</h3>
+                <p className="text-red-400 text-xs mb-3">9.9%</p>
+                <div className="space-y-2">
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase">Taxas</p>
-                    <p className="text-red-400 font-black text-xl">-R$ {monetizzeFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-zinc-500 text-xs">Taxas</p>
+                    <p className="text-red-400 font-bold">-R$ {monetizzeFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase">Você Recebe</p>
-                    <p className="text-white font-black text-lg">R$ {monetizzeNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-zinc-500 text-xs">Você recebe</p>
+                    <p className="text-white font-semibold">R$ {monetizzeNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Acessar.click */}
-            <Card className="bg-gradient-to-br from-green-900/60 to-emerald-900/40 border-2 border-green-400 hover:border-green-300 transition-all relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-green-400 text-black px-3 py-1 text-xs font-black uppercase">
-                Melhor
+            <Card className="bg-[#00D26A]/10 border-2 border-[#00D26A] relative">
+              <div className="absolute -top-2 -right-2 bg-[#00D26A] text-zinc-950 px-2 py-0.5 rounded text-xs font-bold">
+                MELHOR
               </div>
-              <CardContent className="p-5">
-                <h3 className="text-green-400 font-black text-base mb-1">Acessar.click</h3>
-                <p className="text-green-300 text-xs font-bold mb-4">0% taxa • 0% saque</p>
-                <div className="space-y-3">
+              <CardContent className="p-4">
+                <h3 className="text-[#00D26A] font-bold mb-1">Acessar.click</h3>
+                <p className="text-[#00D26A] text-xs mb-3">0% taxa • 0% saque</p>
+                <div className="space-y-2">
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase">Taxas</p>
-                    <p className="text-green-400 font-black text-xl">R$ 0,00</p>
+                    <p className="text-zinc-400 text-xs">Taxas</p>
+                    <p className="text-[#00D26A] font-bold">R$ 0,00</p>
                   </div>
                   <div>
-                    <p className="text-white/40 text-xs font-bold uppercase">Você Recebe</p>
-                    <p className="text-green-400 font-black text-lg">R$ {acessarNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-zinc-400 text-xs">Você recebe</p>
+                    <p className="text-[#00D26A] font-bold">R$ {acessarNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                 </div>
               </CardContent>
@@ -296,41 +318,77 @@ const Index = () => {
           </div>
 
           {/* Savings Highlight */}
-          <div className="mt-12 text-center">
-            <Card className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-2 border-green-400/60 inline-block">
-              <CardContent className="p-10">
-                <p className="text-white/50 font-black uppercase tracking-wide mb-3">Com Acessar.click você economiza até:</p>
-                <p className="text-6xl md:text-7xl font-black text-green-400 tracking-tight">
+          <div className="mt-10 text-center">
+            <Card className="bg-[#00D26A]/5 border border-[#00D26A]/30 inline-block">
+              <CardContent className="p-8">
+                <p className="text-zinc-400 mb-2">Com Acessar.click você economiza até:</p>
+                <p className="text-5xl md:text-6xl font-bold text-[#00D26A]">
                   R$ {maxSavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
-                <p className="text-white/50 font-bold mt-3 uppercase text-sm">em taxas nas suas vendas</p>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-24 px-4 bg-black">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-black text-center mb-16 tracking-tighter uppercase">
-            O QUE VOCÊ <span className="text-green-400">RECEBE</span>
+      {/* How It Works */}
+      <section className="py-20 bg-zinc-950">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Como <span className="text-[#00D26A]">funciona</span>
           </h2>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-4 gap-6">
             {[
-              { icon: <Palette className="w-9 h-9" />, title: "PÁGINA DE VENDAS", description: "Site profissional de alta conversão" },
-              { icon: <Users className="w-9 h-9" />, title: "ÁREA DE MEMBROS", description: "Sistema completo para seu conteúdo" },
-              { icon: <BarChart3 className="w-9 h-9" />, title: "FACEBOOK PIXEL", description: "Rastreamento de conversões automático" },
-              { icon: <Zap className="w-9 h-9" />, title: "RECEBA EM 8s", description: "Pagamento instantâneo InfinitePay" },
-              { icon: <Star className="w-9 h-9" />, title: "VENDAS ILIMITADAS", description: "Sem limite, sem taxas por transação" },
-              { icon: <Clock className="w-9 h-9" />, title: "PRONTO EM 24H", description: "Sua área funcionando rapidamente" }
-            ].map((benefit, index) => (
-              <Card key={index} className="bg-zinc-900/40 border border-white/10 hover:border-green-500/50 transition-all group">
-                <CardContent className="p-7">
-                  <div className="text-green-400 mb-4 group-hover:scale-110 transition-transform">{benefit.icon}</div>
-                  <h3 className="text-lg font-black text-white mb-2 tracking-tight">{benefit.title}</h3>
-                  <p className="text-white/50 font-semibold text-sm">{benefit.description}</p>
+              { step: "1", title: "Cadastre-se", description: "Crie sua conta com nome, email, WhatsApp e senha" },
+              { step: "2", title: "Faça o pagamento", description: "Pague R$997/ano via InfinitePay" },
+              { step: "3", title: "Descreva seu produto", description: "Conte-nos sobre seu curso ou serviço" },
+              { step: "4", title: "Receba em 24h", description: "Sua área de membros pronta para usar" }
+            ].map((item, index) => (
+              <div key={index} className="relative">
+                <Card className="bg-zinc-900 border border-zinc-800 hover:border-[#00D26A]/50 transition-all h-full">
+                  <CardContent className="p-6">
+                    <div className="w-12 h-12 bg-[#00D26A] text-zinc-950 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                      {item.step}
+                    </div>
+                    <h3 className="text-white font-bold mb-2">{item.title}</h3>
+                    <p className="text-zinc-400 text-sm">{item.description}</p>
+                  </CardContent>
+                </Card>
+                {index < 3 && (
+                  <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10">
+                    <ArrowRight className="w-6 h-6 text-[#00D26A]" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="py-20 bg-zinc-900/50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Tudo <span className="text-[#00D26A]">incluso</span> no seu plano
+          </h2>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { icon: <Zap className="w-6 h-6" />, title: "Receba em 8 Segundos", description: "Com Infinit Nitro, seu dinheiro cai na conta instantaneamente." },
+              { icon: <Star className="w-6 h-6" />, title: "Zero Taxas por Venda", description: "Venda R$1.000 ou R$1.000.000 — você recebe 100%." },
+              { icon: <Palette className="w-6 h-6" />, title: "Criamos Seu Site", description: "Página de vendas profissional completa em até 24 horas." },
+              { icon: <Users className="w-6 h-6" />, title: "Área de Membros", description: "Sistema completo com login, dashboard e módulos." },
+              { icon: <BarChart3 className="w-6 h-6" />, title: "Facebook Pixel", description: "Configure seu pixel e rastreie todas as conversões." },
+              { icon: <Shield className="w-6 h-6" />, title: "100% Automatizado", description: "Pagamento libera acesso instantâneo. Zero trabalho manual." }
+            ].map((feature, index) => (
+              <Card key={index} className="bg-zinc-900 border border-zinc-800 hover:border-[#00D26A]/50 transition-all">
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 bg-[#00D26A]/10 rounded-xl flex items-center justify-center mb-4 text-[#00D26A]">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-white font-bold mb-2">{feature.title}</h3>
+                  <p className="text-zinc-400 text-sm">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -338,77 +396,63 @@ const Index = () => {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-24 px-4 bg-gradient-to-b from-black to-zinc-950">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-black text-center mb-16 tracking-tighter uppercase">
-            COMO <span className="text-green-400">FUNCIONA</span>
-          </h2>
-
-          <div className="space-y-6">
-            {[
-              { step: "1", title: "CRIE SUA CONTA INFINITEPAY", description: "Conta bancária digital para receber pagamentos instantâneos." },
-              { step: "2", title: "FAÇA O PAGAMENTO", description: "Assine o plano anual de R$997 e desbloqueie todas as funcionalidades." },
-              { step: "3", title: "PREENCHA O FORMULÁRIO", description: "Descreva seu produto, público-alvo e informações para criarmos sua página." },
-              { step: "4", title: "ADICIONE SEU CONTEÚDO", description: "Em 24h sua área estará pronta. Basta adicionar suas aulas e vídeos." }
-            ].map((item, index) => (
-              <div key={index} className="flex gap-6 items-start group">
-                <div className="w-14 h-14 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl font-black text-black">{item.step}</span>
+      {/* InfinitePay Requirement */}
+      <section className="py-16 bg-zinc-950">
+        <div className="max-w-4xl mx-auto px-4">
+          <Card className="bg-gradient-to-r from-[#00D26A]/10 to-transparent border border-[#00D26A]/30">
+            <CardContent className="p-8 md:p-10">
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="w-20 h-20 bg-[#00D26A] rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <CreditCard className="w-10 h-10 text-zinc-950" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-white mb-1 tracking-tight">{item.title}</h3>
-                  <p className="text-white/50 text-base font-semibold">{item.description}</p>
+                  <h3 className="text-2xl font-bold text-white mb-3">
+                    Você precisa ter uma conta InfinitePay
+                  </h3>
+                  <p className="text-zinc-400 mb-4">
+                    Nossa área de membros se integra diretamente com a InfinitePay.
+                    Ao vender, o dinheiro cai direto na sua conta — sem intermediários.
+                  </p>
+                  <div className="flex flex-wrap gap-4">
+                    <div className="flex items-center gap-2 text-[#00D26A]">
+                      <Clock className="w-4 h-4" />
+                      <span className="text-sm font-medium">Infinit Nitro: 8 segundos</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[#00D26A]">
+                      <Shield className="w-4 h-4" />
+                      <span className="text-sm font-medium">100% Seguro</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* InfinitePay Requirement */}
-      <section className="py-16 px-4 bg-gradient-to-r from-green-900/30 to-emerald-900/20 border-y-2 border-green-500/40">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="w-14 h-14 bg-[#00D26A] rounded-xl flex items-center justify-center">
-              <CreditCard className="w-7 h-7 text-black" />
-            </div>
-            <span className="text-2xl font-black text-[#00D26A]">InfinitePay</span>
-            <span className="bg-yellow-400 text-black px-4 py-1.5 rounded-full text-sm font-black uppercase">Nitro</span>
-          </div>
-          <h3 className="text-2xl md:text-4xl font-black mb-4 tracking-tight">
-            RECEBIMENTO EM ATÉ <span className="text-yellow-400">8 SEGUNDOS</span>
-          </h3>
-          <p className="text-white/60 text-lg font-semibold max-w-2xl mx-auto">
-            Você precisa ter uma conta InfinitePay para receber seus pagamentos. 
-            Integração direta, sem intermediários.
-          </p>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
       {/* Active Products */}
-      <section className="py-24 px-4 bg-black">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-black text-center mb-4 tracking-tighter uppercase">
-            PRODUTOS <span className="text-green-400">ATIVOS</span>
+      <section className="py-20 bg-zinc-900/50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+            Produtos <span className="text-[#00D26A]">ativos</span> em nossa plataforma
           </h2>
-          <p className="text-white/50 text-center mb-12 font-semibold text-lg">
-            Exemplos funcionando em nossa plataforma
+          <p className="text-zinc-400 text-center mb-10">
+            Veja exemplos reais funcionando agora mesmo
           </p>
 
-          <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6">
             {activeProducts.map((product, index) => (
-              <Link key={index} to={product.link}>
-                <Card className="bg-zinc-900/50 border border-white/10 hover:border-green-500/50 transition-all cursor-pointer group">
+              <Link key={index} to={product.link} className="group">
+                <Card className="bg-zinc-900 border border-zinc-800 hover:border-[#00D26A]/50 transition-all hover:scale-105">
                   <CardContent className="p-6 flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-black text-white group-hover:text-green-400 transition-colors tracking-tight">
+                      <h3 className="text-white font-bold text-lg group-hover:text-[#00D26A] transition-colors">
                         {product.name}
                       </h3>
-                      <p className="text-white/50 font-semibold text-sm">{product.description}</p>
-                      <p className="text-green-400 font-black mt-2">{product.price}</p>
+                      <p className="text-zinc-500 text-sm">{product.description}</p>
+                      <p className="text-[#00D26A] font-bold mt-2">{product.price}</p>
                     </div>
-                    <ChevronRight className="w-6 h-6 text-white/30 group-hover:text-green-400 group-hover:translate-x-1 transition-all" />
+                    <ChevronRight className="w-6 h-6 text-zinc-600 group-hover:text-[#00D26A] group-hover:translate-x-1 transition-all" />
                   </CardContent>
                 </Card>
               </Link>
@@ -418,54 +462,81 @@ const Index = () => {
       </section>
 
       {/* Final CTA */}
-      <section className="py-24 px-4 bg-gradient-to-t from-green-950/40 to-black">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter uppercase">
-            COMECE A <span className="text-green-400">VENDER HOJE</span>
-          </h2>
-          <p className="text-lg text-white/60 mb-10 font-semibold">
-            Sistema completo • Automação total • Receba na hora
-          </p>
-          
-          <div className="mb-10">
-            <div className="flex items-center justify-center gap-4 mb-2">
-              <span className="text-xl text-white/40 line-through font-bold">R$ 2.000</span>
-            </div>
-            <div className="flex items-baseline justify-center gap-1">
-              <span className="text-green-400 text-3xl font-black">R$</span>
-              <span className="text-7xl md:text-8xl font-black text-white tracking-tighter">997</span>
-              <span className="text-white/50 text-lg font-bold">/ano</span>
-            </div>
-          </div>
+      <section className="py-20 bg-zinc-950">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Card className="bg-gradient-to-b from-[#00D26A]/10 to-transparent border border-[#00D26A]/20">
+            <CardContent className="p-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Pronto para <span className="text-[#00D26A]">faturar sem taxas</span>?
+              </h2>
+              <p className="text-zinc-400 text-lg mb-8 max-w-2xl mx-auto">
+                Nós criamos sua página de vendas e área de membros completa.
+                Você só adiciona seu conteúdo e começa a vender.
+              </p>
 
-          <div className="flex flex-wrap justify-center gap-3 mb-10">
-            {["Vendas ilimitadas", "0% taxa de venda", "0% taxa de saque", "100% do lucro"].map((item, index) => (
-              <div key={index} className="flex items-center gap-2 bg-green-500/10 px-5 py-2.5 rounded-full border border-green-500/40">
-                <Check className="w-5 h-5 text-green-400" />
-                <span className="text-white font-black text-sm uppercase tracking-wide">{item}</span>
+              <div className="mb-8">
+                <div className="flex items-center justify-center gap-4 mb-2">
+                  <span className="text-lg text-zinc-500 line-through">R$ 2.000</span>
+                </div>
+                <div className="flex items-baseline justify-center gap-2">
+                  <span className="text-[#00D26A] text-2xl font-bold">R$</span>
+                  <span className="text-6xl font-bold text-white">997</span>
+                  <span className="text-zinc-500 text-lg">/ano</span>
+                </div>
               </div>
-            ))}
-          </div>
 
-          <a href={paymentLink} target="_blank" rel="noopener noreferrer">
-            <Button 
-              size="lg" 
-              className="bg-green-500 hover:bg-green-400 text-black font-black text-xl px-16 py-8 rounded-2xl shadow-2xl shadow-green-500/40 transform hover:scale-105 transition-all duration-300 uppercase tracking-wide"
-            >
-              QUERO MINHA ÁREA DE MEMBROS
-              <ArrowRight className="ml-3 w-6 h-6" />
-            </Button>
-          </a>
+              <Button 
+                onClick={() => navigate('/cliente/auth')}
+                size="lg" 
+                className="bg-[#00D26A] hover:bg-[#00D26A]/90 text-zinc-950 px-12 py-6 text-xl font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-[0_0_60px_rgba(0,210,106,0.4)]"
+              >
+                <Zap className="w-6 h-6 mr-2" />
+                Criar Minha Área de Membros
+                <ArrowRight className="w-6 h-6 ml-2" />
+              </Button>
+
+              <div className="flex flex-wrap justify-center gap-6 mt-8 text-zinc-400 text-sm">
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-[#00D26A]" />
+                  <span>Site de vendas incluso</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-[#00D26A]" />
+                  <span>Pronto em 24h</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-[#00D26A]" />
+                  <span>Suporte incluído</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 bg-black border-t border-white/10">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-2xl font-black mb-4 tracking-tight">acessar<span className="text-green-400">.click</span></p>
-          <p className="text-white/40 font-semibold text-sm">
-            © 2024 Acessar.click — Todos os direitos reservados
-          </p>
+      <footer className="py-8 bg-zinc-950 border-t border-zinc-900">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-[#00D26A] rounded-lg flex items-center justify-center">
+                <Zap className="w-4 h-4 text-zinc-950" />
+              </div>
+              <span className="text-lg font-bold text-white">
+                acessar<span className="text-[#00D26A]">.</span>click
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-zinc-500 text-sm">
+              <span>Pagamentos via</span>
+              <div className="flex items-center gap-1 text-[#00D26A] font-semibold">
+                <CreditCard className="w-4 h-4" />
+                InfinitePay
+              </div>
+            </div>
+            <p className="text-zinc-500 text-sm">
+              © 2024 acessar.click — Todos os direitos reservados
+            </p>
+          </div>
         </div>
       </footer>
     </div>

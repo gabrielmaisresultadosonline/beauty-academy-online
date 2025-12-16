@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
+import PlatformAuth from "./pages/PlatformAuth";
+import ClientDashboard from "./pages/ClientDashboard";
+import ClientObrigado from "./pages/ClientObrigado";
 import BelezaLisoPerfeito from "./pages/BelezaLisoPerfeito";
 import BelezaLogin from "./pages/BelezaLogin";
 import BelezaDashboard from "./pages/BelezaDashboard";
@@ -30,6 +33,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/cliente/auth" element={<PlatformAuth />} />
+            <Route path="/cliente/dashboard" element={<ClientDashboard />} />
+            <Route path="/cliente/obrigado" element={<ClientObrigado />} />
             <Route path="/belezalisoperfeito" element={<BelezaLisoPerfeito />} />
             <Route path="/belezalisoperfeito/login" element={<BelezaLogin />} />
             <Route path="/belezalisoperfeito/dashboard" element={<BelezaDashboard />} />
