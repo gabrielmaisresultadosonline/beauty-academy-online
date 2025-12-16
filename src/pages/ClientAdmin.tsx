@@ -722,14 +722,14 @@ const ClientAdmin = () => {
                         <div className="flex gap-2">
                           <Input
                             readOnly
-                            value={`${settings.infinitepay_link}?items=[{"name":"Acessar.Click+Mensal","price":24700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado?plan=trial`}
+                            value={`${settings.infinitepay_link}?items=[{"name":"Mensal","price":24700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado`}
                             className="bg-black/50 border-white/10 text-white/80 font-mono text-xs flex-1"
                           />
                           <Button
                             variant="outline"
                             size="icon"
                             onClick={() => {
-                              navigator.clipboard.writeText(`${settings.infinitepay_link}?items=[{"name":"Acessar.Click+Mensal","price":24700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado?plan=trial`);
+                              navigator.clipboard.writeText(`${settings.infinitepay_link}?items=[{"name":"Mensal","price":24700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado`);
                               toast.success("Link copiado!");
                             }}
                             className="border-green-500/50 text-green-400 hover:bg-green-500/20"
@@ -744,14 +744,14 @@ const ClientAdmin = () => {
                         <div className="flex gap-2">
                           <Input
                             readOnly
-                            value={`${settings.infinitepay_link}?items=[{"name":"Acessar.Click+Anual","price":79700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado?plan=annual`}
+                            value={`${settings.infinitepay_link}?items=[{"name":"Anual","price":79700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado`}
                             className="bg-black/50 border-white/10 text-white/80 font-mono text-xs flex-1"
                           />
                           <Button
                             variant="outline"
                             size="icon"
                             onClick={() => {
-                              navigator.clipboard.writeText(`${settings.infinitepay_link}?items=[{"name":"Acessar.Click+Anual","price":79700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado?plan=annual`);
+                              navigator.clipboard.writeText(`${settings.infinitepay_link}?items=[{"name":"Anual","price":79700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado`);
                               toast.success("Link copiado!");
                             }}
                             className="border-green-500/50 text-green-400 hover:bg-green-500/20"
@@ -760,6 +760,10 @@ const ClientAdmin = () => {
                           </Button>
                         </div>
                       </div>
+
+                      <p className="text-white/50 text-xs mt-2">
+                        URL única de obrigado: <code className="bg-black/30 px-1 rounded">/cliente/obrigado</code> - O sistema identifica o plano pelo valor pago.
+                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -796,53 +800,37 @@ const ClientAdmin = () => {
                 </CardContent>
               </Card>
 
-              {/* URLs Fixas */}
+              {/* URL Única */}
               <Card className="bg-zinc-900 border-white/10">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <Link2 className="w-5 h-5 text-green-400" />
-                    URLs de Obrigado (apenas para referência)
+                    URL de Obrigado (única)
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-white/70 text-sm">Mensal</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        readOnly
-                        value={`${window.location.origin}/cliente/obrigado?plan=trial`}
-                        className="bg-black/50 border-white/10 text-white/60 font-mono text-sm"
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          navigator.clipboard.writeText(`${window.location.origin}/cliente/obrigado?plan=trial`);
-                          toast.success("URL copiada!");
-                        }}
-                        className="border-white/20 text-white/60 hover:bg-white/10"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                    </div>
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-4">
+                    <p className="text-green-200 text-sm">
+                      O sistema identifica <strong>automaticamente</strong> o plano do cliente internamente. Use apenas esta URL única em todas as configurações.
+                    </p>
                   </div>
-
+                  
                   <div className="space-y-2">
-                    <Label className="text-white/70 text-sm">Anual</Label>
+                    <Label className="text-white">URL Única de Obrigado</Label>
                     <div className="flex gap-2">
                       <Input
                         readOnly
-                        value={`${window.location.origin}/cliente/obrigado?plan=annual`}
-                        className="bg-black/50 border-white/10 text-white/60 font-mono text-sm"
+                        value={`${window.location.origin}/cliente/obrigado`}
+                        className="bg-black/50 border-white/10 text-white font-mono text-sm"
                       />
                       <Button
                         variant="outline"
                         size="icon"
                         onClick={() => {
-                          navigator.clipboard.writeText(`${window.location.origin}/cliente/obrigado?plan=annual`);
+                          navigator.clipboard.writeText(`${window.location.origin}/cliente/obrigado`);
                           toast.success("URL copiada!");
                         }}
-                        className="border-white/20 text-white/60 hover:bg-white/10"
+                        className="border-green-500/50 text-green-400 hover:bg-green-500/20"
                       >
                         <Copy className="w-4 h-4" />
                       </Button>

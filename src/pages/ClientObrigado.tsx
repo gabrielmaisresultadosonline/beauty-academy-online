@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,8 +11,9 @@ const ClientObrigado = () => {
   const [loading, setLoading] = useState(true);
   const [activated, setActivated] = useState(false);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const planType = searchParams.get('plan') || 'trial';
+  
+  // Detecta o plano do localStorage ou do perfil pendente
+  const [planType, setPlanType] = useState<string>('trial');
 
   useEffect(() => {
     const activatePayment = async () => {
@@ -25,18 +26,26 @@ const ClientObrigado = () => {
           return;
         }
 
+        // Busca o plano do localStorage (setado na página de preços)
+        const storedPlan = localStorage.getItem('pending_plan_type');
+        const detectedPlan = storedPlan || 'trial';
+        setPlanType(detectedPlan);
+        
+        // Limpa o localStorage após usar
+        localStorage.removeItem('pending_plan_type');
+
         const now = new Date();
         let updateData: any = {
           is_paid: true,
           paid_at: now.toISOString(),
-          plan_type: planType,
+          plan_type: detectedPlan,
           site_blocked: false
         };
 
-        if (planType === 'trial') {
+        if (detectedPlan === 'trial') {
           updateData.plan_amount = 247;
           updateData.trial_ends_at = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
-        } else if (planType === 'annual') {
+        } else if (detectedPlan === 'annual') {
           updateData.plan_amount = 797;
           updateData.subscription_ends_at = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
         }
@@ -60,7 +69,7 @@ const ClientObrigado = () => {
     };
 
     activatePayment();
-  }, [navigate, planType]);
+  }, [navigate]);
 
   if (loading) {
     return (

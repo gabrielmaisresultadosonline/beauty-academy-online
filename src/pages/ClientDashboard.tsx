@@ -155,16 +155,22 @@ const ClientDashboard = () => {
   const handleTrialPayment = () => {
     if (!clientData) return;
     
+    // Salva o plano no localStorage para identificação na página de obrigado
+    localStorage.setItem('pending_plan_type', 'trial');
+    
     // TESTE: R$1 (100 centavos) - Valor oficial: 24700 (R$247)
-    const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%2030%20DIAS%20-%20${encodeURIComponent(clientData.full_name)}","price":100,"quantity":1}]&redirect_url=${encodeURIComponent(`${window.location.origin}/cliente/obrigado?plan=trial`)}`;
+    const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%2030%20DIAS%20-%20${encodeURIComponent(clientData.full_name)}","price":100,"quantity":1}]&redirect_url=${encodeURIComponent(`${window.location.origin}/cliente/obrigado`)}`;
     window.open(paymentLink, '_blank');
   };
 
   const handleAnnualPayment = () => {
     if (!clientData) return;
     
+    // Salva o plano no localStorage para identificação na página de obrigado
+    localStorage.setItem('pending_plan_type', 'annual');
+    
     // TESTE: R$2 (200 centavos) - Valor oficial: 79700 (R$797)
-    const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%20ANUAL%20-%20${encodeURIComponent(clientData.full_name)}","price":200,"quantity":1}]&redirect_url=${encodeURIComponent(`${window.location.origin}/cliente/obrigado?plan=annual`)}`;
+    const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%20ANUAL%20-%20${encodeURIComponent(clientData.full_name)}","price":200,"quantity":1}]&redirect_url=${encodeURIComponent(`${window.location.origin}/cliente/obrigado`)}`;
     window.open(paymentLink, '_blank');
   };
 
