@@ -514,12 +514,15 @@ const Index = () => {
       {/* Final CTA */}
       <section className="py-20 sm:py-24 bg-zinc-950">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <Card className="bg-gradient-to-b from-[#00D26A]/10 to-transparent border border-[#00D26A]/20">
-            <CardContent className="p-8 sm:p-12">
+          <Card className="bg-zinc-900 border border-[#00D26A]/30 relative overflow-hidden">
+            {/* Background glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#00D26A]/5 to-transparent pointer-events-none" />
+            
+            <CardContent className="p-8 sm:p-12 relative z-10">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 tracking-tight">
                 Pronto para <span className="text-[#00D26A]">faturar sem taxas</span>?
               </h2>
-              <p className="text-zinc-500 text-base sm:text-lg mb-8 max-w-2xl mx-auto font-medium">
+              <p className="text-zinc-400 text-base sm:text-lg mb-8 max-w-2xl mx-auto font-medium">
                 Nós criamos sua página de vendas e área de membros completa.
                 Você só adiciona seu conteúdo e começa a vender.
               </p>
@@ -545,7 +548,7 @@ const Index = () => {
                 <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
 
-              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-8 text-zinc-500 text-sm font-medium">
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-8 text-zinc-400 text-sm font-medium">
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-[#00D26A]" />
                   <span>Site de vendas incluso</span>
