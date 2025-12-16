@@ -24,6 +24,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import infinitepayLogo from "@/assets/infinitepay-logo.png";
 import logosIntegracao from "@/assets/logos-integracao.png";
+import dashboardPreview from "@/assets/dashboard-preview.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -159,6 +160,68 @@ const Index = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* Dashboard Preview Section */}
+      <section className="py-16 sm:py-20 bg-zinc-950">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-[#00D26A]/10 border border-[#00D26A]/40 px-4 py-2 mb-6">
+              <BarChart3 className="w-5 h-5 text-[#00D26A]" />
+              <span className="text-[#00D26A] font-bold text-sm tracking-wide uppercase">Sua Dashboard Completa</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 tracking-tight">
+              Tudo que você precisa para <span className="text-[#00D26A]">gerenciar</span>
+            </h2>
+            <p className="text-zinc-400 text-lg max-w-3xl mx-auto font-medium">
+              Pagamentos aprovados, cadastros, controle de conteúdo, módulos e lista de alunos com tracker perfeito para sua performance. Além de toda página de venda pronta e completa!
+            </p>
+          </div>
+
+          {/* Dashboard Image */}
+          <div className="relative max-w-4xl mx-auto">
+            <div className="absolute -inset-4 bg-gradient-to-r from-[#00D26A]/20 via-[#00D26A]/10 to-[#00D26A]/20 blur-2xl opacity-50" />
+            <div className="relative bg-zinc-900 border-2 border-zinc-800 rounded-lg overflow-hidden shadow-2xl">
+              <img 
+                src={dashboardPreview} 
+                alt="Dashboard de vendas com controle de alunos, módulos e pagamentos" 
+                className="w-full h-auto"
+              />
+            </div>
+          </div>
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10 max-w-4xl mx-auto">
+            <div className="bg-zinc-900 border border-zinc-800 p-4 text-center">
+              <div className="w-10 h-10 bg-[#00D26A]/20 flex items-center justify-center mx-auto mb-3">
+                <CreditCard className="w-5 h-5 text-[#00D26A]" />
+              </div>
+              <h4 className="text-white font-bold text-sm">Pagamentos Aprovados</h4>
+              <p className="text-zinc-500 text-xs mt-1">Acompanhe em tempo real</p>
+            </div>
+            <div className="bg-zinc-900 border border-zinc-800 p-4 text-center">
+              <div className="w-10 h-10 bg-[#00D26A]/20 flex items-center justify-center mx-auto mb-3">
+                <Users className="w-5 h-5 text-[#00D26A]" />
+              </div>
+              <h4 className="text-white font-bold text-sm">Lista de Alunos</h4>
+              <p className="text-zinc-500 text-xs mt-1">Gerencie seus membros</p>
+            </div>
+            <div className="bg-zinc-900 border border-zinc-800 p-4 text-center">
+              <div className="w-10 h-10 bg-[#00D26A]/20 flex items-center justify-center mx-auto mb-3">
+                <Play className="w-5 h-5 text-[#00D26A]" />
+              </div>
+              <h4 className="text-white font-bold text-sm">Módulos e Aulas</h4>
+              <p className="text-zinc-500 text-xs mt-1">Organize seu conteúdo</p>
+            </div>
+            <div className="bg-zinc-900 border border-zinc-800 p-4 text-center">
+              <div className="w-10 h-10 bg-[#00D26A]/20 flex items-center justify-center mx-auto mb-3">
+                <Palette className="w-5 h-5 text-[#00D26A]" />
+              </div>
+              <h4 className="text-white font-bold text-sm">Página de Vendas</h4>
+              <p className="text-zinc-500 text-xs mt-1">Pronta e otimizada</p>
+            </div>
+          </div>
         </div>
       </section>
 
