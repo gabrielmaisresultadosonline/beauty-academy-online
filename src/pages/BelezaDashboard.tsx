@@ -356,30 +356,36 @@ export default function BelezaDashboard() {
         ) : (
           // Modules View
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
               Bem-vinda ao Curso, {profile?.full_name?.split(' ')[0]}! 🎉
             </h1>
-            <p className="text-gray-600 mb-8">{user?.email}</p>
+            <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">{user?.email}</p>
 
             {/* Banner - Novos conteúdos */}
-            <div className="bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-200 rounded-2xl p-4 mb-8 flex items-center gap-4">
-              <div className="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-6 h-6 text-amber-600" />
+            <div className="bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-200 rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-6 sm:mb-8 flex items-center gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-200 rounded-full flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
               </div>
               <div>
-                <h3 className="font-bold text-amber-800">Estamos incluindo novos conteúdos</h3>
-                <p className="text-sm text-amber-700">Aguarde por favor, em breve teremos mais módulos e aulas!</p>
+                <h3 className="font-bold text-amber-800 text-sm sm:text-base">Estamos incluindo novos conteúdos</h3>
+                <p className="text-xs sm:text-sm text-amber-700">Aguarde por favor, em breve teremos mais módulos e aulas!</p>
               </div>
             </div>
 
             {/* Main content grid - Module + Certificate side by side */}
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              {/* Module Card */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
+              {/* Module Card - Highlighted */}
               {modules.length > 0 && (
                 <div
                   onClick={() => setSelectedModule(modules[0].id)}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow group"
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-all group border-4 border-pink-400 hover:border-pink-500 relative"
                 >
+                  {/* Play Badge */}
+                  <div className="absolute top-3 right-3 z-10 bg-pink-500 text-white px-3 py-1.5 rounded-full flex items-center gap-1.5 text-sm font-bold shadow-lg">
+                    <Play className="w-4 h-4 fill-white" />
+                    <span className="hidden sm:inline">Assistir</span>
+                  </div>
+                  
                   <div className="aspect-video bg-gradient-to-br from-pink-200 to-rose-300 relative">
                     {modules[0].cover_url && (
                       <img
@@ -388,33 +394,39 @@ export default function BelezaDashboard() {
                         className="w-full h-full object-cover"
                       />
                     )}
-                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Play className="w-12 h-12 text-white" />
+                    {/* Always visible play overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-center justify-center">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/90 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+                        <Play className="w-8 h-8 sm:w-10 sm:h-10 text-pink-500 fill-pink-500 ml-1" />
+                      </div>
                     </div>
                   </div>
-                  <div className="p-5">
-                    <h3 className="font-bold text-gray-900 text-lg">{modules[0].title}</h3>
+                  <div className="p-4 sm:p-5 bg-gradient-to-r from-pink-50 to-rose-50">
+                    <h3 className="font-bold text-gray-900 text-base sm:text-lg">{modules[0].title}</h3>
                     {modules[0].description && (
-                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">{modules[0].description}</p>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{modules[0].description}</p>
                     )}
-                    <p className="text-sm text-pink-600 mt-2 font-medium">
-                      {lessons.filter(l => l.module_id === modules[0].id).length} aulas
-                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Play className="w-4 h-4 text-pink-500" />
+                      <p className="text-sm text-pink-600 font-bold">
+                        {lessons.filter(l => l.module_id === modules[0].id).length} aulas disponíveis
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
 
               {/* Certificate Card - Big */}
-              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-br from-pink-400 to-rose-500 p-6 text-center">
-                  <Award className="w-16 h-16 text-white mx-auto mb-2" />
-                  <h3 className="text-xl font-bold text-white">Certificado</h3>
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                <div className="bg-gradient-to-br from-pink-400 to-rose-500 p-4 sm:p-6 text-center">
+                  <Award className="w-12 h-12 sm:w-16 sm:h-16 text-white mx-auto mb-2" />
+                  <h3 className="text-lg sm:text-xl font-bold text-white">Certificado</h3>
                 </div>
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   {enrollment?.certificate_issued_at ? (
                     <div className="text-center">
-                      <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                      <h3 className="font-bold text-green-700 text-lg mb-1">Certificado Emitido!</h3>
+                      <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 text-green-500 mx-auto mb-3" />
+                      <h3 className="font-bold text-green-700 text-base sm:text-lg mb-1">Certificado Emitido!</h3>
                       <p className="text-sm text-green-600 mb-4">
                         Emitido em {new Date(enrollment.certificate_issued_at).toLocaleDateString('pt-BR')}
                       </p>
@@ -423,26 +435,29 @@ export default function BelezaDashboard() {
                           href={enrollment.certificate_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full"
+                          className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base"
                         >
-                          <Award className="w-5 h-5" />
+                          <Award className="w-4 h-4 sm:w-5 sm:h-5" />
                           Baixar Certificado
                         </a>
                       )}
                     </div>
                   ) : enrollment?.certificate_photo_url ? (
                     <div className="text-center">
-                      <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-amber-300 mx-auto mb-4">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 border-green-400 mx-auto mb-4">
                         <img 
                           src={enrollment.certificate_photo_url} 
                           alt="Sua foto" 
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <h3 className="font-bold text-amber-700 text-lg mb-1">Foto enviada!</h3>
-                      <p className="text-sm text-amber-600 mb-4">Aguardando emissão do certificado</p>
-                      <label className="inline-flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 cursor-pointer border border-amber-300 px-4 py-2 rounded-full hover:bg-amber-50 transition-colors">
-                        <Camera className="w-4 h-4" />
+                      <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
+                        <CheckCircle2 className="w-8 h-8 text-green-500 mx-auto mb-2" />
+                        <h3 className="font-bold text-green-700 text-base sm:text-lg mb-1">Foto carregada!</h3>
+                        <p className="text-sm text-green-600">Em no máximo 8 dias vamos entregar seu certificado</p>
+                      </div>
+                      <label className="inline-flex items-center gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-700 cursor-pointer border border-gray-200 px-3 sm:px-4 py-2 rounded-full hover:bg-gray-50 transition-colors">
+                        <Camera className="w-3 h-3 sm:w-4 sm:h-4" />
                         Trocar foto
                         <input
                           type="file"
@@ -455,20 +470,20 @@ export default function BelezaDashboard() {
                     </div>
                   ) : (
                     <div className="text-center">
-                      <Camera className="w-12 h-12 text-pink-400 mx-auto mb-3" />
-                      <p className="text-gray-700 mb-4 font-medium">
+                      <Camera className="w-10 h-10 sm:w-12 sm:h-12 text-pink-400 mx-auto mb-3" />
+                      <p className="text-sm sm:text-base text-gray-700 mb-4 font-medium px-2">
                         Envie uma foto sua para emitirmos o certificado
                       </p>
-                      <label className="inline-flex items-center gap-3 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-lg px-8 py-4 rounded-full cursor-pointer shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                      <label className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 rounded-full cursor-pointer shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
                         {uploadingPhoto ? (
                           <>
-                            <Loader2 className="w-6 h-6 animate-spin" />
-                            Enviando...
+                            <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
+                            <span className="text-sm sm:text-base">Enviando...</span>
                           </>
                         ) : (
                           <>
-                            <Upload className="w-6 h-6" />
-                            Enviar Foto
+                            <Upload className="w-5 h-5 sm:w-6 sm:h-6" />
+                            <span>Enviar Foto</span>
                           </>
                         )}
                         <input
@@ -487,15 +502,20 @@ export default function BelezaDashboard() {
 
             {/* Additional modules */}
             {modules.length > 1 && (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {modules.slice(1).map((module) => {
                   const lessonCount = lessons.filter(l => l.module_id === module.id).length;
                   return (
                     <div
                       key={module.id}
                       onClick={() => setSelectedModule(module.id)}
-                      className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow group"
+                      className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-all group border-2 border-pink-200 hover:border-pink-400 relative"
                     >
+                      {/* Play Badge */}
+                      <div className="absolute top-2 right-2 z-10 bg-pink-500/90 text-white px-2 py-1 rounded-full flex items-center gap-1 text-xs font-bold">
+                        <Play className="w-3 h-3 fill-white" />
+                      </div>
+                      
                       <div className="aspect-video bg-gradient-to-br from-pink-200 to-rose-300 relative">
                         {module.cover_url && (
                           <img
@@ -504,16 +524,21 @@ export default function BelezaDashboard() {
                             className="w-full h-full object-cover"
                           />
                         )}
-                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Play className="w-12 h-12 text-white" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-center justify-center">
+                          <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/90 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                            <Play className="w-6 h-6 sm:w-7 sm:h-7 text-pink-500 fill-pink-500 ml-0.5" />
+                          </div>
                         </div>
                       </div>
-                      <div className="p-4">
-                        <h3 className="font-bold text-gray-900">{module.title}</h3>
+                      <div className="p-3 sm:p-4 bg-gradient-to-r from-pink-50 to-rose-50">
+                        <h3 className="font-bold text-gray-900 text-sm sm:text-base">{module.title}</h3>
                         {module.description && (
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{module.description}</p>
+                          <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{module.description}</p>
                         )}
-                        <p className="text-xs text-pink-600 mt-2">{lessonCount} aulas</p>
+                        <div className="flex items-center gap-1 mt-2">
+                          <Play className="w-3 h-3 text-pink-500" />
+                          <p className="text-xs sm:text-sm text-pink-600 font-medium">{lessonCount} aulas</p>
+                        </div>
                       </div>
                     </div>
                   );
