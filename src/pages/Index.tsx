@@ -427,6 +427,39 @@ const Index = () => {
                     Nossa área de membros se integra diretamente com a InfinitePay.
                     Ao vender, o dinheiro cai direto na sua conta — sem intermediários.
                   </p>
+                  
+                  {/* Recebimento na hora */}
+                  <div className="bg-zinc-50 rounded-xl p-4 mb-4">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-[#00D26A] rounded-full p-2 mt-0.5">
+                        <Zap className="w-5 h-5 text-zinc-900" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-zinc-900 text-lg">Recebimento na hora</h4>
+                        <p className="text-zinc-600 text-sm">
+                          Receba em <span className="font-bold text-[#00D26A]">PIX</span> ou <span className="font-bold text-[#00D26A]">Cartão de Crédito</span> instantaneamente. 
+                          Sem esperar 1 semana ou 15 dias — <span className="font-bold">receba na hora</span> todas as vendas feitas.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Reembolso */}
+                  <div className="bg-zinc-50 rounded-xl p-4 mb-4">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-zinc-200 rounded-full p-2 mt-0.5">
+                        <Shield className="w-5 h-5 text-zinc-700" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-zinc-900 text-lg">Como funciona o reembolso?</h4>
+                        <p className="text-zinc-600 text-sm">
+                          Você recebe o ticket de reembolso em sua área administrativa. 
+                          <span className="font-bold"> Você controla o seu reembolso</span> — total autonomia sobre suas vendas.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="flex flex-wrap gap-4">
                     <div className="flex items-center gap-2 bg-[#00D26A] px-4 py-2 rounded-full">
                       <Zap className="w-4 h-4 text-zinc-900" />
