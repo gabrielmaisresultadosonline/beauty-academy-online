@@ -20,6 +20,9 @@ import SpotMusicLogin from "./pages/SpotMusicLogin";
 import SpotMusicDashboard from "./pages/SpotMusicDashboard";
 import SpotMusicAdmin from "./pages/SpotMusicAdmin";
 import SpotMusicObrigado from "./pages/SpotMusicObrigado";
+import DemoLogin from "./pages/DemoLogin";
+import DemoAdmin from "./pages/DemoAdmin";
+import DemoMembro from "./pages/DemoMembro";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +51,9 @@ const App = () => (
             <Route path="/comunidademusica/dashboard" element={<SpotMusicDashboard />} />
             <Route path="/comunidademusica/admin" element={<SpotMusicAdmin />} />
             <Route path="/comunidademusica/obrigado" element={<SpotMusicObrigado />} />
+            <Route path="/demonstracao" element={<DemoLogin />} />
+            <Route path="/demonstracao/admin" element={<DemoAdmin />} />
+            <Route path="/demonstracao/membro" element={<DemoMembro />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
