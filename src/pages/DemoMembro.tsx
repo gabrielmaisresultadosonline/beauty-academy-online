@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
 import { 
-  ArrowLeft, Play, Clock, CheckCircle, Lock, 
-  ChevronDown, ChevronUp, Settings
+  ArrowLeft, Play, Clock, Settings, X,
+  ChevronDown, ChevronUp, Bell, CheckCircle
 } from "lucide-react";
 
 interface DemoModule {
@@ -29,6 +28,14 @@ interface DemoSettings {
   logoUrl: string;
 }
 
+interface DemoNotice {
+  id: string;
+  title: string;
+  message: string;
+  type: "once" | "always" | "per_access";
+  active: boolean;
+}
+
 const DemoMembro = () => {
   const navigate = useNavigate();
   const [modules, setModules] = useState<DemoModule[]>([]);
@@ -37,9 +44,12 @@ const DemoMembro = () => {
     primaryColor: "#00D26A",
     logoUrl: ""
   });
+  const [notices, setNotices] = useState<DemoNotice[]>([]);
   const [selectedModule, setSelectedModule] = useState<DemoModule | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<DemoLesson | null>(null);
   const [expandedModules, setExpandedModules] = useState<string[]>([]);
+  const [dismissedNotices, setDismissedNotices] = useState<string[]>([]);
+  const [showPopupNotices, setShowPopupNotices] = useState<DemoNotice[]>([]);
 
   useEffect(() => {
     const isAuth = localStorage.getItem("demo_authenticated");
@@ -50,6 +60,8 @@ const DemoMembro = () => {
 
     const savedModules = localStorage.getItem("demo_modules");
     const savedSettings = localStorage.getItem("demo_settings");
+    const savedNotices = localStorage.getItem("demo_notices");
+    const savedDismissed = localStorage.getItem("demo_dismissed_notices");
     
     if (savedModules) {
       const parsed = JSON.parse(savedModules);
@@ -59,6 +71,28 @@ const DemoMembro = () => {
       }
     }
     if (savedSettings) setSettings(JSON.parse(savedSettings));
+    if (savedNotices) {
+      const parsedNotices: DemoNotice[] = JSON.parse(savedNotices);
+      setNotices(parsedNotices);
+      
+      // Get dismissed notices
+      const dismissed = savedDismissed ? JSON.parse(savedDismissed) : [];
+      setDismissedNotices(dismissed);
+      
+      // Determine which popup notices to show
+      const activeNotices = parsedNotices.filter(n => n.active);
+      const popupNotices = activeNotices.filter(n => {
+        if (n.type === "once") {
+          return !dismissed.includes(n.id);
+        }
+        if (n.type === "per_access") {
+          return true; // Show every time
+        }
+        return false; // "always" type is shown as banner, not popup
+      });
+      
+      setShowPopupNotices(popupNotices);
+    }
   }, [navigate]);
 
   const toggleModule = (moduleId: string) => {
@@ -78,8 +112,51 @@ const DemoMembro = () => {
     navigate("/demonstracao/admin");
   };
 
+  const handleDismissNotice = (noticeId: string, noticeType: string) => {
+    if (noticeType === "once") {
+      const newDismissed = [...dismissedNotices, noticeId];
+      setDismissedNotices(newDismissed);
+      localStorage.setItem("demo_dismissed_notices", JSON.stringify(newDismissed));
+    }
+    setShowPopupNotices(prev => prev.filter(n => n.id !== noticeId));
+  };
+
+  // Get "always" type notices for banner display
+  const alwaysNotices = notices.filter(n => n.active && n.type === "always");
+
   return (
     <div className="min-h-screen bg-zinc-950">
+      {/* Popup Notices */}
+      {showPopupNotices.length > 0 && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <Card className="bg-zinc-900 border-zinc-700 max-w-md w-full animate-scale-in">
+            <CardContent className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Bell className="w-5 h-5" style={{ color: settings.primaryColor }} />
+                  <h3 className="text-white font-bold">{showPopupNotices[0].title}</h3>
+                </div>
+                <span className={`px-2 py-0.5 rounded text-xs ${
+                  showPopupNotices[0].type === "once" ? "bg-blue-500/20 text-blue-400" :
+                  "bg-orange-500/20 text-orange-400"
+                }`}>
+                  {showPopupNotices[0].type === "once" ? "Novo" : "Lembrete"}
+                </span>
+              </div>
+              <p className="text-zinc-300 mb-6">{showPopupNotices[0].message}</p>
+              <Button 
+                onClick={() => handleDismissNotice(showPopupNotices[0].id, showPopupNotices[0].type)}
+                className="w-full text-black font-bold"
+                style={{ backgroundColor: settings.primaryColor }}
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                {showPopupNotices[0].type === "once" ? "Entendi, não mostrar novamente" : "OK, entendi"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Header */}
       <header 
         className="border-b border-zinc-800 px-4 py-4"
@@ -110,6 +187,28 @@ const DemoMembro = () => {
         </div>
       </header>
 
+      {/* Always visible notices (banner) */}
+      {alwaysNotices.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 pt-4">
+          {alwaysNotices.map((notice) => (
+            <div 
+              key={notice.id}
+              className="rounded-lg p-4 mb-3 border flex items-start gap-3"
+              style={{ 
+                backgroundColor: settings.primaryColor + "15",
+                borderColor: settings.primaryColor + "40"
+              }}
+            >
+              <Bell className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: settings.primaryColor }} />
+              <div>
+                <h4 className="text-white font-bold text-sm">{notice.title}</h4>
+                <p className="text-zinc-300 text-sm">{notice.message}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto p-4 md:p-6">
         {/* Banner informativo */}
         <div 
@@ -120,7 +219,7 @@ const DemoMembro = () => {
           }}
         >
           <p style={{ color: settings.primaryColor }} className="text-sm font-medium">
-            <strong>Visualização:</strong> Esta é a visão do membro/cliente da sua área de membros.
+            <strong>Visualização do Membro:</strong> Esta é a visão do seu cliente ao acessar a área de membros.
           </p>
         </div>
 
