@@ -22,20 +22,44 @@ export default function BelezaObrigado() {
       return;
     }
 
-    // Update enrollment to premium
-    const { error } = await supabase
+    // Check if enrollment exists
+    const { data: existingEnrollment } = await supabase
       .from('course_enrollments')
-      .update({
-        is_premium: true,
-        premium_activated_at: new Date().toISOString()
-      })
-      .eq('user_id', user.id);
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
 
-    if (!error) {
+    let success = false;
+
+    if (existingEnrollment) {
+      // Update existing enrollment to premium
+      const { error } = await supabase
+        .from('course_enrollments')
+        .update({
+          is_premium: true,
+          premium_activated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
+      
+      success = !error;
+    } else {
+      // Create new enrollment as premium
+      const { error } = await supabase
+        .from('course_enrollments')
+        .insert({
+          user_id: user.id,
+          is_premium: true,
+          premium_activated_at: new Date().toISOString()
+        });
+      
+      success = !error;
+    }
+
+    if (success) {
       // Record payment
       await supabase.from('course_payments').insert({
         user_id: user.id,
-        amount: 47,
+        amount: 25,
         status: 'completed',
         payment_provider: 'infinitepay'
       });
