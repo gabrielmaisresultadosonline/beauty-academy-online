@@ -59,9 +59,31 @@ export function FacebookPixel({ productSlug }: FacebookPixelProps) {
   return null;
 }
 
-// Helper to track custom events
+// Helper to track custom events with retry logic
 export function trackFacebookEvent(eventName: string, params?: Record<string, any>) {
-  if (typeof window !== 'undefined' && (window as any).fbq) {
-    (window as any).fbq('track', eventName, params);
-  }
+  const track = () => {
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', eventName, params);
+      console.log(`[FB Pixel] Event tracked: ${eventName}`, params);
+      return true;
+    }
+    return false;
+  };
+
+  // Try immediately
+  if (track()) return;
+
+  // Retry up to 5 times with increasing delays
+  let attempts = 0;
+  const maxAttempts = 5;
+  const retry = () => {
+    attempts++;
+    if (track()) return;
+    if (attempts < maxAttempts) {
+      setTimeout(retry, 500 * attempts);
+    } else {
+      console.warn(`[FB Pixel] Failed to track event after ${maxAttempts} attempts: ${eventName}`);
+    }
+  };
+  setTimeout(retry, 500);
 }
