@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Scissors, Plus, Trash2, Edit, Upload, Save, X, 
-  FolderOpen, Video, LogOut, Users, Settings, BarChart3
+  FolderOpen, Video, LogOut, Users, Settings, BarChart3, CreditCard
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,9 +50,10 @@ export default function BelezaAdmin() {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   
-  // Pixel settings
+  // Settings
   const [pixelCode, setPixelCode] = useState('');
-  const [savingPixel, setSavingPixel] = useState(false);
+  const [paymentLink, setPaymentLink] = useState('');
+  const [savingSettings, setSavingSettings] = useState(false);
   
   // Forms
   const [showModuleForm, setShowModuleForm] = useState(false);
@@ -107,7 +108,7 @@ export default function BelezaAdmin() {
 
     setIsAdmin(true);
     loadData();
-    loadPixelSettings();
+    loadSettings();
   };
 
   const loadData = async () => {
@@ -126,31 +127,35 @@ export default function BelezaAdmin() {
     setIsLoading(false);
   };
 
-  const loadPixelSettings = async () => {
+  const loadSettings = async () => {
     const { data } = await supabase
       .from('platform_settings')
-      .select('facebook_pixel_code')
+      .select('facebook_pixel_code, infinitepay_link')
       .eq('product_slug', 'belezalisoperfeito')
       .maybeSingle();
     
-    if (data?.facebook_pixel_code) {
-      setPixelCode(data.facebook_pixel_code);
+    if (data) {
+      setPixelCode(data.facebook_pixel_code || '');
+      setPaymentLink(data.infinitepay_link || '');
     }
   };
 
-  const savePixelSettings = async () => {
-    setSavingPixel(true);
+  const saveSettings = async () => {
+    setSavingSettings(true);
     const { error } = await supabase
       .from('platform_settings')
-      .update({ facebook_pixel_code: pixelCode })
+      .update({ 
+        facebook_pixel_code: pixelCode,
+        infinitepay_link: paymentLink
+      })
       .eq('product_slug', 'belezalisoperfeito');
 
     if (error) {
-      toast({ title: "Erro ao salvar pixel", variant: "destructive" });
+      toast({ title: "Erro ao salvar configurações", variant: "destructive" });
     } else {
-      toast({ title: "Pixel salvo com sucesso!" });
+      toast({ title: "Configurações salvas com sucesso!" });
     }
-    setSavingPixel(false);
+    setSavingSettings(false);
   };
 
   const handleLogout = async () => {
@@ -586,35 +591,69 @@ export default function BelezaAdmin() {
           <TabsContent value="settings">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Configurações</h2>
             
-            <Card className="bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  Facebook Pixel
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-gray-600">
-                  Cole o código completo do seu Facebook Pixel abaixo. O pixel será carregado automaticamente em todas as páginas do curso.
-                </p>
-                <Textarea
-                  value={pixelCode}
-                  onChange={(e) => setPixelCode(e.target.value)}
-                  placeholder={`<!-- Meta Pixel Code -->\n<script>...</script>\n<noscript>...</noscript>\n<!-- End Meta Pixel Code -->`}
-                  className="font-mono text-xs min-h-[200px]"
-                />
-                <Button onClick={savePixelSettings} disabled={savingPixel} className="bg-pink-500 hover:bg-pink-600">
-                  {savingPixel ? (
-                    <>Salvando...</>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      Salvar Pixel
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              {/* Payment Link */}
+              <Card className="bg-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5" />
+                    Link de Pagamento InfinitePay
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-gray-600">
+                    Cole o link completo do InfinitePay para receber pagamentos. Gere o link no painel do InfinitePay.
+                  </p>
+                  <Input
+                    value={paymentLink}
+                    onChange={(e) => setPaymentLink(e.target.value)}
+                    placeholder="https://checkout.infinitepay.io/seuusuario?items=[...]"
+                    className="font-mono text-xs"
+                  />
+                  <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
+                    <p className="text-sm font-medium text-pink-800 mb-2">URL de Redirecionamento (Obrigado)</p>
+                    <p className="text-xs text-pink-600 font-mono bg-white p-2 rounded border">
+                      https://acessar.click/belezalisoperfeito/obrigado
+                    </p>
+                    <p className="text-xs text-pink-600 mt-2">
+                      Configure esta URL no campo "redirect_url" do seu link InfinitePay.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Facebook Pixel */}
+              <Card className="bg-white">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="w-5 h-5" />
+                    Facebook Pixel
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-gray-600">
+                    Cole o código completo do seu Facebook Pixel abaixo. O pixel será carregado automaticamente em todas as páginas do curso.
+                  </p>
+                  <Textarea
+                    value={pixelCode}
+                    onChange={(e) => setPixelCode(e.target.value)}
+                    placeholder={`<!-- Meta Pixel Code -->\n<script>...</script>\n<noscript>...</noscript>\n<!-- End Meta Pixel Code -->`}
+                    className="font-mono text-xs min-h-[200px]"
+                  />
+                </CardContent>
+              </Card>
+
+              <Button onClick={saveSettings} disabled={savingSettings} className="bg-pink-500 hover:bg-pink-600">
+                {savingSettings ? (
+                  <>Salvando...</>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Salvar Configurações
+                  </>
+                )}
+              </Button>
+            </div>
           </TabsContent>
         </Tabs>
       </main>

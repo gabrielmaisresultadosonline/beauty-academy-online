@@ -213,21 +213,27 @@ export type Database = {
           created_at: string
           facebook_pixel_code: string | null
           id: string
+          infinitepay_link: string | null
           product_slug: string
+          thank_you_url: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           facebook_pixel_code?: string | null
           id?: string
+          infinitepay_link?: string | null
           product_slug: string
+          thank_you_url?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           facebook_pixel_code?: string | null
           id?: string
+          infinitepay_link?: string | null
           product_slug?: string
+          thank_you_url?: string | null
           updated_at?: string
         }
         Relationships: []
