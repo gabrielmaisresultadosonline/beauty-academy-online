@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { FacebookPixel } from '@/components/FacebookPixel';
 import { Button } from '@/components/ui/button';
 import CountdownTimer from '@/components/CountdownTimer';
@@ -134,8 +135,20 @@ const testimonials = [
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background font-body">
-      <FacebookPixel productSlug="belezalisoperfeito" />
+    <>
+      <Helmet>
+        <title>Curso de Cabeleireira Completo | Comunidade da Beleza - Acesso Vitalício</title>
+        <meta name="description" content="Curso completo de cabeleireira com acesso vitalício. Aprenda técnicas profissionais de alisamento, colorimetria, corte e muito mais. Comunidade da Beleza." />
+        <meta property="og:title" content="Curso de Cabeleireira Completo | Comunidade da Beleza" />
+        <meta property="og:description" content="Acesso vitalício ao curso completo de cabeleireira. Aprenda técnicas profissionais e transforme sua carreira!" />
+        <meta property="og:url" content="https://acessar.click/belezalisoperfeito" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Curso de Cabeleireira Completo | Comunidade da Beleza" />
+        <meta name="twitter:description" content="Acesso vitalício ao curso completo de cabeleireira. Transforme sua carreira!" />
+        <link rel="canonical" href="https://acessar.click/belezalisoperfeito" />
+      </Helmet>
+      <div className="min-h-screen bg-background font-body">
+        <FacebookPixel productSlug="belezalisoperfeito" />
       {/* Header Badge */}
       <div className="gradient-primary py-2">
         <div className="container flex items-center justify-between">
@@ -418,7 +431,8 @@ const Index = () => {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 };
 
