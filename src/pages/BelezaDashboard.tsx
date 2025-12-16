@@ -178,7 +178,7 @@ export default function BelezaDashboard() {
   const getPaymentLink = () => {
     const userName = profile?.full_name || 'Aluna';
     const itemName = encodeURIComponent(`CURSO BELEZA LISO PERFEITO - ${userName}`);
-    return `https://checkout.infinitepay.io/paguemro?items=[{"name":"${itemName}","price":100,"quantity":1}]&redirect_url=${encodeURIComponent('https://acessar.click/belezalisoperfeito/obrigado')}`;
+    return `https://checkout.infinitepay.io/paguemro?items=[{"name":"${itemName}","price":2500,"quantity":1}]&redirect_url=${encodeURIComponent('https://acessar.click/belezalisoperfeito/obrigado')}`;
   };
 
   const handlePaymentClick = () => {
@@ -186,7 +186,7 @@ export default function BelezaDashboard() {
     trackFacebookEvent('InitiateCheckout', {
       content_name: 'Curso Beleza Liso Perfeito',
       content_category: 'Course',
-      value: 1.00,
+      value: 25.00,
       currency: 'BRL'
     });
   };
@@ -283,7 +283,7 @@ export default function BelezaDashboard() {
                 <Sparkles className="w-6 h-6" />
                 <span className="text-lg font-medium">Oferta Especial</span>
               </div>
-              <div className="text-5xl font-bold mb-2">R$ 1,00</div>
+              <div className="text-5xl font-bold mb-2">R$ 25,00</div>
               <p className="text-pink-100 line-through">De R$ 197,00</p>
               <p className="text-sm text-pink-100 mt-2">Pagamento único • Acesso vitalício</p>
             </div>
