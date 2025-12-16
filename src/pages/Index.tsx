@@ -101,31 +101,40 @@ const Index = () => {
           </header>
 
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-[#00D26A]/10 border border-[#00D26A]/30 rounded-full px-5 py-2 mb-8">
-            <BadgeCheck className="w-5 h-5 text-[#00D26A]" />
-            <span className="text-sm text-[#00D26A] font-semibold">Venda sem taxas • Receba na hora</span>
+          <div className="inline-flex items-center gap-2 bg-[#00D26A]/10 border border-[#00D26A]/30 rounded-full px-6 py-2.5 mb-8">
+            <BadgeCheck className="w-6 h-6 text-[#00D26A]" />
+            <span className="text-base text-[#00D26A] font-bold">Venda sem taxas • Receba na hora</span>
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            Sua <span className="text-[#00D26A]">Área de Membros</span>
-            <br />sem taxas por venda
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight tracking-tight">
+            Sua <span className="text-[#00D26A]">Área de Membros</span> e 
+            <br />página de vendas pronta
           </h1>
 
-          <p className="text-xl text-zinc-400 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Receba <span className="text-white font-semibold">100% de cada venda</span> direto na sua conta InfinitePay.
-            <br />Criamos seu site de vendas completo em até 24 horas.
+          {/* Subheadline Features */}
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <span className="text-xl md:text-2xl font-bold text-white">Sem taxas por venda</span>
+            <span className="text-zinc-600">•</span>
+            <span className="text-xl md:text-2xl font-bold text-yellow-400">Recebimento na hora</span>
+            <span className="text-zinc-600">•</span>
+            <span className="text-xl md:text-2xl font-bold text-white">100% do lucro é seu</span>
+          </div>
+
+          <p className="text-xl md:text-2xl text-zinc-300 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
+            Receba <span className="text-[#00D26A] font-bold">100% de cada venda</span> direto na sua conta InfinitePay.
+            <br />Criamos seu site completo em até 24 horas.
           </p>
 
           {/* Instant Payment Badge */}
-          <div className="inline-flex items-center gap-4 bg-gradient-to-r from-yellow-500/10 to-[#00D26A]/10 border border-yellow-500/30 px-8 py-4 rounded-2xl mb-10">
+          <div className="inline-flex items-center gap-5 bg-gradient-to-r from-yellow-500/20 to-[#00D26A]/10 border-2 border-yellow-400/50 px-10 py-5 rounded-2xl mb-10">
             <div className="relative">
-              <Zap className="w-8 h-8 text-yellow-400" />
-              <div className="absolute inset-0 bg-yellow-400/40 rounded-full blur-xl animate-pulse" />
+              <Zap className="w-12 h-12 text-yellow-400" />
+              <div className="absolute inset-0 bg-yellow-400/50 rounded-full blur-2xl animate-pulse" />
             </div>
             <div className="text-left">
-              <p className="text-yellow-400 font-bold text-lg">Infinit Nitro: 8 segundos</p>
-              <p className="text-zinc-400 text-sm">Receba instantaneamente na sua conta</p>
+              <p className="text-yellow-400 font-extrabold text-2xl">RECEBA EM 8 SEGUNDOS</p>
+              <p className="text-zinc-300 text-base font-semibold">Infinit Nitro • Instantâneo na sua conta</p>
             </div>
           </div>
 
@@ -368,28 +377,28 @@ const Index = () => {
       </section>
 
       {/* Features */}
-      <section className="py-20 bg-zinc-900/50">
+      <section className="py-24 bg-zinc-900/50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-14">
             Tudo <span className="text-[#00D26A]">incluso</span> no seu plano
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: <Zap className="w-6 h-6" />, title: "Receba em 8 Segundos", description: "Com Infinit Nitro, seu dinheiro cai na conta instantaneamente." },
-              { icon: <Star className="w-6 h-6" />, title: "Zero Taxas por Venda", description: "Venda R$1.000 ou R$1.000.000 — você recebe 100%." },
-              { icon: <Palette className="w-6 h-6" />, title: "Criamos Seu Site", description: "Página de vendas profissional completa em até 24 horas." },
-              { icon: <Users className="w-6 h-6" />, title: "Área de Membros", description: "Sistema completo com login, dashboard e módulos." },
-              { icon: <BarChart3 className="w-6 h-6" />, title: "Facebook Pixel", description: "Configure seu pixel e rastreie todas as conversões." },
-              { icon: <Shield className="w-6 h-6" />, title: "100% Automatizado", description: "Pagamento libera acesso instantâneo. Zero trabalho manual." }
+              { icon: <Zap className="w-7 h-7" />, title: "Receba em 8 Segundos", description: "Com Infinit Nitro, seu dinheiro cai na conta instantaneamente." },
+              { icon: <Star className="w-7 h-7" />, title: "Zero Taxas por Venda", description: "Venda R$1.000 ou R$1.000.000 — você recebe 100%." },
+              { icon: <Palette className="w-7 h-7" />, title: "Criamos Seu Site", description: "Página de vendas profissional completa em até 24 horas." },
+              { icon: <Users className="w-7 h-7" />, title: "Área de Membros", description: "Sistema completo com login, dashboard e módulos." },
+              { icon: <BarChart3 className="w-7 h-7" />, title: "Facebook Pixel", description: "Configure seu pixel e rastreie todas as conversões." },
+              { icon: <Shield className="w-7 h-7" />, title: "100% Automatizado", description: "Pagamento libera acesso instantâneo. Zero trabalho manual." }
             ].map((feature, index) => (
               <Card key={index} className="bg-zinc-900 border border-zinc-800 hover:border-[#00D26A]/50 transition-all">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-[#00D26A]/10 rounded-xl flex items-center justify-center mb-4 text-[#00D26A]">
+                <CardContent className="p-7">
+                  <div className="w-14 h-14 bg-[#00D26A]/15 rounded-xl flex items-center justify-center mb-5 text-[#00D26A]">
                     {feature.icon}
                   </div>
-                  <h3 className="text-white font-bold mb-2">{feature.title}</h3>
-                  <p className="text-zinc-400 text-sm">{feature.description}</p>
+                  <h3 className="text-white font-bold text-xl mb-3">{feature.title}</h3>
+                  <p className="text-zinc-400 text-base leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
