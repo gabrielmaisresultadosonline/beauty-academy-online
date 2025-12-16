@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { FacebookPixel } from '@/components/FacebookPixel';
 import { Button } from '@/components/ui/button';
 import CountdownTimer from '@/components/CountdownTimer';
 import WhatsAppProof from '@/components/WhatsAppProof';
@@ -134,6 +135,7 @@ const testimonials = [
 const Index = () => {
   return (
     <div className="min-h-screen bg-background font-body">
+      <FacebookPixel productSlug="belezalisoperfeito" />
       {/* Header Badge */}
       <div className="gradient-primary py-2">
         <div className="container flex items-center justify-between">

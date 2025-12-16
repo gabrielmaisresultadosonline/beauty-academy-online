@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FacebookPixel } from '@/components/FacebookPixel';
 import {
   Music,
   Music2,
@@ -164,6 +165,7 @@ const ComunidadeMusica = () => {
 
   return (
     <div className="min-h-screen bg-zinc-950 font-body overflow-hidden">
+      <FacebookPixel productSlug="comunidademusica" />
       {/* Floating Music Notes Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
