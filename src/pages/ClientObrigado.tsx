@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,8 @@ const ClientObrigado = () => {
   const [loading, setLoading] = useState(true);
   const [activated, setActivated] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const planType = searchParams.get('plan') || 'trial';
 
   useEffect(() => {
     const activatePayment = async () => {
@@ -23,43 +25,31 @@ const ClientObrigado = () => {
           return;
         }
 
-        // Update payment status
+        const now = new Date();
+        let updateData: any = {
+          is_paid: true,
+          paid_at: now.toISOString(),
+          plan_type: planType,
+          site_blocked: false
+        };
+
+        if (planType === 'trial') {
+          updateData.plan_amount = 247;
+          updateData.trial_ends_at = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        } else if (planType === 'annual') {
+          updateData.plan_amount = 797;
+          updateData.subscription_ends_at = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
+        }
+
         const { error } = await supabase
           .from('platform_clients')
-          .update({
-            is_paid: true,
-            paid_at: new Date().toISOString()
-          })
+          .update(updateData)
           .eq('user_id', session.user.id);
 
         if (error) throw error;
 
         setActivated(true);
-        
-        // Celebration!
-        confetti({
-          particleCount: 150,
-          spread: 100,
-          origin: { y: 0.6 }
-        });
-
-        setTimeout(() => {
-          confetti({
-            particleCount: 100,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0 }
-          });
-        }, 250);
-
-        setTimeout(() => {
-          confetti({
-            particleCount: 100,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1 }
-          });
-        }, 400);
+        confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
 
       } catch (error) {
         console.error('Error activating payment:', error);
@@ -70,7 +60,7 @@ const ClientObrigado = () => {
     };
 
     activatePayment();
-  }, [navigate]);
+  }, [navigate, planType]);
 
   if (loading) {
     return (
@@ -85,10 +75,7 @@ const ClientObrigado = () => {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4 py-12">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-green-950/50 via-black to-emerald-950/30" />
-      <div className="absolute top-1/3 left-1/3 w-96 h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl animate-pulse delay-1000" />
 
       <div className="relative z-10 w-full max-w-lg">
         <Card className="bg-zinc-900/90 border border-green-500/30 backdrop-blur-sm overflow-hidden">
@@ -105,21 +92,27 @@ const ClientObrigado = () => {
             </div>
 
             <h1 className="text-3xl font-black text-white mb-4">
-              Pagamento Confirmado!
+              {planType === 'annual' ? 'Renovação Confirmada!' : 'Pagamento Confirmado!'}
             </h1>
 
             <p className="text-white/70 text-lg mb-8">
-              Sua área de membros está sendo preparada. Agora você precisa descrever seu projeto para começarmos a criar tudo para você.
+              {planType === 'annual' 
+                ? 'Seu site permanecerá ativo por mais 1 ano!'
+                : 'Sua área de membros está sendo preparada. Descreva seu projeto para começarmos.'}
             </p>
 
             <div className="space-y-4">
               <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4">
                 <div className="flex items-center gap-3 justify-center mb-2">
                   <Zap className="w-5 h-5 text-green-400" />
-                  <span className="text-green-400 font-bold">Próximo Passo</span>
+                  <span className="text-green-400 font-bold">
+                    {planType === 'trial' ? 'Próximo Passo' : 'Tudo Pronto'}
+                  </span>
                 </div>
                 <p className="text-white/60 text-sm">
-                  Descreva seu produto na próxima tela para criarmos sua página de vendas e área de membros.
+                  {planType === 'trial' 
+                    ? 'Descreva seu produto para criarmos sua página de vendas e área de membros.'
+                    : 'Seu site continua ativo. Acesse o dashboard para gerenciar.'}
                 </p>
               </div>
 
@@ -127,7 +120,7 @@ const ClientObrigado = () => {
                 onClick={() => navigate('/cliente/dashboard')}
                 className="w-full bg-green-500 hover:bg-green-400 text-black font-black py-6 text-lg"
               >
-                DESCREVER MEU PROJETO
+                {planType === 'trial' ? 'DESCREVER MEU PROJETO' : 'IR PARA DASHBOARD'}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </div>
