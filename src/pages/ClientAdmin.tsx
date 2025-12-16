@@ -8,12 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { 
   Zap, LogOut, Users, CreditCard, Settings, BarChart3, 
   CheckCircle, Clock, AlertTriangle, Save, Eye, Calendar,
-  DollarSign, TrendingUp
+  DollarSign, TrendingUp, FileText, Phone, Globe, Link2,
+  X, RefreshCw, ExternalLink
 } from "lucide-react";
 
 interface PlatformClient {
@@ -30,7 +33,18 @@ interface PlatformClient {
   site_blocked: boolean | null;
   site_status: string | null;
   product_name: string | null;
+  product_type: string | null;
+  product_description: string | null;
+  target_audience: string | null;
+  product_price: number | null;
+  infinitepay_username: string | null;
+  phone_number: string | null;
+  existing_site_url: string | null;
+  payment_link: string | null;
+  additional_notes: string | null;
+  site_description_count: number | null;
   created_at: string;
+  updated_at: string;
 }
 
 interface PlatformSettings {
@@ -43,8 +57,10 @@ interface PlatformSettings {
 
 const ClientAdmin = () => {
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [clients, setClients] = useState<PlatformClient[]>([]);
+  const [selectedClient, setSelectedClient] = useState<PlatformClient | null>(null);
   const [settings, setSettings] = useState<PlatformSettings>({
     product_slug: 'acessar-click',
     facebook_pixel_code: '',
@@ -98,6 +114,13 @@ const ClientAdmin = () => {
     setClients(data || []);
   };
 
+  const refreshData = async () => {
+    setRefreshing(true);
+    await fetchClients();
+    toast.success("Dados atualizados da nuvem!");
+    setRefreshing(false);
+  };
+
   const fetchSettings = async () => {
     const { data, error } = await supabase
       .from('platform_settings')
@@ -144,7 +167,7 @@ const ClientAdmin = () => {
         if (error) throw error;
       }
 
-      toast.success("Configurações salvas com sucesso!");
+      toast.success("Configurações salvas na nuvem!");
     } catch (error: any) {
       console.error('Error saving settings:', error);
       toast.error("Erro ao salvar configurações");
@@ -200,6 +223,16 @@ const ClientAdmin = () => {
     fetchClients();
   };
 
+  // Calculate days remaining
+  const getDaysRemaining = (endDate: string | null) => {
+    if (!endDate) return null;
+    const end = new Date(endDate);
+    const now = new Date();
+    const diff = end.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return days;
+  };
+
   // Statistics
   const totalClients = clients.length;
   const paidClients = clients.filter(c => c.is_paid).length;
@@ -207,10 +240,16 @@ const ClientAdmin = () => {
   const blockedClients = clients.filter(c => c.site_blocked).length;
   const annualClients = clients.filter(c => c.plan_type === 'annual').length;
   const monthlyClients = clients.filter(c => c.plan_type === 'trial' || c.plan_type === 'monthly').length;
+  const clientsWithSiteRequest = clients.filter(c => c.product_name).length;
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return '-';
     return new Date(dateStr).toLocaleDateString('pt-BR');
+  };
+
+  const formatDateTime = (dateStr: string | null) => {
+    if (!dateStr) return '-';
+    return new Date(dateStr).toLocaleString('pt-BR');
   };
 
   const getStatusBadge = (client: PlatformClient) => {
@@ -218,15 +257,38 @@ const ClientAdmin = () => {
       return <Badge variant="destructive">Bloqueado</Badge>;
     }
     if (client.is_paid) {
+      const days = getDaysRemaining(client.subscription_ends_at);
+      if (days !== null && days <= 7 && days > 0) {
+        return <Badge className="bg-amber-500">Expira em {days}d</Badge>;
+      }
+      if (days !== null && days <= 0) {
+        return <Badge variant="destructive">Expirado</Badge>;
+      }
       return <Badge className="bg-green-500">Ativo</Badge>;
     }
     return <Badge variant="secondary">Pendente</Badge>;
   };
 
+  const getSiteStatusBadge = (status: string | null) => {
+    switch (status) {
+      case 'pending':
+        return <Badge className="bg-amber-500">Aguardando</Badge>;
+      case 'in_progress':
+        return <Badge className="bg-blue-500">Em Produção</Badge>;
+      case 'completed':
+        return <Badge className="bg-green-500">Concluído</Badge>;
+      default:
+        return <Badge variant="secondary">Não solicitado</Badge>;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-green-400 font-bold">Carregando...</div>
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 text-green-400 animate-spin mx-auto mb-4" />
+          <div className="text-green-400 font-bold">Carregando dados da nuvem...</div>
+        </div>
       </div>
     );
   }
@@ -249,15 +311,27 @@ const ClientAdmin = () => {
               <span className="ml-2 text-sm text-green-400 font-medium">Admin Master</span>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleLogout}
-            className="border-white/20 text-white hover:bg-white/10"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sair
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refreshData}
+              disabled={refreshing}
+              className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+              Atualizar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sair
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -271,6 +345,10 @@ const ClientAdmin = () => {
             <TabsTrigger value="clients" className="data-[state=active]:bg-green-500 data-[state=active]:text-black">
               <Users className="w-4 h-4 mr-2" />
               Clientes
+            </TabsTrigger>
+            <TabsTrigger value="requests" className="data-[state=active]:bg-green-500 data-[state=active]:text-black">
+              <FileText className="w-4 h-4 mr-2" />
+              Solicitações
             </TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-green-500 data-[state=active]:text-black">
               <Settings className="w-4 h-4 mr-2" />
@@ -313,11 +391,11 @@ const ClientAdmin = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-white/60">Pendentes</p>
-                      <p className="text-3xl font-black text-amber-400">{pendingClients}</p>
+                      <p className="text-sm text-white/60">Solicitações de Site</p>
+                      <p className="text-3xl font-black text-purple-400">{clientsWithSiteRequest}</p>
                     </div>
-                    <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
-                      <Clock className="w-6 h-6 text-amber-400" />
+                    <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                      <FileText className="w-6 h-6 text-purple-400" />
                     </div>
                   </div>
                 </CardContent>
@@ -343,7 +421,7 @@ const ClientAdmin = () => {
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-green-400" />
-                    Planos
+                    Planos Ativos
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -354,6 +432,10 @@ const ClientAdmin = () => {
                   <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
                     <span className="text-white/80">Planos Mensais</span>
                     <span className="text-xl font-bold text-amber-400">{monthlyClients}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                    <span className="text-white/80">Pendentes</span>
+                    <span className="text-xl font-bold text-zinc-400">{pendingClients}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -374,6 +456,10 @@ const ClientAdmin = () => {
                     <span className="text-white/80">Mensais (R$247)</span>
                     <span className="text-xl font-bold text-amber-400">R$ {(monthlyClients * 247).toLocaleString('pt-BR')}</span>
                   </div>
+                  <div className="flex justify-between items-center p-3 bg-green-500/20 rounded-lg border border-green-500/30">
+                    <span className="text-white font-bold">Total</span>
+                    <span className="text-xl font-bold text-green-400">R$ {((annualClients * 797) + (monthlyClients * 247)).toLocaleString('pt-BR')}</span>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -386,7 +472,11 @@ const ClientAdmin = () => {
               <CardContent>
                 <div className="space-y-3">
                   {clients.slice(0, 5).map((client) => (
-                    <div key={client.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <div 
+                      key={client.id} 
+                      className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer transition-colors"
+                      onClick={() => setSelectedClient(client)}
+                    >
                       <div>
                         <p className="font-medium text-white">{client.full_name}</p>
                         <p className="text-sm text-white/60">{client.email}</p>
@@ -394,6 +484,7 @@ const ClientAdmin = () => {
                       <div className="flex items-center gap-3">
                         {getStatusBadge(client)}
                         <span className="text-xs text-white/40">{formatDate(client.created_at)}</span>
+                        <Eye className="w-4 h-4 text-white/40" />
                       </div>
                     </div>
                   ))}
@@ -414,66 +505,154 @@ const ClientAdmin = () => {
                     <TableHeader>
                       <TableRow className="border-white/10">
                         <TableHead className="text-white/60">Nome</TableHead>
-                        <TableHead className="text-white/60">Email</TableHead>
-                        <TableHead className="text-white/60">WhatsApp</TableHead>
+                        <TableHead className="text-white/60">Contato</TableHead>
                         <TableHead className="text-white/60">Plano</TableHead>
                         <TableHead className="text-white/60">Status</TableHead>
-                        <TableHead className="text-white/60">Expira</TableHead>
+                        <TableHead className="text-white/60">Dias Restantes</TableHead>
                         <TableHead className="text-white/60">Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {clients.map((client) => (
-                        <TableRow key={client.id} className="border-white/10">
-                          <TableCell className="text-white font-medium">{client.full_name}</TableCell>
-                          <TableCell className="text-white/80">{client.email}</TableCell>
-                          <TableCell className="text-white/80">{client.whatsapp}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="border-white/20 text-white/80">
-                              {client.plan_type === 'annual' ? 'Anual' : client.plan_type === 'trial' ? 'Mensal' : 'Pendente'}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{getStatusBadge(client)}</TableCell>
-                          <TableCell className="text-white/60">{formatDate(client.subscription_ends_at)}</TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              {!client.is_paid && (
-                                <>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => markAsPaid(client.id, 'trial')}
-                                    className="border-amber-500/50 text-amber-400 hover:bg-amber-500/20 text-xs"
-                                  >
-                                    Mensal
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => markAsPaid(client.id, 'annual')}
-                                    className="border-green-500/50 text-green-400 hover:bg-green-500/20 text-xs"
-                                  >
-                                    Anual
-                                  </Button>
-                                </>
+                      {clients.map((client) => {
+                        const daysRemaining = getDaysRemaining(client.subscription_ends_at);
+                        return (
+                          <TableRow key={client.id} className="border-white/10">
+                            <TableCell>
+                              <div>
+                                <p className="text-white font-medium">{client.full_name}</p>
+                                <p className="text-xs text-white/50">{client.email}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="space-y-1">
+                                <p className="text-white/80 text-sm">{client.whatsapp}</p>
+                                {client.phone_number && (
+                                  <p className="text-white/50 text-xs">{client.phone_number}</p>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="border-white/20 text-white/80">
+                                {client.plan_type === 'annual' ? 'Anual' : client.plan_type === 'trial' ? 'Mensal' : 'Pendente'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{getStatusBadge(client)}</TableCell>
+                            <TableCell>
+                              {daysRemaining !== null ? (
+                                <span className={`font-bold ${daysRemaining <= 7 ? 'text-red-400' : daysRemaining <= 30 ? 'text-amber-400' : 'text-green-400'}`}>
+                                  {daysRemaining > 0 ? `${daysRemaining} dias` : 'Expirado'}
+                                </span>
+                              ) : (
+                                <span className="text-white/40">-</span>
                               )}
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => toggleClientBlock(client.id, client.site_blocked || false)}
-                                className={client.site_blocked 
-                                  ? "border-green-500/50 text-green-400 hover:bg-green-500/20 text-xs"
-                                  : "border-red-500/50 text-red-400 hover:bg-red-500/20 text-xs"
-                                }
-                              >
-                                {client.site_blocked ? 'Desbloquear' : 'Bloquear'}
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setSelectedClient(client)}
+                                  className="border-blue-500/50 text-blue-400 hover:bg-blue-500/20"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                                {!client.is_paid && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => markAsPaid(client.id, 'trial')}
+                                      className="border-amber-500/50 text-amber-400 hover:bg-amber-500/20 text-xs"
+                                    >
+                                      Mensal
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => markAsPaid(client.id, 'annual')}
+                                      className="border-green-500/50 text-green-400 hover:bg-green-500/20 text-xs"
+                                    >
+                                      Anual
+                                    </Button>
+                                  </>
+                                )}
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => toggleClientBlock(client.id, client.site_blocked || false)}
+                                  className={client.site_blocked 
+                                    ? "border-green-500/50 text-green-400 hover:bg-green-500/20 text-xs"
+                                    : "border-red-500/50 text-red-400 hover:bg-red-500/20 text-xs"
+                                  }
+                                >
+                                  {client.site_blocked ? 'Desbloquear' : 'Bloquear'}
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Site Requests Tab */}
+          <TabsContent value="requests">
+            <Card className="bg-zinc-900 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white">Solicitações de Site ({clientsWithSiteRequest})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {clients.filter(c => c.product_name).map((client) => (
+                    <div 
+                      key={client.id} 
+                      className="bg-white/5 rounded-lg p-4 hover:bg-white/10 cursor-pointer transition-colors border border-white/10"
+                      onClick={() => setSelectedClient(client)}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <h3 className="text-white font-bold text-lg">{client.product_name}</h3>
+                          <p className="text-white/60 text-sm">Por: {client.full_name}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {getSiteStatusBadge(client.site_status)}
+                          <Button size="sm" variant="outline" className="border-white/20">
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <p className="text-white/50">Tipo de Produto</p>
+                          <p className="text-white">{client.product_type || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-white/50">Preço</p>
+                          <p className="text-white">{client.product_price ? `R$ ${client.product_price}` : '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-white/50">Edições</p>
+                          <p className="text-white">{client.site_description_count || 0}/2 usadas</p>
+                        </div>
+                      </div>
+                      {client.product_description && (
+                        <div className="mt-3 p-3 bg-black/30 rounded border border-white/5">
+                          <p className="text-white/50 text-xs mb-1">Descrição:</p>
+                          <p className="text-white/80 text-sm line-clamp-2">{client.product_description}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {clientsWithSiteRequest === 0 && (
+                    <div className="text-center py-12 text-white/40">
+                      <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>Nenhuma solicitação de site ainda</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -531,13 +710,252 @@ const ClientAdmin = () => {
                   className="bg-green-500 hover:bg-green-400 text-black font-bold"
                 >
                   <Save className="w-4 h-4 mr-2" />
-                  {savingSettings ? 'Salvando...' : 'Salvar Configurações'}
+                  {savingSettings ? 'Salvando na nuvem...' : 'Salvar Configurações'}
                 </Button>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Client Detail Modal */}
+      <Dialog open={!!selectedClient} onOpenChange={() => setSelectedClient(null)}>
+        <DialogContent className="bg-zinc-900 border-white/10 text-white max-w-3xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black flex items-center gap-2">
+              <Users className="w-5 h-5 text-green-400" />
+              Detalhes do Cliente
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedClient && (
+            <ScrollArea className="max-h-[70vh] pr-4">
+              <div className="space-y-6">
+                {/* Basic Info */}
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+                    <Users className="w-4 h-4 text-green-400" />
+                    Informações Básicas
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-white/50 text-xs">Nome Completo</p>
+                      <p className="text-white font-medium">{selectedClient.full_name}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-xs">Email</p>
+                      <p className="text-white font-medium">{selectedClient.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-xs">WhatsApp</p>
+                      <p className="text-white font-medium">{selectedClient.whatsapp}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-xs">Telefone</p>
+                      <p className="text-white font-medium">{selectedClient.phone_number || '-'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Subscription Info */}
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-green-400" />
+                    Assinatura
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-white/50 text-xs">Status</p>
+                      <div className="mt-1">{getStatusBadge(selectedClient)}</div>
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-xs">Plano</p>
+                      <p className="text-white font-medium">
+                        {selectedClient.plan_type === 'annual' ? 'Anual (R$797)' : 
+                         selectedClient.plan_type === 'trial' ? 'Mensal (R$247)' : 'Não definido'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-xs">Data do Pagamento</p>
+                      <p className="text-white font-medium">{formatDateTime(selectedClient.paid_at)}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-xs">Expira em</p>
+                      <p className="text-white font-medium">{formatDate(selectedClient.subscription_ends_at)}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-xs">Dias Restantes</p>
+                      {(() => {
+                        const days = getDaysRemaining(selectedClient.subscription_ends_at);
+                        return days !== null ? (
+                          <p className={`font-bold text-lg ${days <= 7 ? 'text-red-400' : days <= 30 ? 'text-amber-400' : 'text-green-400'}`}>
+                            {days > 0 ? `${days} dias` : 'Expirado'}
+                          </p>
+                        ) : <p className="text-white/40">-</p>;
+                      })()}
+                    </div>
+                    <div>
+                      <p className="text-white/50 text-xs">Cadastro</p>
+                      <p className="text-white font-medium">{formatDateTime(selectedClient.created_at)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Site Request Info */}
+                {selectedClient.product_name && (
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-green-400" />
+                      Solicitação do Site
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-white/50 text-xs">Nome do Produto</p>
+                          <p className="text-white font-medium">{selectedClient.product_name}</p>
+                        </div>
+                        <div>
+                          <p className="text-white/50 text-xs">Tipo</p>
+                          <p className="text-white font-medium">{selectedClient.product_type || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-white/50 text-xs">Preço do Produto</p>
+                          <p className="text-white font-medium">
+                            {selectedClient.product_price ? `R$ ${selectedClient.product_price}` : '-'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-white/50 text-xs">Status do Site</p>
+                          <div className="mt-1">{getSiteStatusBadge(selectedClient.site_status)}</div>
+                        </div>
+                        <div>
+                          <p className="text-white/50 text-xs">Público-Alvo</p>
+                          <p className="text-white font-medium">{selectedClient.target_audience || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-white/50 text-xs">Edições Usadas</p>
+                          <p className="text-white font-medium">{selectedClient.site_description_count || 0}/2</p>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <p className="text-white/50 text-xs mb-1">Descrição do Produto</p>
+                        <div className="bg-black/30 p-3 rounded border border-white/5">
+                          <p className="text-white/80 text-sm whitespace-pre-wrap">
+                            {selectedClient.product_description || 'Não informado'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {selectedClient.additional_notes && (
+                        <div>
+                          <p className="text-white/50 text-xs mb-1">Observações Adicionais</p>
+                          <div className="bg-black/30 p-3 rounded border border-white/5">
+                            <p className="text-white/80 text-sm whitespace-pre-wrap">
+                              {selectedClient.additional_notes}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Integration Info */}
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <h3 className="text-white font-bold mb-3 flex items-center gap-2">
+                    <Link2 className="w-4 h-4 text-green-400" />
+                    Integrações
+                  </h3>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-white/50 text-xs">Usuário InfinitePay</p>
+                      <p className="text-white font-medium">{selectedClient.infinitepay_username || '-'}</p>
+                    </div>
+                    {selectedClient.payment_link && (
+                      <div>
+                        <p className="text-white/50 text-xs">Link de Pagamento</p>
+                        <a 
+                          href={selectedClient.payment_link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-green-400 hover:underline flex items-center gap-1 text-sm"
+                        >
+                          {selectedClient.payment_link}
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
+                    {selectedClient.existing_site_url && (
+                      <div>
+                        <p className="text-white/50 text-xs">Site Existente</p>
+                        <a 
+                          href={selectedClient.existing_site_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-green-400 hover:underline flex items-center gap-1 text-sm"
+                        >
+                          {selectedClient.existing_site_url}
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-4 border-t border-white/10">
+                  {!selectedClient.is_paid && (
+                    <>
+                      <Button
+                        onClick={() => {
+                          markAsPaid(selectedClient.id, 'trial');
+                          setSelectedClient(null);
+                        }}
+                        className="bg-amber-500 hover:bg-amber-400 text-black font-bold"
+                      >
+                        Ativar Mensal
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          markAsPaid(selectedClient.id, 'annual');
+                          setSelectedClient(null);
+                        }}
+                        className="bg-green-500 hover:bg-green-400 text-black font-bold"
+                      >
+                        Ativar Anual
+                      </Button>
+                    </>
+                  )}
+                  <Button
+                    onClick={() => {
+                      toggleClientBlock(selectedClient.id, selectedClient.site_blocked || false);
+                      setSelectedClient(null);
+                    }}
+                    variant="outline"
+                    className={selectedClient.site_blocked 
+                      ? "border-green-500/50 text-green-400" 
+                      : "border-red-500/50 text-red-400"
+                    }
+                  >
+                    {selectedClient.site_blocked ? 'Desbloquear' : 'Bloquear'}
+                  </Button>
+                  <a 
+                    href={`https://wa.me/${selectedClient.whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outline" className="border-green-500/50 text-green-400">
+                      <Phone className="w-4 h-4 mr-2" />
+                      WhatsApp
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            </ScrollArea>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
