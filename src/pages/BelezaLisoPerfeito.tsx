@@ -377,10 +377,10 @@ const Index = () => {
                 <Award className="w-5 h-5" />
                 <span className="font-medium">Comunidade + Certificado Inclusos</span>
               </div>
-              <Button variant="cta" size="xl" className="w-full" asChild>
-                <Link to={REGISTER_LINK}>
-                  GARANTIR MINHA VAGA POR R$25
-                  <ArrowRight className="w-5 h-5" />
+              <Button variant="cta" size="xl" className="w-full whitespace-normal text-center h-auto py-4" asChild>
+                <Link to={REGISTER_LINK} className="flex items-center justify-center gap-2">
+                  <span className="text-sm sm:text-base md:text-lg">GARANTIR MINHA VAGA POR R$25</span>
+                  <ArrowRight className="w-5 h-5 flex-shrink-0" />
                 </Link>
               </Button>
               <div className="flex items-center justify-center gap-4 mt-6 text-sm text-muted-foreground">
@@ -428,10 +428,10 @@ const Index = () => {
             <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto text-lg">
               Não perca mais tempo. Milhares de mulheres já transformaram suas vidas com o nosso curso. Agora é a sua vez!
             </p>
-            <Button variant="secondary" size="xl" className="text-foreground" asChild>
-              <Link to={REGISTER_LINK}>
-                GARANTIR MINHA VAGA
-                <ArrowRight className="w-5 h-5" />
+            <Button variant="secondary" size="xl" className="text-foreground whitespace-normal text-center h-auto py-4" asChild>
+              <Link to={REGISTER_LINK} className="flex items-center justify-center gap-2">
+                <span className="text-sm sm:text-base md:text-lg">GARANTIR MINHA VAGA</span>
+                <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </Link>
             </Button>
           </div>
