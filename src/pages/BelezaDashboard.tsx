@@ -37,7 +37,7 @@ export default function BelezaDashboard() {
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [showCertificate, setShowCertificate] = useState(false);
+  // showCertificate state removed - certificate now shown inline
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -356,93 +356,118 @@ export default function BelezaDashboard() {
         ) : (
           // Modules View
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Bem-vinda ao Curso, {profile?.full_name?.split(' ')[0]}! 🎉
             </h1>
+            <p className="text-gray-600 mb-8">{user?.email}</p>
 
-            {/* Certificate Tab - Small */}
-            <div className="mb-6">
-              <button
-                onClick={() => setShowCertificate(!showCertificate)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                  enrollment?.certificate_issued_at 
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200' 
-                    : enrollment?.certificate_photo_url 
-                      ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
-                      : 'bg-pink-100 text-pink-700 hover:bg-pink-200'
-                }`}
-              >
-                <Award className="w-4 h-4" />
-                {enrollment?.certificate_issued_at 
-                  ? 'Certificado Pronto' 
-                  : enrollment?.certificate_photo_url 
-                    ? 'Aguardando Certificado'
-                    : 'Certificado'}
-                <ChevronRight className={`w-4 h-4 transition-transform ${showCertificate ? 'rotate-90' : ''}`} />
-              </button>
+            {/* Banner - Novos conteúdos */}
+            <div className="bg-gradient-to-r from-amber-100 to-yellow-100 border border-amber-200 rounded-2xl p-4 mb-8 flex items-center gap-4">
+              <div className="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-amber-800">Estamos incluindo novos conteúdos</h3>
+                <p className="text-sm text-amber-700">Aguarde por favor, em breve teremos mais módulos e aulas!</p>
+              </div>
+            </div>
 
-              {/* Expandable Certificate Section */}
-              {showCertificate && (
-                <div className="mt-4 bg-white rounded-xl shadow-md p-5 border border-gray-100 max-w-md">
+            {/* Main content grid - Module + Certificate side by side */}
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {/* Module Card */}
+              {modules.length > 0 && (
+                <div
+                  onClick={() => setSelectedModule(modules[0].id)}
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow group"
+                >
+                  <div className="aspect-video bg-gradient-to-br from-pink-200 to-rose-300 relative">
+                    {modules[0].cover_url && (
+                      <img
+                        src={modules[0].cover_url}
+                        alt={modules[0].title}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Play className="w-12 h-12 text-white" />
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-bold text-gray-900 text-lg">{modules[0].title}</h3>
+                    {modules[0].description && (
+                      <p className="text-sm text-gray-600 mt-1 line-clamp-2">{modules[0].description}</p>
+                    )}
+                    <p className="text-sm text-pink-600 mt-2 font-medium">
+                      {lessons.filter(l => l.module_id === modules[0].id).length} aulas
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Certificate Card - Big */}
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div className="bg-gradient-to-br from-pink-400 to-rose-500 p-6 text-center">
+                  <Award className="w-16 h-16 text-white mx-auto mb-2" />
+                  <h3 className="text-xl font-bold text-white">Certificado</h3>
+                </div>
+                <div className="p-6">
                   {enrollment?.certificate_issued_at ? (
                     <div className="text-center">
-                      <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto mb-2" />
-                      <h3 className="font-bold text-green-700 mb-1">Certificado Emitido!</h3>
-                      <p className="text-sm text-green-600 mb-3">
-                        {new Date(enrollment.certificate_issued_at).toLocaleDateString('pt-BR')}
+                      <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                      <h3 className="font-bold text-green-700 text-lg mb-1">Certificado Emitido!</h3>
+                      <p className="text-sm text-green-600 mb-4">
+                        Emitido em {new Date(enrollment.certificate_issued_at).toLocaleDateString('pt-BR')}
                       </p>
                       {enrollment.certificate_url && (
                         <a
                           href={enrollment.certificate_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium px-4 py-2 rounded-full"
+                          className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full"
                         >
-                          <Award className="w-4 h-4" />
-                          Baixar
+                          <Award className="w-5 h-5" />
+                          Baixar Certificado
                         </a>
                       )}
                     </div>
                   ) : enrollment?.certificate_photo_url ? (
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-300 flex-shrink-0">
+                    <div className="text-center">
+                      <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-amber-300 mx-auto mb-4">
                         <img 
                           src={enrollment.certificate_photo_url} 
                           alt="Sua foto" 
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-amber-700">Foto enviada!</p>
-                        <p className="text-xs text-amber-600">Aguardando emissão</p>
-                        <label className="mt-2 inline-flex items-center gap-1 text-xs text-amber-600 hover:text-amber-700 cursor-pointer">
-                          <Camera className="w-3 h-3" />
-                          Trocar foto
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handlePhotoUpload}
-                            className="hidden"
-                            disabled={uploadingPhoto}
-                          />
-                        </label>
-                      </div>
+                      <h3 className="font-bold text-amber-700 text-lg mb-1">Foto enviada!</h3>
+                      <p className="text-sm text-amber-600 mb-4">Aguardando emissão do certificado</p>
+                      <label className="inline-flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 cursor-pointer border border-amber-300 px-4 py-2 rounded-full hover:bg-amber-50 transition-colors">
+                        <Camera className="w-4 h-4" />
+                        Trocar foto
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePhotoUpload}
+                          className="hidden"
+                          disabled={uploadingPhoto}
+                        />
+                      </label>
                     </div>
                   ) : (
                     <div className="text-center">
-                      <Camera className="w-10 h-10 text-pink-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 mb-3">
-                        Envie sua foto para o certificado
+                      <Camera className="w-12 h-12 text-pink-400 mx-auto mb-3" />
+                      <p className="text-gray-700 mb-4 font-medium">
+                        Envie uma foto sua para emitirmos o certificado
                       </p>
-                      <label className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white text-sm font-medium px-4 py-2 rounded-full cursor-pointer">
+                      <label className="inline-flex items-center gap-3 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-lg px-8 py-4 rounded-full cursor-pointer shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
                         {uploadingPhoto ? (
                           <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <Loader2 className="w-6 h-6 animate-spin" />
                             Enviando...
                           </>
                         ) : (
                           <>
-                            <Upload className="w-4 h-4" />
+                            <Upload className="w-6 h-6" />
                             Enviar Foto
                           </>
                         )}
@@ -457,22 +482,13 @@ export default function BelezaDashboard() {
                     </div>
                   )}
                 </div>
-              )}
+              </div>
             </div>
 
-            {modules.length === 0 ? (
-              <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-                <BookOpen className="w-16 h-16 text-pink-300 mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
-                  Conteúdo em Breve
-                </h2>
-                <p className="text-gray-600">
-                  Os módulos do curso estão sendo preparados. Em breve você terá acesso a todo o conteúdo!
-                </p>
-              </div>
-            ) : (
+            {/* Additional modules */}
+            {modules.length > 1 && (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {modules.map((module) => {
+                {modules.slice(1).map((module) => {
                   const lessonCount = lessons.filter(l => l.module_id === module.id).length;
                   return (
                     <div
@@ -502,6 +518,18 @@ export default function BelezaDashboard() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+
+            {modules.length === 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+                <BookOpen className="w-16 h-16 text-pink-300 mx-auto mb-4" />
+                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                  Conteúdo em Breve
+                </h2>
+                <p className="text-gray-600">
+                  Os módulos do curso estão sendo preparados. Em breve você terá acesso a todo o conteúdo!
+                </p>
               </div>
             )}
 
