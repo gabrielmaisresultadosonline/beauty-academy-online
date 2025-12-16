@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { trackFacebookEvent } from '@/components/FacebookPixel';
 import { 
   Scissors, Play, Lock, LogOut, Crown, ChevronRight, 
   BookOpen, Clock, Award, Sparkles, Camera, Upload, CheckCircle2, Loader2
@@ -180,6 +181,16 @@ export default function BelezaDashboard() {
     return `https://checkout.infinitepay.io/paguemro?items=[{"name":"${itemName}","price":100,"quantity":1}]&redirect_url=${encodeURIComponent('https://acessar.click/belezalisoperfeito/obrigado')}`;
   };
 
+  const handlePaymentClick = () => {
+    // Track InitiateCheckout event in Facebook Pixel
+    trackFacebookEvent('InitiateCheckout', {
+      content_name: 'Curso Beleza Liso Perfeito',
+      content_category: 'Course',
+      value: 1.00,
+      currency: 'BRL'
+    });
+  };
+
   const moduleLessons = selectedModule 
     ? lessons.filter(l => l.module_id === selectedModule)
     : [];
@@ -277,6 +288,7 @@ export default function BelezaDashboard() {
 
             <a
               href={getPaymentLink()}
+              onClick={handlePaymentClick}
               className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold text-xl px-12 py-5 rounded-full shadow-lg transition-all transform hover:scale-105"
             >
               <Lock className="w-5 h-5" />

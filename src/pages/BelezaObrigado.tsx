@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle, Sparkles, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FacebookPixel, trackFacebookEvent } from '@/components/FacebookPixel';
 import confetti from 'canvas-confetti';
 
 export default function BelezaObrigado() {
@@ -66,6 +67,14 @@ export default function BelezaObrigado() {
 
       setActivated(true);
       
+      // Track Purchase event in Facebook Pixel
+      trackFacebookEvent('Purchase', {
+        content_name: 'Curso Beleza Liso Perfeito',
+        content_category: 'Course',
+        value: 25.00,
+        currency: 'BRL'
+      });
+      
       // Confetti celebration
       confetti({
         particleCount: 100,
@@ -80,6 +89,7 @@ export default function BelezaObrigado() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200 flex items-center justify-center p-4">
+      <FacebookPixel productSlug="belezalisoperfeito" />
       <div className="max-w-lg w-full bg-white rounded-3xl shadow-2xl p-8 md:p-12 text-center">
         {isActivating ? (
           <>
