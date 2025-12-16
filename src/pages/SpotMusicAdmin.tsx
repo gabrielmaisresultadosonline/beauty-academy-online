@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +15,9 @@ import {
   Trash2, 
   ArrowLeft,
   Loader2,
-  Plus
+  Plus,
+  Image as ImageIcon,
+  FileAudio
 } from 'lucide-react';
 
 interface Album {
@@ -43,6 +45,11 @@ export default function SpotMusicAdmin() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
 
   // Album form
   const [albumTitle, setAlbumTitle] = useState('');
@@ -50,6 +57,7 @@ export default function SpotMusicAdmin() {
   const [albumCoverUrl, setAlbumCoverUrl] = useState('');
   const [albumGenre, setAlbumGenre] = useState('');
   const [albumYear, setAlbumYear] = useState('');
+  const [coverFile, setCoverFile] = useState<File | null>(null);
 
   // Track form
   const [trackTitle, setTrackTitle] = useState('');
@@ -57,6 +65,7 @@ export default function SpotMusicAdmin() {
   const [trackAudioUrl, setTrackAudioUrl] = useState('');
   const [trackAlbumId, setTrackAlbumId] = useState('');
   const [trackDuration, setTrackDuration] = useState('');
+  const [audioFile, setAudioFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -91,6 +100,80 @@ export default function SpotMusicAdmin() {
     if (data) setTracks(data);
   };
 
+  const uploadCoverImage = async (file: File): Promise<string | null> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    
+    const { error } = await supabase.storage
+      .from('album-covers')
+      .upload(fileName, file);
+
+    if (error) {
+      console.error('Error uploading cover:', error);
+      toast({ title: 'Erro ao fazer upload da capa', description: error.message, variant: 'destructive' });
+      return null;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('album-covers')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
+  const uploadAudioFile = async (file: File): Promise<string | null> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    
+    const { error } = await supabase.storage
+      .from('music-files')
+      .upload(fileName, file);
+
+    if (error) {
+      console.error('Error uploading audio:', error);
+      toast({ title: 'Erro ao fazer upload do áudio', description: error.message, variant: 'destructive' });
+      return null;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('music-files')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
+  const handleCoverFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setCoverFile(file);
+    setUploadingCover(true);
+    
+    const url = await uploadCoverImage(file);
+    if (url) {
+      setAlbumCoverUrl(url);
+      toast({ title: 'Capa carregada com sucesso!' });
+    }
+    
+    setUploadingCover(false);
+  };
+
+  const handleAudioFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAudioFile(file);
+    setUploadingAudio(true);
+    
+    const url = await uploadAudioFile(file);
+    if (url) {
+      setTrackAudioUrl(url);
+      toast({ title: 'Áudio carregado com sucesso!' });
+    }
+    
+    setUploadingAudio(false);
+  };
+
   const handleAddAlbum = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!albumTitle || !albumArtist) {
@@ -117,6 +200,8 @@ export default function SpotMusicAdmin() {
       setAlbumCoverUrl('');
       setAlbumGenre('');
       setAlbumYear('');
+      setCoverFile(null);
+      if (coverInputRef.current) coverInputRef.current.value = '';
       fetchAlbums();
     }
     setIsSubmitting(false);
@@ -125,7 +210,7 @@ export default function SpotMusicAdmin() {
   const handleAddTrack = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!trackTitle || !trackArtist || !trackAudioUrl) {
-      toast({ title: 'Preencha título, artista e URL do áudio', variant: 'destructive' });
+      toast({ title: 'Preencha título, artista e áudio', variant: 'destructive' });
       return;
     }
 
@@ -147,6 +232,8 @@ export default function SpotMusicAdmin() {
       setTrackAudioUrl('');
       setTrackAlbumId('');
       setTrackDuration('');
+      setAudioFile(null);
+      if (audioInputRef.current) audioInputRef.current.value = '';
       fetchTracks();
     }
     setIsSubmitting(false);
@@ -239,15 +326,50 @@ export default function SpotMusicAdmin() {
                       className="bg-spotmusic-dark border-spotmusic-border text-spotmusic-foreground"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-spotmusic-foreground">URL da Capa (VPS)</Label>
+                  
+                  {/* Cover Upload */}
+                  <div className="space-y-2 md:col-span-2">
+                    <Label className="text-spotmusic-foreground">Capa do Álbum</Label>
+                    <div className="flex gap-4 items-center">
+                      <input
+                        ref={coverInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={handleCoverFileChange}
+                        className="hidden"
+                        id="cover-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => coverInputRef.current?.click()}
+                        disabled={uploadingCover}
+                        className="border-spotmusic-border text-spotmusic-foreground hover:bg-spotmusic-dark"
+                      >
+                        {uploadingCover ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <ImageIcon className="w-4 h-4 mr-2" />
+                        )}
+                        {uploadingCover ? 'Enviando...' : 'Selecionar Imagem'}
+                      </Button>
+                      {coverFile && (
+                        <span className="text-sm text-spotmusic-muted truncate max-w-[200px]">
+                          {coverFile.name}
+                        </span>
+                      )}
+                      {albumCoverUrl && !coverFile && (
+                        <span className="text-sm text-spotmusic-green">✓ Imagem carregada</span>
+                      )}
+                    </div>
                     <Input
                       value={albumCoverUrl}
                       onChange={(e) => setAlbumCoverUrl(e.target.value)}
-                      placeholder="https://seu-vps.com/capas/album.jpg"
-                      className="bg-spotmusic-dark border-spotmusic-border text-spotmusic-foreground"
+                      placeholder="Ou cole uma URL externa"
+                      className="bg-spotmusic-dark border-spotmusic-border text-spotmusic-foreground mt-2"
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label className="text-spotmusic-foreground">Gênero</Label>
                     <Input
@@ -267,10 +389,10 @@ export default function SpotMusicAdmin() {
                       className="bg-spotmusic-dark border-spotmusic-border text-spotmusic-foreground"
                     />
                   </div>
-                  <div className="flex items-end">
+                  <div className="flex items-end md:col-span-2">
                     <Button 
                       type="submit" 
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || uploadingCover}
                       className="bg-spotmusic-green hover:bg-spotmusic-green/90 text-spotmusic-dark"
                     >
                       {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
@@ -353,15 +475,50 @@ export default function SpotMusicAdmin() {
                       className="bg-spotmusic-dark border-spotmusic-border text-spotmusic-foreground"
                     />
                   </div>
+                  
+                  {/* Audio Upload */}
                   <div className="space-y-2 md:col-span-2">
-                    <Label className="text-spotmusic-foreground">URL do Áudio (VPS) *</Label>
+                    <Label className="text-spotmusic-foreground">Arquivo de Áudio *</Label>
+                    <div className="flex gap-4 items-center">
+                      <input
+                        ref={audioInputRef}
+                        type="file"
+                        accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/flac,audio/m4a,audio/aac"
+                        onChange={handleAudioFileChange}
+                        className="hidden"
+                        id="audio-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => audioInputRef.current?.click()}
+                        disabled={uploadingAudio}
+                        className="border-spotmusic-border text-spotmusic-foreground hover:bg-spotmusic-dark"
+                      >
+                        {uploadingAudio ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <FileAudio className="w-4 h-4 mr-2" />
+                        )}
+                        {uploadingAudio ? 'Enviando...' : 'Selecionar Áudio'}
+                      </Button>
+                      {audioFile && (
+                        <span className="text-sm text-spotmusic-muted truncate max-w-[200px]">
+                          {audioFile.name}
+                        </span>
+                      )}
+                      {trackAudioUrl && !audioFile && (
+                        <span className="text-sm text-spotmusic-green">✓ Áudio carregado</span>
+                      )}
+                    </div>
                     <Input
                       value={trackAudioUrl}
                       onChange={(e) => setTrackAudioUrl(e.target.value)}
-                      placeholder="https://seu-vps.com/musicas/track.mp3"
-                      className="bg-spotmusic-dark border-spotmusic-border text-spotmusic-foreground"
+                      placeholder="Ou cole uma URL externa"
+                      className="bg-spotmusic-dark border-spotmusic-border text-spotmusic-foreground mt-2"
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label className="text-spotmusic-foreground">Álbum</Label>
                     <select
@@ -388,7 +545,7 @@ export default function SpotMusicAdmin() {
                   <div className="flex items-end md:col-span-2">
                     <Button 
                       type="submit" 
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || uploadingAudio}
                       className="bg-spotmusic-green hover:bg-spotmusic-green/90 text-spotmusic-dark"
                     >
                       {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
