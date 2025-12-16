@@ -152,22 +152,38 @@ const ClientDashboard = () => {
     return 2 - count;
   };
 
-  const handleTrialPayment = () => {
+  const handleTrialPayment = async () => {
     if (!clientData) return;
     
-    // Salva o plano no localStorage para identificação na página de obrigado
-    localStorage.setItem('pending_plan_type', 'trial');
+    // Salva o plano pendente no banco de dados (nuvem)
+    const { error } = await supabase
+      .from('platform_clients')
+      .update({ pending_plan_type: 'trial' })
+      .eq('id', clientData.id);
+    
+    if (error) {
+      toast.error("Erro ao iniciar pagamento");
+      return;
+    }
     
     // TESTE: R$1 (100 centavos) - Valor oficial: 24700 (R$247)
     const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%2030%20DIAS%20-%20${encodeURIComponent(clientData.full_name)}","price":100,"quantity":1}]&redirect_url=${encodeURIComponent(`${window.location.origin}/cliente/obrigado`)}`;
     window.open(paymentLink, '_blank');
   };
 
-  const handleAnnualPayment = () => {
+  const handleAnnualPayment = async () => {
     if (!clientData) return;
     
-    // Salva o plano no localStorage para identificação na página de obrigado
-    localStorage.setItem('pending_plan_type', 'annual');
+    // Salva o plano pendente no banco de dados (nuvem)
+    const { error } = await supabase
+      .from('platform_clients')
+      .update({ pending_plan_type: 'annual' })
+      .eq('id', clientData.id);
+    
+    if (error) {
+      toast.error("Erro ao iniciar pagamento");
+      return;
+    }
     
     // TESTE: R$2 (200 centavos) - Valor oficial: 79700 (R$797)
     const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%20ANUAL%20-%20${encodeURIComponent(clientData.full_name)}","price":200,"quantity":1}]&redirect_url=${encodeURIComponent(`${window.location.origin}/cliente/obrigado`)}`;

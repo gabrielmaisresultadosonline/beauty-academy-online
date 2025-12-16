@@ -264,6 +264,7 @@ export type Database = {
           is_paid: boolean | null
           paid_at: string | null
           payment_link: string | null
+          pending_plan_type: string | null
           phone_number: string | null
           plan_amount: number | null
           plan_type: string | null
@@ -292,6 +293,7 @@ export type Database = {
           is_paid?: boolean | null
           paid_at?: string | null
           payment_link?: string | null
+          pending_plan_type?: string | null
           phone_number?: string | null
           plan_amount?: number | null
           plan_type?: string | null
@@ -320,6 +322,7 @@ export type Database = {
           is_paid?: boolean | null
           paid_at?: string | null
           payment_link?: string | null
+          pending_plan_type?: string | null
           phone_number?: string | null
           plan_amount?: number | null
           plan_type?: string | null
