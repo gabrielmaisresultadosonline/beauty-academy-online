@@ -93,6 +93,9 @@ export type Database = {
       }
       course_enrollments: {
         Row: {
+          certificate_issued_at: string | null
+          certificate_photo_url: string | null
+          certificate_url: string | null
           created_at: string
           id: string
           is_premium: boolean | null
@@ -100,6 +103,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          certificate_issued_at?: string | null
+          certificate_photo_url?: string | null
+          certificate_url?: string | null
           created_at?: string
           id?: string
           is_premium?: boolean | null
@@ -107,6 +113,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          certificate_issued_at?: string | null
+          certificate_photo_url?: string | null
+          certificate_url?: string | null
           created_at?: string
           id?: string
           is_premium?: boolean | null

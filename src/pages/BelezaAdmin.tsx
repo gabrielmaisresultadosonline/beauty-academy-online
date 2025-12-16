@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Scissors, Plus, Trash2, Edit, Upload, Save, X, 
-  FolderOpen, Video, LogOut, Users, Settings, BarChart3, CreditCard
+  FolderOpen, Video, LogOut, Users, Settings, BarChart3, CreditCard, Award, Image, CheckCircle2
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,6 +37,9 @@ interface Enrollment {
   user_id: string;
   is_premium: boolean;
   created_at: string;
+  certificate_photo_url?: string;
+  certificate_issued_at?: string;
+  certificate_url?: string;
   profiles?: {
     full_name: string;
     email: string;
@@ -125,6 +128,23 @@ export default function BelezaAdmin() {
     setLessons(lessonsRes.data || []);
     setEnrollments(enrollmentsRes.data as any || []);
     setIsLoading(false);
+  };
+
+  const issueCertificate = async (enrollment: Enrollment, certificateUrl: string) => {
+    const { error } = await supabase
+      .from('course_enrollments')
+      .update({ 
+        certificate_issued_at: new Date().toISOString(),
+        certificate_url: certificateUrl 
+      })
+      .eq('id', enrollment.id);
+
+    if (error) {
+      toast({ title: "Erro ao emitir certificado", variant: "destructive" });
+    } else {
+      toast({ title: "Certificado emitido com sucesso!" });
+      loadData();
+    }
   };
 
   const loadSettings = async () => {
@@ -364,6 +384,10 @@ export default function BelezaAdmin() {
               <Users className="w-4 h-4" />
               Alunos
             </TabsTrigger>
+            <TabsTrigger value="certificates" className="gap-2">
+              <Award className="w-4 h-4" />
+              Certificados
+            </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="w-4 h-4" />
               Configurações
@@ -585,6 +609,177 @@ export default function BelezaAdmin() {
                 </table>
               </div>
             </div>
+          </TabsContent>
+
+          {/* Certificates Tab */}
+          <TabsContent value="certificates">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Emissão de Certificados</h2>
+            
+            {/* Stats */}
+            <div className="grid md:grid-cols-3 gap-4 mb-8">
+              <Card className="bg-white border-amber-100">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                      <Image className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {enrollments.filter(e => e.certificate_photo_url && !e.certificate_issued_at).length}
+                      </p>
+                      <p className="text-sm text-gray-500">Aguardando emissão</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-white border-green-100">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                      <CheckCircle2 className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {enrollments.filter(e => e.certificate_issued_at).length}
+                      </p>
+                      <p className="text-sm text-gray-500">Certificados emitidos</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-white border-gray-100">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                      <Users className="w-6 h-6 text-gray-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {enrollments.filter(e => e.is_premium && !e.certificate_photo_url).length}
+                      </p>
+                      <p className="text-sm text-gray-500">Sem foto enviada</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Pending Certificates */}
+            <Card className="bg-white mb-6">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2 text-amber-600">
+                  <Image className="w-5 h-5" />
+                  Aguardando Emissão de Certificado
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {enrollments.filter(e => e.certificate_photo_url && !e.certificate_issued_at).length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Nenhum certificado pendente</p>
+                ) : (
+                  <div className="space-y-4">
+                    {enrollments
+                      .filter(e => e.certificate_photo_url && !e.certificate_issued_at)
+                      .map((enrollment) => (
+                        <div key={enrollment.id} className="flex items-center gap-4 p-4 bg-amber-50 rounded-xl">
+                          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-300">
+                            <img 
+                              src={enrollment.certificate_photo_url} 
+                              alt="Foto do aluno" 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-bold text-gray-900">
+                              {(enrollment.profiles as any)?.full_name || 'Aluno'}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {(enrollment.profiles as any)?.email || '-'}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <a 
+                              href={enrollment.certificate_photo_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-sm text-pink-600 hover:underline"
+                            >
+                              Ver foto
+                            </a>
+                            <Button
+                              size="sm"
+                              className="bg-green-500 hover:bg-green-600"
+                              onClick={() => {
+                                const url = prompt('Cole o link do certificado gerado:');
+                                if (url) {
+                                  issueCertificate(enrollment, url);
+                                }
+                              }}
+                            >
+                              <Award className="w-4 h-4 mr-1" />
+                              Emitir
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Issued Certificates */}
+            <Card className="bg-white">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2 text-green-600">
+                  <CheckCircle2 className="w-5 h-5" />
+                  Certificados Emitidos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {enrollments.filter(e => e.certificate_issued_at).length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">Nenhum certificado emitido ainda</p>
+                ) : (
+                  <div className="space-y-3">
+                    {enrollments
+                      .filter(e => e.certificate_issued_at)
+                      .map((enrollment) => (
+                        <div key={enrollment.id} className="flex items-center gap-4 p-4 bg-green-50 rounded-lg">
+                          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-green-300">
+                            {enrollment.certificate_photo_url ? (
+                              <img 
+                                src={enrollment.certificate_photo_url} 
+                                alt="Foto" 
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                <Users className="w-6 h-6 text-gray-400" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900">
+                              {(enrollment.profiles as any)?.full_name || 'Aluno'}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Emitido em {new Date(enrollment.certificate_issued_at!).toLocaleDateString('pt-BR')}
+                            </p>
+                          </div>
+                          {enrollment.certificate_url && (
+                            <a 
+                              href={enrollment.certificate_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-sm text-green-600 hover:underline"
+                            >
+                              Ver certificado
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Settings Tab */}
