@@ -661,6 +661,110 @@ const ClientAdmin = () => {
           {/* Settings Tab */}
           <TabsContent value="settings">
             <div className="space-y-6">
+              {/* InfinitePay Config */}
+              <Card className="bg-zinc-900 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-green-400" />
+                    Configuração InfinitePay
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
+                    <div className="flex items-start gap-2">
+                      <Info className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-blue-200 text-sm">
+                        Cole qualquer link do InfinitePay abaixo. O sistema extrai automaticamente o <strong>username</strong> e gera os links de pagamento.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="infinitepayLink" className="text-white">Link do InfinitePay (cole qualquer link)</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="infinitepayLink"
+                        placeholder="https://checkout.infinitepay.io/paguemro?items=..."
+                        value={settings.infinitepay_link || ''}
+                        onChange={(e) => {
+                          const fullUrl = e.target.value;
+                          let baseUrl = fullUrl;
+                          if (fullUrl.includes('?')) {
+                            baseUrl = fullUrl.split('?')[0];
+                          }
+                          setSettings({...settings, infinitepay_link: baseUrl});
+                        }}
+                        className="bg-black border-white/20 text-white flex-1 font-mono text-sm"
+                      />
+                      <Button 
+                        onClick={handleSaveSettings}
+                        disabled={savingSettings}
+                        className="bg-green-500 hover:bg-green-400 text-black font-bold"
+                      >
+                        <Save className="w-4 h-4 mr-2" />
+                        Salvar
+                      </Button>
+                    </div>
+                    <p className="text-xs text-white/40">
+                      Exemplo: https://checkout.infinitepay.io/paguemro?items=[...]
+                    </p>
+                  </div>
+
+                  {settings.infinitepay_link && (
+                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-400" />
+                        <span className="text-green-400 font-bold">Links Gerados Automaticamente</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-white text-sm">Link Plano Mensal (R$247)</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            readOnly
+                            value={`${settings.infinitepay_link}?items=[{"name":"Acessar.Click+Mensal","price":24700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado?plan=trial`}
+                            className="bg-black/50 border-white/10 text-white/80 font-mono text-xs flex-1"
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              navigator.clipboard.writeText(`${settings.infinitepay_link}?items=[{"name":"Acessar.Click+Mensal","price":24700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado?plan=trial`);
+                              toast.success("Link copiado!");
+                            }}
+                            className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-white text-sm">Link Plano Anual (R$797)</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            readOnly
+                            value={`${settings.infinitepay_link}?items=[{"name":"Acessar.Click+Anual","price":79700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado?plan=annual`}
+                            className="bg-black/50 border-white/10 text-white/80 font-mono text-xs flex-1"
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              navigator.clipboard.writeText(`${settings.infinitepay_link}?items=[{"name":"Acessar.Click+Anual","price":79700,"quantity":1}]&redirect_url=${window.location.origin}/cliente/obrigado?plan=annual`);
+                              toast.success("Link copiado!");
+                            }}
+                            className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
               {/* Facebook Pixel */}
               <Card className="bg-zinc-900 border-white/10">
                 <CardHeader>
@@ -679,9 +783,6 @@ const ClientAdmin = () => {
                       onChange={(e) => setSettings({...settings, facebook_pixel_code: e.target.value})}
                       className="bg-black border-white/20 text-white min-h-[150px] font-mono text-sm"
                     />
-                    <p className="text-xs text-white/40">
-                      Cole o código completo do Pixel do Facebook (incluindo as tags script)
-                    </p>
                   </div>
 
                   <Button 
@@ -700,26 +801,17 @@ const ClientAdmin = () => {
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <Link2 className="w-5 h-5 text-green-400" />
-                    URLs do Sistema (Fixas)
+                    URLs de Obrigado (apenas para referência)
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
-                    <div className="flex items-start gap-2">
-                      <Info className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
-                      <p className="text-blue-200 text-sm">
-                        Essas URLs são <strong>geradas automaticamente</strong> pelo sistema. Use-as para configurar o redirecionamento no InfinitePay.
-                      </p>
-                    </div>
-                  </div>
-
                   <div className="space-y-2">
-                    <Label className="text-white">URL de Obrigado - Plano Mensal</Label>
+                    <Label className="text-white/70 text-sm">Mensal</Label>
                     <div className="flex gap-2">
                       <Input
                         readOnly
                         value={`${window.location.origin}/cliente/obrigado?plan=trial`}
-                        className="bg-black/50 border-white/10 text-white/80 font-mono text-sm"
+                        className="bg-black/50 border-white/10 text-white/60 font-mono text-sm"
                       />
                       <Button
                         variant="outline"
@@ -728,7 +820,7 @@ const ClientAdmin = () => {
                           navigator.clipboard.writeText(`${window.location.origin}/cliente/obrigado?plan=trial`);
                           toast.success("URL copiada!");
                         }}
-                        className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                        className="border-white/20 text-white/60 hover:bg-white/10"
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
@@ -736,12 +828,12 @@ const ClientAdmin = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-white">URL de Obrigado - Plano Anual</Label>
+                    <Label className="text-white/70 text-sm">Anual</Label>
                     <div className="flex gap-2">
                       <Input
                         readOnly
                         value={`${window.location.origin}/cliente/obrigado?plan=annual`}
-                        className="bg-black/50 border-white/10 text-white/80 font-mono text-sm"
+                        className="bg-black/50 border-white/10 text-white/60 font-mono text-sm"
                       />
                       <Button
                         variant="outline"
@@ -750,50 +842,10 @@ const ClientAdmin = () => {
                           navigator.clipboard.writeText(`${window.location.origin}/cliente/obrigado?plan=annual`);
                           toast.success("URL copiada!");
                         }}
-                        className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                        className="border-white/20 text-white/60 hover:bg-white/10"
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Como funciona o pagamento */}
-              <Card className="bg-zinc-900 border-white/10">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-green-400" />
-                    Como Funciona o Pagamento
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-                    <h4 className="text-green-400 font-bold mb-2">Links Dinâmicos</h4>
-                    <p className="text-white/80 text-sm mb-3">
-                      Os links de pagamento são <strong>gerados automaticamente</strong> quando o cliente clica em "Assinar". 
-                      Cada link inclui:
-                    </p>
-                    <ul className="text-white/70 text-sm space-y-1 ml-4">
-                      <li>• Nome completo do cliente</li>
-                      <li>• Valor do plano escolhido (Mensal: R$247 / Anual: R$797)</li>
-                      <li>• URL de redirecionamento após pagamento</li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
-                    <h4 className="text-amber-400 font-bold mb-2">Configuração no InfinitePay</h4>
-                    <p className="text-white/80 text-sm">
-                      No seu painel InfinitePay, você <strong>não precisa</strong> configurar nada especial. 
-                      O sistema usa o checkout dinâmico que cria os links automaticamente com seu username: 
-                      <code className="bg-black/30 px-2 py-0.5 rounded ml-1">paguemro</code>
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-white">Exemplo de Link Gerado (Mensal)</Label>
-                    <div className="bg-black/50 border border-white/10 rounded-lg p-3 font-mono text-xs text-white/60 break-all">
-                      https://checkout.infinitepay.io/paguemro?items=[{`{"name":"AREA DE MEMBROS 30 DIAS - Nome do Cliente","price":24700,"quantity":1}`}]&redirect_url=...
                     </div>
                   </div>
                 </CardContent>
