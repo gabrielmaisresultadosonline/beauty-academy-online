@@ -316,15 +316,19 @@ const Index = () => {
               <p className="text-muted-foreground line-through text-lg mb-2">De R$ 197,00</p>
               <div className="flex items-baseline justify-center gap-2 mb-2">
                 <span className="text-2xl font-bold text-foreground">R$</span>
-                <span className="text-7xl font-bold font-heading text-primary">47</span>
+                <span className="text-7xl font-bold font-heading text-primary">25</span>
                 <span className="text-2xl font-bold text-foreground">,00</span>
               </div>
-              <p className="text-muted-foreground mb-8">
-                Pagamento único. Acesso vitalício a todo o conteúdo.
+              <p className="text-muted-foreground mb-4">
+                Pagamento único • Acesso vitalício • Certificado incluso
               </p>
+              <div className="flex items-center justify-center gap-2 mb-6 text-success">
+                <Award className="w-5 h-5" />
+                <span className="font-medium">Certificado de Conclusão Incluso</span>
+              </div>
               <Button variant="cta" size="xl" className="w-full" asChild>
                 <Link to={REGISTER_LINK}>
-                  GARANTIR MINHA VAGA POR R$47
+                  GARANTIR MINHA VAGA POR R$25
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </Button>
@@ -336,6 +340,10 @@ const Index = () => {
                 <span className="flex items-center gap-1">
                   <CheckCircle2 className="w-4 h-4 text-success" />
                   Acesso imediato
+                </span>
+                <span className="flex items-center gap-1">
+                  <Infinity className="w-4 h-4 text-success" />
+                  Vitalício
                 </span>
               </div>
             </div>
