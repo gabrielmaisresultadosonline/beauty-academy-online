@@ -161,11 +161,11 @@ const Index = () => {
                 CURSO COMPLETO ONLINE
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-foreground leading-tight">
-                Cabeleireira{' '}
-                <span className="text-gradient">Completo</span> Online
+                Comunidade da{' '}
+                <span className="text-gradient">Cabeleireira</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
-                Tudo que você precisa para se tornar uma profissional de sucesso na área de cabeleiraria. Aprenda com especialistas e comece sua transformação hoje!
+                Curso completo com conhecimentos atualizados mensalmente. Aprenda com especialistas e faça parte da maior comunidade de cabeleireiras do Brasil!
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button variant="cta" size="xl" asChild>
@@ -177,12 +177,17 @@ const Index = () => {
               </div>
               <div className="flex items-center gap-6 pt-4">
                 <div className="flex -space-x-3">
-                  {[1, 2, 3, 4].map((i) => (
+                  {[
+                    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face'
+                  ].map((src, i) => (
                     <img
                       key={i}
-                      src={`https://i.pravatar.cc/40?img=${i + 10}`}
+                      src={src}
                       alt="Aluna"
-                      className="w-10 h-10 rounded-full border-2 border-background"
+                      className="w-10 h-10 rounded-full border-2 border-background object-cover"
                     />
                   ))}
                 </div>
@@ -320,11 +325,11 @@ const Index = () => {
                 <span className="text-2xl font-bold text-foreground">,00</span>
               </div>
               <p className="text-muted-foreground mb-4">
-                Pagamento único • Acesso vitalício • Certificado incluso
+                Pagamento único • Acesso vitalício • Certificado incluso • Conteúdo atualizado mensalmente
               </p>
               <div className="flex items-center justify-center gap-2 mb-6 text-success">
                 <Award className="w-5 h-5" />
-                <span className="font-medium">Certificado de Conclusão Incluso</span>
+                <span className="font-medium">Comunidade + Certificado Inclusos</span>
               </div>
               <Button variant="cta" size="xl" className="w-full" asChild>
                 <Link to={REGISTER_LINK}>
