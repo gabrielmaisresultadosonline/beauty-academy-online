@@ -8,9 +8,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Scissors, Plus, Trash2, Edit, Upload, Save, X, 
-  FolderOpen, Video, LogOut, Users, CreditCard 
+  FolderOpen, Video, LogOut, Users, Settings, BarChart3
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Module {
   id: string;
@@ -48,6 +49,10 @@ export default function BelezaAdmin() {
   const [modules, setModules] = useState<Module[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  
+  // Pixel settings
+  const [pixelCode, setPixelCode] = useState('');
+  const [savingPixel, setSavingPixel] = useState(false);
   
   // Forms
   const [showModuleForm, setShowModuleForm] = useState(false);
@@ -102,6 +107,7 @@ export default function BelezaAdmin() {
 
     setIsAdmin(true);
     loadData();
+    loadPixelSettings();
   };
 
   const loadData = async () => {
@@ -118,6 +124,33 @@ export default function BelezaAdmin() {
     setLessons(lessonsRes.data || []);
     setEnrollments(enrollmentsRes.data as any || []);
     setIsLoading(false);
+  };
+
+  const loadPixelSettings = async () => {
+    const { data } = await supabase
+      .from('platform_settings')
+      .select('facebook_pixel_code')
+      .eq('product_slug', 'belezalisoperfeito')
+      .maybeSingle();
+    
+    if (data?.facebook_pixel_code) {
+      setPixelCode(data.facebook_pixel_code);
+    }
+  };
+
+  const savePixelSettings = async () => {
+    setSavingPixel(true);
+    const { error } = await supabase
+      .from('platform_settings')
+      .update({ facebook_pixel_code: pixelCode })
+      .eq('product_slug', 'belezalisoperfeito');
+
+    if (error) {
+      toast({ title: "Erro ao salvar pixel", variant: "destructive" });
+    } else {
+      toast({ title: "Pixel salvo com sucesso!" });
+    }
+    setSavingPixel(false);
   };
 
   const handleLogout = async () => {
@@ -274,6 +307,11 @@ export default function BelezaAdmin() {
     setShowLessonForm(true);
   };
 
+  // Stats
+  const totalUsers = enrollments.length;
+  const premiumUsers = enrollments.filter(e => e.is_premium).length;
+  const pendingUsers = totalUsers - premiumUsers;
+
   if (isLoading || !isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200 flex items-center justify-center">
@@ -303,8 +341,12 @@ export default function BelezaAdmin() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <Tabs defaultValue="modules">
+        <Tabs defaultValue="dashboard">
           <TabsList className="mb-8">
+            <TabsTrigger value="dashboard" className="gap-2">
+              <BarChart3 className="w-4 h-4" />
+              Dashboard
+            </TabsTrigger>
             <TabsTrigger value="modules" className="gap-2">
               <FolderOpen className="w-4 h-4" />
               Módulos
@@ -317,7 +359,81 @@ export default function BelezaAdmin() {
               <Users className="w-4 h-4" />
               Alunos
             </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Configurações
+            </TabsTrigger>
           </TabsList>
+
+          {/* Dashboard Tab */}
+          <TabsContent value="dashboard">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Dashboard de Vendas</h2>
+            
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <Card className="bg-white border-pink-100">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Total de Usuários</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-gray-900">{totalUsers}</div>
+                  <p className="text-xs text-gray-500 mt-1">cadastrados na plataforma</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white border-green-100">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-green-600">Compras Aprovadas</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-green-600">{premiumUsers}</div>
+                  <p className="text-xs text-gray-500 mt-1">usuários premium ativos</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white border-orange-100">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-orange-600">Pendentes</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-orange-600">{pendingUsers}</div>
+                  <p className="text-xs text-gray-500 mt-1">aguardando pagamento</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Activity */}
+            <Card className="bg-white">
+              <CardHeader>
+                <CardTitle className="text-lg">Atividade Recente</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {enrollments.slice(0, 10).map((enrollment) => (
+                    <div key={enrollment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {(enrollment.profiles as any)?.full_name || 'Usuário'}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {(enrollment.profiles as any)?.email || '-'}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        {enrollment.is_premium ? (
+                          <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Pago</span>
+                        ) : (
+                          <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">Pendente</span>
+                        )}
+                        <p className="text-xs text-gray-400 mt-1">
+                          {new Date(enrollment.created_at).toLocaleDateString('pt-BR')}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Modules Tab */}
           <TabsContent value="modules">
@@ -465,35 +581,69 @@ export default function BelezaAdmin() {
               </div>
             </div>
           </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Configurações</h2>
+            
+            <Card className="bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5" />
+                  Facebook Pixel
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Cole o código completo do seu Facebook Pixel abaixo. O pixel será carregado automaticamente em todas as páginas do curso.
+                </p>
+                <Textarea
+                  value={pixelCode}
+                  onChange={(e) => setPixelCode(e.target.value)}
+                  placeholder={`<!-- Meta Pixel Code -->\n<script>...</script>\n<noscript>...</noscript>\n<!-- End Meta Pixel Code -->`}
+                  className="font-mono text-xs min-h-[200px]"
+                />
+                <Button onClick={savePixelSettings} disabled={savingPixel} className="bg-pink-500 hover:bg-pink-600">
+                  {savingPixel ? (
+                    <>Salvando...</>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Salvar Pixel
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </main>
 
       {/* Module Form Modal */}
       {showModuleForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold">{editingModule ? 'Editar Módulo' : 'Novo Módulo'}</h2>
-              <button onClick={resetModuleForm} className="text-gray-400 hover:text-gray-600">
-                <X className="w-6 h-6" />
-              </button>
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">{editingModule ? 'Editar Módulo' : 'Novo Módulo'}</h3>
+              <Button variant="ghost" size="icon" onClick={resetModuleForm}>
+                <X className="w-4 h-4" />
+              </Button>
             </div>
-            
             <div className="space-y-4">
               <div>
                 <Label>Título *</Label>
-                <Input value={moduleTitle} onChange={(e) => setModuleTitle(e.target.value)} placeholder="Ex: Colorimetria" />
+                <Input value={moduleTitle} onChange={(e) => setModuleTitle(e.target.value)} />
               </div>
               <div>
                 <Label>Descrição</Label>
-                <Textarea value={moduleDescription} onChange={(e) => setModuleDescription(e.target.value)} placeholder="Descrição do módulo" />
+                <Textarea value={moduleDescription} onChange={(e) => setModuleDescription(e.target.value)} />
               </div>
               <div>
-                <Label>Capa do Módulo</Label>
+                <Label>Capa</Label>
                 <Input type="file" accept="image/*" onChange={(e) => setModuleCover(e.target.files?.[0] || null)} />
               </div>
               <Button onClick={handleSaveModule} disabled={uploading} className="w-full bg-pink-500 hover:bg-pink-600">
-                {uploading ? 'Salvando...' : <><Save className="w-4 h-4 mr-2" /> Salvar</>}
+                {uploading ? 'Salvando...' : <><Save className="w-4 h-4 mr-2" />Salvar</>}
               </Button>
             </div>
           </div>
@@ -503,21 +653,20 @@ export default function BelezaAdmin() {
       {/* Lesson Form Modal */}
       {showLessonForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold">{editingLesson ? 'Editar Aula' : 'Nova Aula'}</h2>
-              <button onClick={resetLessonForm} className="text-gray-400 hover:text-gray-600">
-                <X className="w-6 h-6" />
-              </button>
+          <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">{editingLesson ? 'Editar Aula' : 'Nova Aula'}</h3>
+              <Button variant="ghost" size="icon" onClick={resetLessonForm}>
+                <X className="w-4 h-4" />
+              </Button>
             </div>
-            
             <div className="space-y-4">
               <div>
                 <Label>Módulo *</Label>
                 <select
                   value={selectedModuleForLesson}
                   onChange={(e) => setSelectedModuleForLesson(e.target.value)}
-                  className="w-full border border-gray-200 rounded-md px-3 py-2"
+                  className="w-full border rounded-md p-2"
                 >
                   <option value="">Selecione um módulo</option>
                   {modules.map((m) => (
@@ -527,26 +676,26 @@ export default function BelezaAdmin() {
               </div>
               <div>
                 <Label>Título *</Label>
-                <Input value={lessonTitle} onChange={(e) => setLessonTitle(e.target.value)} placeholder="Ex: Introdução à Colorimetria" />
+                <Input value={lessonTitle} onChange={(e) => setLessonTitle(e.target.value)} />
               </div>
               <div>
                 <Label>Descrição</Label>
-                <Textarea value={lessonDescription} onChange={(e) => setLessonDescription(e.target.value)} placeholder="Descrição da aula" />
+                <Textarea value={lessonDescription} onChange={(e) => setLessonDescription(e.target.value)} />
               </div>
               <div>
                 <Label>URL do Vídeo (YouTube, Vimeo, etc)</Label>
-                <Input value={lessonVideoUrl} onChange={(e) => setLessonVideoUrl(e.target.value)} placeholder="https://youtube.com/embed/..." />
+                <Input value={lessonVideoUrl} onChange={(e) => setLessonVideoUrl(e.target.value)} placeholder="https://..." />
               </div>
               <div>
-                <Label>Ou Upload de Vídeo</Label>
+                <Label>Ou fazer upload do vídeo</Label>
                 <Input type="file" accept="video/*" onChange={(e) => setLessonVideoFile(e.target.files?.[0] || null)} />
               </div>
               <div>
                 <Label>Duração (minutos)</Label>
-                <Input type="number" value={lessonDuration} onChange={(e) => setLessonDuration(e.target.value)} placeholder="15" />
+                <Input type="number" value={lessonDuration} onChange={(e) => setLessonDuration(e.target.value)} />
               </div>
               <Button onClick={handleSaveLesson} disabled={uploading} className="w-full bg-pink-500 hover:bg-pink-600">
-                {uploading ? 'Salvando...' : <><Save className="w-4 h-4 mr-2" /> Salvar</>}
+                {uploading ? 'Salvando...' : <><Save className="w-4 h-4 mr-2" />Salvar</>}
               </Button>
             </div>
           </div>

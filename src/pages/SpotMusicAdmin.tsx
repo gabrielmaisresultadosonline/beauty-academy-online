@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
@@ -17,7 +18,11 @@ import {
   Loader2,
   Plus,
   Image as ImageIcon,
-  FileAudio
+  FileAudio,
+  BarChart3,
+  Users,
+  Settings,
+  Save
 } from 'lucide-react';
 
 interface Album {
@@ -37,6 +42,15 @@ interface Track {
   album_id: string | null;
 }
 
+interface Profile {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string;
+  is_premium: boolean;
+  created_at: string;
+}
+
 export default function SpotMusicAdmin() {
   const { user, isLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -44,9 +58,14 @@ export default function SpotMusicAdmin() {
   
   const [albums, setAlbums] = useState<Album[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
+
+  // Pixel settings
+  const [pixelCode, setPixelCode] = useState('');
+  const [savingPixel, setSavingPixel] = useState(false);
 
   const coverInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
@@ -79,6 +98,8 @@ export default function SpotMusicAdmin() {
     if (isAdmin) {
       fetchAlbums();
       fetchTracks();
+      fetchProfiles();
+      loadPixelSettings();
     }
   }, [isAdmin]);
 
@@ -98,6 +119,42 @@ export default function SpotMusicAdmin() {
       .order('created_at', { ascending: false });
     
     if (data) setTracks(data);
+  };
+
+  const fetchProfiles = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (data) setProfiles(data);
+  };
+
+  const loadPixelSettings = async () => {
+    const { data } = await supabase
+      .from('platform_settings')
+      .select('facebook_pixel_code')
+      .eq('product_slug', 'comunidademusica')
+      .maybeSingle();
+    
+    if (data?.facebook_pixel_code) {
+      setPixelCode(data.facebook_pixel_code);
+    }
+  };
+
+  const savePixelSettings = async () => {
+    setSavingPixel(true);
+    const { error } = await supabase
+      .from('platform_settings')
+      .update({ facebook_pixel_code: pixelCode })
+      .eq('product_slug', 'comunidademusica');
+
+    if (error) {
+      toast({ title: "Erro ao salvar pixel", variant: "destructive" });
+    } else {
+      toast({ title: "Pixel salvo com sucesso!" });
+    }
+    setSavingPixel(false);
   };
 
   const uploadCoverImage = async (file: File): Promise<string | null> => {
@@ -260,6 +317,11 @@ export default function SpotMusicAdmin() {
     }
   };
 
+  // Stats
+  const totalUsers = profiles.length;
+  const premiumUsers = profiles.filter(p => p.is_premium).length;
+  const pendingUsers = totalUsers - premiumUsers;
+
   if (isLoading || !isAdmin) {
     return (
       <div className="min-h-screen bg-spotmusic-dark flex items-center justify-center">
@@ -281,12 +343,16 @@ export default function SpotMusicAdmin() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-spotmusic-foreground">Painel Admin</h1>
-            <p className="text-spotmusic-muted">Gerencie álbuns e músicas</p>
+            <p className="text-spotmusic-muted">Gerencie álbuns, músicas e configurações</p>
           </div>
         </header>
 
-        <Tabs defaultValue="albums" className="space-y-6">
+        <Tabs defaultValue="dashboard" className="space-y-6">
           <TabsList className="bg-spotmusic-card border-spotmusic-border">
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-spotmusic-green data-[state=active]:text-spotmusic-dark">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Dashboard
+            </TabsTrigger>
             <TabsTrigger value="albums" className="data-[state=active]:bg-spotmusic-green data-[state=active]:text-spotmusic-dark">
               <Disc className="w-4 h-4 mr-2" />
               Álbuns
@@ -295,10 +361,84 @@ export default function SpotMusicAdmin() {
               <Music className="w-4 h-4 mr-2" />
               Músicas
             </TabsTrigger>
+            <TabsTrigger value="users" className="data-[state=active]:bg-spotmusic-green data-[state=active]:text-spotmusic-dark">
+              <Users className="w-4 h-4 mr-2" />
+              Usuários
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="data-[state=active]:bg-spotmusic-green data-[state=active]:text-spotmusic-dark">
+              <Settings className="w-4 h-4 mr-2" />
+              Configurações
+            </TabsTrigger>
           </TabsList>
 
+          {/* Dashboard Tab */}
+          <TabsContent value="dashboard" className="space-y-6">
+            <h2 className="text-xl font-bold text-spotmusic-foreground">Dashboard de Vendas</h2>
+            
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="bg-spotmusic-card border-spotmusic-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-spotmusic-muted">Total de Usuários</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-spotmusic-foreground">{totalUsers}</div>
+                  <p className="text-xs text-spotmusic-muted mt-1">cadastrados na plataforma</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-spotmusic-card border-spotmusic-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-spotmusic-green">Compras Aprovadas</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-spotmusic-green">{premiumUsers}</div>
+                  <p className="text-xs text-spotmusic-muted mt-1">usuários premium ativos</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-spotmusic-card border-spotmusic-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-amber-500">Pendentes</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-amber-500">{pendingUsers}</div>
+                  <p className="text-xs text-spotmusic-muted mt-1">aguardando pagamento</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Activity */}
+            <Card className="bg-spotmusic-card border-spotmusic-border">
+              <CardHeader>
+                <CardTitle className="text-spotmusic-foreground">Atividade Recente</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {profiles.slice(0, 10).map((profile) => (
+                    <div key={profile.id} className="flex items-center justify-between p-3 bg-spotmusic-dark rounded-lg">
+                      <div>
+                        <p className="font-medium text-spotmusic-foreground">{profile.full_name || 'Usuário'}</p>
+                        <p className="text-sm text-spotmusic-muted">{profile.email}</p>
+                      </div>
+                      <div className="text-right">
+                        {profile.is_premium ? (
+                          <span className="px-2 py-1 bg-spotmusic-green/20 text-spotmusic-green text-xs rounded-full">Pago</span>
+                        ) : (
+                          <span className="px-2 py-1 bg-amber-500/20 text-amber-500 text-xs rounded-full">Pendente</span>
+                        )}
+                        <p className="text-xs text-spotmusic-muted mt-1">
+                          {new Date(profile.created_at).toLocaleDateString('pt-BR')}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Albums Tab */}
           <TabsContent value="albums" className="space-y-6">
-            {/* Add Album Form */}
             <Card className="bg-spotmusic-card border-spotmusic-border">
               <CardHeader>
                 <CardTitle className="text-spotmusic-foreground flex items-center gap-2">
@@ -327,7 +467,6 @@ export default function SpotMusicAdmin() {
                     />
                   </div>
                   
-                  {/* Cover Upload */}
                   <div className="space-y-2 md:col-span-2">
                     <Label className="text-spotmusic-foreground">Capa do Álbum</Label>
                     <div className="flex gap-4 items-center">
@@ -403,7 +542,6 @@ export default function SpotMusicAdmin() {
               </CardContent>
             </Card>
 
-            {/* Albums List */}
             <Card className="bg-spotmusic-card border-spotmusic-border">
               <CardHeader>
                 <CardTitle className="text-spotmusic-foreground">Álbuns ({albums.length})</CardTitle>
@@ -446,8 +584,8 @@ export default function SpotMusicAdmin() {
             </Card>
           </TabsContent>
 
+          {/* Tracks Tab */}
           <TabsContent value="tracks" className="space-y-6">
-            {/* Add Track Form */}
             <Card className="bg-spotmusic-card border-spotmusic-border">
               <CardHeader>
                 <CardTitle className="text-spotmusic-foreground flex items-center gap-2">
@@ -476,14 +614,13 @@ export default function SpotMusicAdmin() {
                     />
                   </div>
                   
-                  {/* Audio Upload */}
                   <div className="space-y-2 md:col-span-2">
                     <Label className="text-spotmusic-foreground">Arquivo de Áudio *</Label>
                     <div className="flex gap-4 items-center">
                       <input
                         ref={audioInputRef}
                         type="file"
-                        accept="audio/mpeg,audio/mp3,audio/wav,audio/ogg,audio/flac,audio/m4a,audio/aac"
+                        accept="audio/mpeg,audio/ogg,audio/wav"
                         onChange={handleAudioFileChange}
                         className="hidden"
                         id="audio-upload"
@@ -524,11 +661,13 @@ export default function SpotMusicAdmin() {
                     <select
                       value={trackAlbumId}
                       onChange={(e) => setTrackAlbumId(e.target.value)}
-                      className="w-full h-10 px-3 rounded-md bg-spotmusic-dark border border-spotmusic-border text-spotmusic-foreground"
+                      className="w-full p-2 rounded-md bg-spotmusic-dark border border-spotmusic-border text-spotmusic-foreground"
                     >
-                      <option value="">Selecione um álbum (opcional)</option>
+                      <option value="">Sem álbum</option>
                       {albums.map((album) => (
-                        <option key={album.id} value={album.id}>{album.title} - {album.artist}</option>
+                        <option key={album.id} value={album.id}>
+                          {album.title} - {album.artist}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -556,7 +695,6 @@ export default function SpotMusicAdmin() {
               </CardContent>
             </Card>
 
-            {/* Tracks List */}
             <Card className="bg-spotmusic-card border-spotmusic-border">
               <CardHeader>
                 <CardTitle className="text-spotmusic-foreground">Músicas ({tracks.length})</CardTitle>
@@ -571,9 +709,9 @@ export default function SpotMusicAdmin() {
                       <div className="w-10 h-10 bg-spotmusic-card rounded flex items-center justify-center">
                         <Music className="w-5 h-5 text-spotmusic-muted" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-spotmusic-foreground truncate">{track.title}</h4>
-                        <p className="text-sm text-spotmusic-muted truncate">{track.artist}</p>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-spotmusic-foreground">{track.title}</h4>
+                        <p className="text-sm text-spotmusic-muted">{track.artist}</p>
                       </div>
                       <Button 
                         variant="ghost" 
@@ -589,6 +727,85 @@ export default function SpotMusicAdmin() {
                     <p className="text-center text-spotmusic-muted py-8">Nenhuma música cadastrada</p>
                   )}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Users Tab */}
+          <TabsContent value="users" className="space-y-6">
+            <h2 className="text-xl font-bold text-spotmusic-foreground">Usuários Cadastrados</h2>
+            
+            <Card className="bg-spotmusic-card border-spotmusic-border">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-spotmusic-dark">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-spotmusic-muted uppercase">Nome</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-spotmusic-muted uppercase">Email</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-spotmusic-muted uppercase">Status</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-spotmusic-muted uppercase">Data</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-spotmusic-border">
+                      {profiles.map((profile) => (
+                        <tr key={profile.id}>
+                          <td className="px-6 py-4 text-sm text-spotmusic-foreground">
+                            {profile.full_name || '-'}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-spotmusic-muted">
+                            {profile.email}
+                          </td>
+                          <td className="px-6 py-4">
+                            {profile.is_premium ? (
+                              <span className="px-2 py-1 bg-spotmusic-green/20 text-spotmusic-green text-xs rounded-full">Premium</span>
+                            ) : (
+                              <span className="px-2 py-1 bg-gray-500/20 text-gray-400 text-xs rounded-full">Grátis</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-spotmusic-muted">
+                            {new Date(profile.created_at).toLocaleDateString('pt-BR')}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <h2 className="text-xl font-bold text-spotmusic-foreground">Configurações</h2>
+            
+            <Card className="bg-spotmusic-card border-spotmusic-border">
+              <CardHeader>
+                <CardTitle className="text-spotmusic-foreground flex items-center gap-2">
+                  <Settings className="w-5 h-5" />
+                  Facebook Pixel
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-spotmusic-muted">
+                  Cole o código completo do seu Facebook Pixel abaixo. O pixel será carregado automaticamente em todas as páginas do SpotMusic.
+                </p>
+                <Textarea
+                  value={pixelCode}
+                  onChange={(e) => setPixelCode(e.target.value)}
+                  placeholder={`<!-- Meta Pixel Code -->\n<script>...</script>\n<noscript>...</noscript>\n<!-- End Meta Pixel Code -->`}
+                  className="font-mono text-xs min-h-[200px] bg-spotmusic-dark border-spotmusic-border text-spotmusic-foreground"
+                />
+                <Button onClick={savePixelSettings} disabled={savingPixel} className="bg-spotmusic-green hover:bg-spotmusic-green/90 text-spotmusic-dark">
+                  {savingPixel ? (
+                    <>Salvando...</>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Salvar Pixel
+                    </>
+                  )}
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
