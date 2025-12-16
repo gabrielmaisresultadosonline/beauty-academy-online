@@ -3,9 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
-  Play, Clock, Settings, ChevronDown, ChevronUp, 
-  Bell, CheckCircle, Crown, Sparkles, LogOut
+  Play, Clock, Settings, ChevronDown, ChevronLeft, ChevronRight,
+  Bell, CheckCircle, Crown, Sparkles, LogOut, BookOpen, ArrowLeft, X
 } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface DemoModule {
   id: string;
@@ -80,9 +87,9 @@ const DemoMembro = () => {
   const [notices, setNotices] = useState<DemoNotice[]>([]);
   const [selectedModule, setSelectedModule] = useState<DemoModule | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<DemoLesson | null>(null);
-  const [expandedModules, setExpandedModules] = useState<string[]>([]);
   const [dismissedNotices, setDismissedNotices] = useState<string[]>([]);
   const [showPopupNotices, setShowPopupNotices] = useState<DemoNotice[]>([]);
+  const [viewingModuleDetail, setViewingModuleDetail] = useState<DemoModule | null>(null);
 
   // Default demo modules
   const defaultDemoModules: DemoModule[] = [
@@ -190,9 +197,6 @@ const DemoMembro = () => {
       localStorage.setItem("demo_modules", JSON.stringify(defaultDemoModules));
     }
     setModules(modulesToUse);
-    if (modulesToUse.length > 0) {
-      setExpandedModules([modulesToUse[0].id]);
-    }
     
     if (savedSettings) setSettings({ ...settings, ...JSON.parse(savedSettings) });
     
@@ -222,17 +226,20 @@ const DemoMembro = () => {
     }
   }, [navigate]);
 
-  const toggleModule = (moduleId: string) => {
-    setExpandedModules(prev => 
-      prev.includes(moduleId) 
-        ? prev.filter(id => id !== moduleId)
-        : [...prev, moduleId]
-    );
-  };
-
   const handleSelectLesson = (module: DemoModule, lesson: DemoLesson) => {
     setSelectedModule(module);
     setSelectedLesson(lesson);
+    setViewingModuleDetail(null);
+  };
+
+  const handleOpenModuleDetail = (module: DemoModule) => {
+    setViewingModuleDetail(module);
+  };
+
+  const handleBackToModules = () => {
+    setViewingModuleDetail(null);
+    setSelectedLesson(null);
+    setSelectedModule(null);
   };
 
   const handleBackToAdmin = () => {
@@ -433,13 +440,13 @@ const DemoMembro = () => {
           </Card>
         ) : selectedLesson ? (
           // Video Player View
-          <div>
+          <div className="animate-fade-in">
             <button
-              onClick={() => setSelectedLesson(null)}
+              onClick={handleBackToModules}
               className="flex items-center gap-2 hover:opacity-80 mb-6 font-medium"
               style={{ color: settings.primaryColor }}
             >
-              <ChevronDown className="w-4 h-4 rotate-90" />
+              <ArrowLeft className="w-4 h-4" />
               Voltar aos módulos
             </button>
             
@@ -468,80 +475,296 @@ const DemoMembro = () => {
                 <p className="text-gray-500 text-sm mt-2">{selectedModule?.title}</p>
               </div>
             </div>
-          </div>
-        ) : (
-          // Modules View
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Sidebar - Lista de Módulos */}
-            <div className="lg:col-span-1 space-y-4">
-              <h2 className="text-gray-900 font-bold text-lg">Conteúdo do Curso</h2>
-              <div className="space-y-2">
-                {modules.map((module) => (
-                  <Card key={module.id} className="bg-white border-pink-100 overflow-hidden shadow-sm">
+
+            {/* Lista de aulas do módulo atual */}
+            {selectedModule && (
+              <div className="mt-8">
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" style={{ color: settings.primaryColor }} />
+                  Outras aulas deste módulo
+                </h3>
+                <div className="grid gap-3">
+                  {selectedModule.lessons.map((lesson, index) => (
                     <button
-                      onClick={() => toggleModule(module.id)}
-                      className="w-full p-4 flex items-center justify-between text-left hover:bg-pink-50/50 transition-colors"
+                      key={lesson.id}
+                      onClick={() => handleSelectLesson(selectedModule, lesson)}
+                      className={`w-full p-4 rounded-2xl flex items-center gap-4 text-left transition-all ${
+                        selectedLesson?.id === lesson.id 
+                          ? "bg-pink-100 border-2 shadow-md" 
+                          : "bg-white border border-pink-100 hover:bg-pink-50 hover:shadow-md"
+                      }`}
+                      style={{ borderColor: selectedLesson?.id === lesson.id ? settings.primaryColor : undefined }}
                     >
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-10 h-10 rounded-xl flex items-center justify-center"
-                          style={{ backgroundColor: settings.primaryColor + "15" }}
-                        >
-                          <Play className="w-5 h-5" style={{ color: settings.primaryColor }} />
-                        </div>
-                        <div>
-                          <h3 className="text-gray-900 font-bold text-sm">{module.title}</h3>
-                          <p className="text-gray-500 text-xs">{module.lessons.length} aulas</p>
-                        </div>
+                      <span 
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                        style={{ 
+                          backgroundColor: selectedLesson?.id === lesson.id ? settings.primaryColor : settings.primaryColor + "15",
+                          color: selectedLesson?.id === lesson.id ? "white" : settings.primaryColor,
+                        }}
+                      >
+                        {index + 1}
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-gray-900 font-medium">{lesson.title}</p>
+                        <p className="text-gray-400 text-xs flex items-center gap-1 mt-1">
+                          <Clock className="w-3 h-3" />
+                          {lesson.duration}
+                        </p>
                       </div>
-                      {expandedModules.includes(module.id) ? (
-                        <ChevronUp className="w-5 h-5 text-gray-400" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                      {selectedLesson?.id === lesson.id && (
+                        <Play className="w-5 h-5 flex-shrink-0" style={{ color: settings.primaryColor }} />
                       )}
                     </button>
-                    
-                    {expandedModules.includes(module.id) && module.lessons.length > 0 && (
-                      <div className="border-t border-pink-100">
-                        {module.lessons.map((lesson, index) => (
-                          <button
-                            key={lesson.id}
-                            onClick={() => handleSelectLesson(module, lesson)}
-                            className={`w-full p-3 pl-6 flex items-center gap-3 text-left hover:bg-pink-50/50 transition-colors ${
-                              selectedLesson?.id === lesson.id ? "bg-pink-50" : ""
-                            }`}
-                          >
-                            <span 
-                              className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                              style={{ 
-                                backgroundColor: selectedLesson?.id === lesson.id ? settings.primaryColor : "transparent",
-                                color: selectedLesson?.id === lesson.id ? "white" : settings.primaryColor,
-                                border: `2px solid ${settings.primaryColor}`
-                              }}
-                            >
-                              {index + 1}
-                            </span>
-                            <div className="flex-1">
-                              <p className="text-gray-700 text-sm font-medium">{lesson.title}</p>
-                              <p className="text-gray-400 text-xs flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {lesson.duration}
-                              </p>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </Card>
-                ))}
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : viewingModuleDetail ? (
+          // Module Detail View - Lista de Aulas
+          <div className="animate-fade-in">
+            <button
+              onClick={handleBackToModules}
+              className="flex items-center gap-2 hover:opacity-80 mb-6 font-medium"
+              style={{ color: settings.primaryColor }}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Voltar aos módulos
+            </button>
+
+            {/* Module Header */}
+            <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-pink-100 mb-8">
+              <div className="aspect-[21/9] relative bg-gradient-to-br from-pink-200 to-rose-300">
+                {viewingModuleDetail.coverUrl && (
+                  <img 
+                    src={viewingModuleDetail.coverUrl} 
+                    alt={viewingModuleDetail.title}
+                    className="w-full h-full object-cover"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">{viewingModuleDetail.title}</h1>
+                  {viewingModuleDetail.showDescription && viewingModuleDetail.description && (
+                    <p className="text-white/80 mt-2 text-sm md:text-base">{viewingModuleDetail.description}</p>
+                  )}
+                  <p className="text-white/60 text-sm mt-2">
+                    {viewingModuleDetail.lessons.length} aulas disponíveis
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Main Content - Modules Grid */}
-            <div className="lg:col-span-2">
-              <h2 className="text-gray-900 font-bold text-lg mb-4">Módulos Disponíveis</h2>
-              <div className="space-y-4">
-                {modules.map((module) => (
+            {/* Buttons for this module */}
+            {getButtonsForModule(viewingModuleDetail.id, "before").map((button) => (
+              <a
+                key={button.id}
+                href={button.url || "#"}
+                target={button.url ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className="block mb-4"
+              >
+                <Button 
+                  className="w-full py-6 text-white font-bold text-lg rounded-2xl shadow-lg hover:opacity-90 transition-all"
+                  style={{ backgroundColor: button.color }}
+                >
+                  {button.text}
+                </Button>
+              </a>
+            ))}
+
+            {/* Lessons List */}
+            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <BookOpen className="w-5 h-5" style={{ color: settings.primaryColor }} />
+              Conteúdo do Módulo
+            </h3>
+            <div className="grid gap-4">
+              {viewingModuleDetail.lessons.map((lesson, index) => (
+                <Card 
+                  key={lesson.id}
+                  className="bg-white border-pink-100 overflow-hidden cursor-pointer hover:shadow-xl transition-all shadow-md group"
+                  onClick={() => handleSelectLesson(viewingModuleDetail, lesson)}
+                >
+                  <div className="flex flex-col sm:flex-row">
+                    {/* Lesson Cover/Number */}
+                    <div className="sm:w-48 h-32 relative bg-gradient-to-br from-pink-200 to-rose-300 flex-shrink-0">
+                      {lesson.showCover && lesson.coverUrl ? (
+                        <img src={lesson.coverUrl} alt={lesson.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span 
+                            className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-lg"
+                            style={{ backgroundColor: settings.primaryColor }}
+                          >
+                            {index + 1}
+                          </span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30">
+                        <div 
+                          className="w-12 h-12 rounded-full flex items-center justify-center shadow-xl"
+                          style={{ backgroundColor: settings.primaryColor }}
+                        >
+                          <Play className="w-5 h-5 text-white ml-0.5" />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Lesson Info */}
+                    <CardContent className="p-4 flex-1 flex flex-col justify-center">
+                      <h4 className="text-gray-900 font-bold text-lg group-hover:text-pink-600 transition-colors">
+                        {lesson.title}
+                      </h4>
+                      {lesson.showDescription && lesson.description && (
+                        <p className="text-gray-500 text-sm mt-1 line-clamp-2">{lesson.description}</p>
+                      )}
+                      <div className="flex items-center gap-4 mt-2">
+                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {lesson.duration}
+                        </span>
+                        <span 
+                          className="text-xs font-medium px-2 py-1 rounded-full"
+                          style={{ backgroundColor: settings.primaryColor + "15", color: settings.primaryColor }}
+                        >
+                          Aula {index + 1}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            {/* Buttons after module */}
+            {getButtonsForModule(viewingModuleDetail.id, "after").map((button) => (
+              <a
+                key={button.id}
+                href={button.url || "#"}
+                target={button.url ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className="block mt-4"
+              >
+                <Button 
+                  className="w-full py-6 text-white font-bold text-lg rounded-2xl shadow-lg hover:opacity-90 transition-all"
+                  style={{ backgroundColor: button.color }}
+                >
+                  {button.text}
+                </Button>
+              </a>
+            ))}
+          </div>
+        ) : (
+          // Modules Carousel View
+          <div className="animate-fade-in">
+            <h2 className="text-gray-900 font-bold text-xl mb-6 flex items-center gap-2">
+              <BookOpen className="w-6 h-6" style={{ color: settings.primaryColor }} />
+              Módulos do Curso
+            </h2>
+
+            {/* Global buttons before modules */}
+            {buttons.filter(b => b.position === "before" && !modules.some(m => m.id === b.moduleId)).map((button) => (
+              <a
+                key={button.id}
+                href={button.url || "#"}
+                target={button.url ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className="block mb-6"
+              >
+                <Button 
+                  className="w-full py-6 text-white font-bold text-lg rounded-2xl shadow-lg hover:opacity-90 transition-all"
+                  style={{ backgroundColor: button.color }}
+                >
+                  {button.text}
+                </Button>
+              </a>
+            ))}
+
+            {/* Modules Carousel */}
+            <Carousel
+              opts={{
+                align: "start",
+                loop: modules.length > 3,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {modules.map((module, index) => (
+                  <CarouselItem key={module.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                    <Card 
+                      className="bg-white border-pink-100 overflow-hidden cursor-pointer hover:shadow-2xl transition-all shadow-lg group h-full"
+                      style={{ borderColor: settings.primaryColor + "30" }}
+                      onClick={() => handleOpenModuleDetail(module)}
+                    >
+                      <div className="aspect-[4/3] relative bg-gradient-to-br from-pink-200 to-rose-300 overflow-hidden">
+                        {module.coverUrl && (
+                          <img 
+                            src={module.coverUrl} 
+                            alt={module.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        )}
+                        {module.showPlayButton && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div 
+                              className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform bg-white/90"
+                            >
+                              <Play className="w-6 h-6 ml-0.5" style={{ color: settings.primaryColor }} />
+                            </div>
+                          </div>
+                        )}
+                        <div 
+                          className="absolute top-3 left-3 px-3 py-1.5 rounded-full text-sm font-bold shadow-lg text-white"
+                          style={{ backgroundColor: settings.primaryColor }}
+                        >
+                          Módulo {index + 1}
+                        </div>
+                        <div 
+                          className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-medium shadow-lg"
+                          style={{ backgroundColor: "white", color: settings.primaryColor }}
+                        >
+                          <BookOpen className="w-3 h-3" />
+                          {module.lessons.length} aulas
+                        </div>
+                      </div>
+                      <CardContent className="p-5">
+                        <h3 className="text-gray-900 font-bold text-lg line-clamp-2 group-hover:text-pink-600 transition-colors">
+                          {module.title}
+                        </h3>
+                        {module.showDescription && module.description && (
+                          <p className="text-gray-500 text-sm mt-2 line-clamp-2">{module.description}</p>
+                        )}
+                        <Button 
+                          className="w-full mt-4 text-white font-bold"
+                          style={{ backgroundColor: settings.primaryColor }}
+                        >
+                          Ver Conteúdo
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex -left-4 bg-white border-pink-200 hover:bg-pink-50" />
+              <CarouselNext className="hidden md:flex -right-4 bg-white border-pink-200 hover:bg-pink-50" />
+            </Carousel>
+
+            {/* Mobile scroll indicator */}
+            <div className="flex justify-center gap-2 mt-6 md:hidden">
+              {modules.map((_, index) => (
+                <div 
+                  key={index}
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: settings.primaryColor + (index === 0 ? "" : "40") }}
+                />
+              ))}
+            </div>
+
+            {/* All Modules Grid (desktop view below carousel) */}
+            <div className="mt-12">
+              <h3 className="text-gray-900 font-bold text-lg mb-4">Todos os Módulos</h3>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {modules.map((module, index) => (
                   <div key={module.id}>
                     {/* Buttons BEFORE module */}
                     {getButtonsForModule(module.id, "before").map((button) => (
@@ -550,10 +773,10 @@ const DemoMembro = () => {
                         href={button.url || "#"}
                         target={button.url ? "_blank" : undefined}
                         rel="noopener noreferrer"
-                        className="block mb-4"
+                        className="block mb-3"
                       >
                         <Button 
-                          className="w-full py-6 text-white font-bold text-lg rounded-2xl shadow-lg hover:opacity-90 transition-all"
+                          className="w-full py-4 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-all text-sm"
                           style={{ backgroundColor: button.color }}
                         >
                           {button.text}
@@ -561,54 +784,31 @@ const DemoMembro = () => {
                       </a>
                     ))}
 
-                    {/* Module Card */}
                     <Card 
-                      className="bg-white border-pink-100 overflow-hidden cursor-pointer hover:shadow-xl transition-all shadow-lg group"
-                      style={{ borderColor: settings.primaryColor + "30" }}
-                      onClick={() => {
-                        if (!expandedModules.includes(module.id)) {
-                          toggleModule(module.id);
-                        }
-                        if (module.lessons.length > 0) {
-                          handleSelectLesson(module, module.lessons[0]);
-                        }
-                      }}
+                      className="bg-white border-pink-100 overflow-hidden cursor-pointer hover:shadow-lg transition-all shadow-sm group"
+                      onClick={() => handleOpenModuleDetail(module)}
                     >
-                      <div className="aspect-video relative bg-gradient-to-br from-pink-200 to-rose-300">
-                        {module.coverUrl && (
-                          <img 
-                            src={module.coverUrl} 
-                            alt={module.title}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                        {module.showPlayButton && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div 
-                              className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform"
-                              style={{ backgroundColor: settings.primaryColor }}
-                            >
-                              <Play className="w-7 h-7 text-white ml-1" />
-                            </div>
-                          </div>
-                        )}
+                      <div className="flex items-center gap-4 p-4">
                         <div 
-                          className="absolute top-3 right-3 px-3 py-1.5 rounded-full flex items-center gap-1.5 text-sm font-bold shadow-lg text-white"
-                          style={{ backgroundColor: settings.primaryColor }}
+                          className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 relative"
+                          style={{ backgroundColor: settings.primaryColor + "15" }}
                         >
-                          <Play className="w-4 h-4 fill-white" />
-                          <span className="hidden sm:inline">Assistir</span>
+                          {module.coverUrl ? (
+                            <img src={module.coverUrl} alt={module.title} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <span className="font-bold text-xl" style={{ color: settings.primaryColor }}>{index + 1}</span>
+                            </div>
+                          )}
                         </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-gray-900 font-bold text-sm line-clamp-2 group-hover:text-pink-600 transition-colors">
+                            {module.title}
+                          </h4>
+                          <p className="text-gray-400 text-xs mt-1">{module.lessons.length} aulas</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0 group-hover:text-pink-500 transition-colors" />
                       </div>
-                      <CardContent className="p-5">
-                        <h3 className="text-gray-900 font-bold text-lg">{module.title}</h3>
-                        {module.showDescription && module.description && (
-                          <p className="text-gray-500 text-sm mt-1">{module.description}</p>
-                        )}
-                        <p className="text-sm mt-2 font-medium" style={{ color: settings.primaryColor }}>
-                          {module.lessons.length} aulas disponíveis
-                        </p>
-                      </CardContent>
                     </Card>
 
                     {/* Buttons AFTER module */}
@@ -618,10 +818,10 @@ const DemoMembro = () => {
                         href={button.url || "#"}
                         target={button.url ? "_blank" : undefined}
                         rel="noopener noreferrer"
-                        className="block mt-4"
+                        className="block mt-3"
                       >
                         <Button 
-                          className="w-full py-6 text-white font-bold text-lg rounded-2xl shadow-lg hover:opacity-90 transition-all"
+                          className="w-full py-4 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-all text-sm"
                           style={{ backgroundColor: button.color }}
                         >
                           {button.text}
