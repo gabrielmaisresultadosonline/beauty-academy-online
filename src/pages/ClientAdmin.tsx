@@ -16,7 +16,7 @@ import {
   Zap, LogOut, Users, CreditCard, Settings, BarChart3, 
   CheckCircle, Clock, AlertTriangle, Save, Eye, Calendar,
   DollarSign, TrendingUp, FileText, Phone, Globe, Link2,
-  X, RefreshCw, ExternalLink, Copy, Info
+  X, RefreshCw, ExternalLink, Copy, Info, Edit
 } from "lucide-react";
 
 interface PlatformClient {
@@ -43,6 +43,9 @@ interface PlatformClient {
   payment_link: string | null;
   additional_notes: string | null;
   site_description_count: number | null;
+  site_url: string | null;
+  admin_instructions: string | null;
+  site_completed_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -68,11 +71,23 @@ const ClientAdmin = () => {
     thank_you_url: ''
   });
   const [savingSettings, setSavingSettings] = useState(false);
+  const [editingSiteInfo, setEditingSiteInfo] = useState(false);
+  const [siteUrl, setSiteUrl] = useState("");
+  const [adminInstructions, setAdminInstructions] = useState("");
+  const [savingSiteInfo, setSavingSiteInfo] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     checkAdminAccess();
   }, []);
+
+  useEffect(() => {
+    if (selectedClient) {
+      setSiteUrl(selectedClient.site_url || "");
+      setAdminInstructions(selectedClient.admin_instructions || "");
+      setEditingSiteInfo(false);
+    }
+  }, [selectedClient]);
 
   const checkAdminAccess = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -221,6 +236,34 @@ const ClientAdmin = () => {
 
     toast.success("Cliente marcado como pago!");
     fetchClients();
+  };
+
+  const handleSaveSiteInfo = async () => {
+    if (!selectedClient) return;
+    
+    setSavingSiteInfo(true);
+    
+    const { error } = await supabase
+      .from('platform_clients')
+      .update({
+        site_url: siteUrl.trim() || null,
+        admin_instructions: adminInstructions.trim() || null,
+        site_status: siteUrl.trim() ? 'completed' : selectedClient.site_status,
+        site_completed_at: siteUrl.trim() && !selectedClient.site_completed_at ? new Date().toISOString() : selectedClient.site_completed_at
+      })
+      .eq('id', selectedClient.id);
+    
+    if (error) {
+      toast.error("Erro ao salvar informações");
+      setSavingSiteInfo(false);
+      return;
+    }
+    
+    toast.success("Informações do site salvas!");
+    setEditingSiteInfo(false);
+    setSavingSiteInfo(false);
+    fetchClients();
+    setSelectedClient(null);
   };
 
   // Calculate days remaining
@@ -1026,6 +1069,104 @@ const ClientAdmin = () => {
                       </div>
                     )}
                   </div>
+                </div>
+
+                {/* Site Pronto - Admin pode editar */}
+                <div className="bg-green-500/10 rounded-lg p-4 border border-green-500/30">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-white font-bold flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-green-400" />
+                      Site Pronto (Informações para o Cliente)
+                    </h3>
+                    {!editingSiteInfo && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingSiteInfo(true)}
+                        className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Editar
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {editingSiteInfo ? (
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-white text-sm">URL do Site Pronto</Label>
+                        <Input
+                          placeholder="https://exemplo.acessar.click"
+                          value={siteUrl}
+                          onChange={(e) => setSiteUrl(e.target.value)}
+                          className="bg-black/50 border-white/20 text-white mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-white text-sm">Instruções para o Cliente</Label>
+                        <Textarea
+                          placeholder="Explique como o cliente deve acessar, usar a área de membros, onde encontrar os links, etc..."
+                          value={adminInstructions}
+                          onChange={(e) => setAdminInstructions(e.target.value)}
+                          className="bg-black/50 border-white/20 text-white mt-1 min-h-[120px]"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handleSaveSiteInfo}
+                          disabled={savingSiteInfo}
+                          className="bg-green-500 hover:bg-green-400 text-black font-bold"
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          {savingSiteInfo ? 'Salvando...' : 'Salvar'}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setEditingSiteInfo(false);
+                            setSiteUrl(selectedClient.site_url || "");
+                            setAdminInstructions(selectedClient.admin_instructions || "");
+                          }}
+                          className="border-white/20 text-white"
+                        >
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-white/50 text-xs">URL do Site</p>
+                        {selectedClient.site_url ? (
+                          <a 
+                            href={selectedClient.site_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-green-400 hover:underline flex items-center gap-1"
+                          >
+                            {selectedClient.site_url}
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ) : (
+                          <p className="text-white/40 italic">Ainda não configurado</p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-white/50 text-xs">Instruções</p>
+                        {selectedClient.admin_instructions ? (
+                          <p className="text-white/80 text-sm whitespace-pre-wrap">{selectedClient.admin_instructions}</p>
+                        ) : (
+                          <p className="text-white/40 italic">Nenhuma instrução adicionada</p>
+                        )}
+                      </div>
+                      {selectedClient.site_completed_at && (
+                        <div>
+                          <p className="text-white/50 text-xs">Site Concluído em</p>
+                          <p className="text-green-400 font-medium">{formatDateTime(selectedClient.site_completed_at)}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions */}

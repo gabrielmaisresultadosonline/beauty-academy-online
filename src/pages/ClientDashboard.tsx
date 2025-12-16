@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Zap, CreditCard, LogOut, CheckCircle, Clock, ArrowRight, FileText, Send, AlertTriangle, Calendar, Lock, Edit, Check } from "lucide-react";
+import { Zap, CreditCard, LogOut, CheckCircle, Clock, ArrowRight, FileText, Send, AlertTriangle, Calendar, Lock, Edit, Check, Globe, ExternalLink, Copy, Sparkles } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface ClientData {
@@ -35,6 +35,9 @@ interface ClientData {
   site_description_count: number | null;
   phone_number: string | null;
   payment_link: string | null;
+  site_url: string | null;
+  admin_instructions: string | null;
+  site_completed_at: string | null;
 }
 
 const ClientDashboard = () => {
@@ -570,6 +573,80 @@ const ClientDashboard = () => {
               </Card>
             )}
           </>
+        )}
+
+        {/* Site Pronto - Informações do Admin */}
+        {clientData?.is_paid && clientData?.site_url && (
+          <Card className="bg-gradient-to-br from-green-500/20 to-emerald-600/10 border-2 border-green-500/50 mb-6">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-green-400" />
+                </div>
+                <div>
+                  <CardTitle className="text-white font-black text-xl flex items-center gap-2">
+                    🎉 Seu Site Está Pronto!
+                  </CardTitle>
+                  <p className="text-white/60 text-sm">
+                    Seu site foi criado e está disponível para divulgação
+                  </p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Link do Site */}
+              <div className="bg-black/30 rounded-lg p-4 border border-green-500/20">
+                <Label className="text-white/60 text-xs mb-2 block">Link do seu site</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    readOnly
+                    value={clientData.site_url}
+                    className="bg-black/50 border-green-500/30 text-green-400 font-mono flex-1"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      navigator.clipboard.writeText(clientData.site_url || '');
+                      toast.success("Link copiado!");
+                    }}
+                    className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                  <a href={clientData.site_url} target="_blank" rel="noopener noreferrer">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
+                  </a>
+                </div>
+              </div>
+
+              {/* Instruções do Admin */}
+              {clientData.admin_instructions && (
+                <div className="bg-black/30 rounded-lg p-4 border border-white/10">
+                  <Label className="text-white/60 text-xs mb-2 block flex items-center gap-2">
+                    <Globe className="w-3 h-3" />
+                    Instruções da Equipe
+                  </Label>
+                  <div className="text-white/90 text-sm whitespace-pre-wrap leading-relaxed">
+                    {clientData.admin_instructions}
+                  </div>
+                </div>
+              )}
+
+              {/* Data de conclusão */}
+              {clientData.site_completed_at && (
+                <p className="text-white/40 text-xs text-center">
+                  Site concluído em {new Date(clientData.site_completed_at).toLocaleDateString('pt-BR')}
+                </p>
+              )}
+            </CardContent>
+          </Card>
         )}
 
         {/* Site Request Form - Only show after payment */}

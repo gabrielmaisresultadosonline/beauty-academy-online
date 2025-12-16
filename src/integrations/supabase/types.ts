@@ -255,6 +255,7 @@ export type Database = {
       platform_clients: {
         Row: {
           additional_notes: string | null
+          admin_instructions: string | null
           created_at: string
           email: string
           existing_site_url: string | null
@@ -273,8 +274,10 @@ export type Database = {
           product_price: number | null
           product_type: string | null
           site_blocked: boolean | null
+          site_completed_at: string | null
           site_description_count: number | null
           site_status: string | null
+          site_url: string | null
           subscription_ends_at: string | null
           target_audience: string | null
           trial_ends_at: string | null
@@ -284,6 +287,7 @@ export type Database = {
         }
         Insert: {
           additional_notes?: string | null
+          admin_instructions?: string | null
           created_at?: string
           email: string
           existing_site_url?: string | null
@@ -302,8 +306,10 @@ export type Database = {
           product_price?: number | null
           product_type?: string | null
           site_blocked?: boolean | null
+          site_completed_at?: string | null
           site_description_count?: number | null
           site_status?: string | null
+          site_url?: string | null
           subscription_ends_at?: string | null
           target_audience?: string | null
           trial_ends_at?: string | null
@@ -313,6 +319,7 @@ export type Database = {
         }
         Update: {
           additional_notes?: string | null
+          admin_instructions?: string | null
           created_at?: string
           email?: string
           existing_site_url?: string | null
@@ -331,8 +338,10 @@ export type Database = {
           product_price?: number | null
           product_type?: string | null
           site_blocked?: boolean | null
+          site_completed_at?: string | null
           site_description_count?: number | null
           site_status?: string | null
+          site_url?: string | null
           subscription_ends_at?: string | null
           target_audience?: string | null
           trial_ends_at?: string | null
