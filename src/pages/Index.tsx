@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   Check, 
   ArrowRight, 
@@ -26,28 +28,20 @@ import infinitepayLogo from "@/assets/infinitepay-logo.png";
 const Index = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
+  const [productPrice, setProductPrice] = useState(97);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
-  // Low Ticket Simulation (R$10)
-  const lowTicketPrice = 10;
-  const lowTicketSales = 100;
-  const lowTicketRevenue = lowTicketPrice * lowTicketSales;
-  const lowTicketKiwify = (lowTicketRevenue * 0.0899) + (lowTicketSales * 2.49) + 3.50;
-  const lowTicketHotmart = (lowTicketRevenue * 0.099) + (lowTicketSales * 1);
-  const lowTicketEduzz = (lowTicketRevenue * 0.099) + (lowTicketSales * 1) + 2.90;
-  const lowTicketMonetizze = lowTicketRevenue * 0.099;
-
-  // High Ticket Simulation (R$997)
-  const highTicketPrice = 997;
-  const highTicketSales = 100;
-  const highTicketRevenue = highTicketPrice * highTicketSales;
-  const highTicketKiwify = (highTicketRevenue * 0.0899) + (highTicketSales * 2.49) + 3.50;
-  const highTicketHotmart = (highTicketRevenue * 0.099) + (highTicketSales * 1);
-  const highTicketEduzz = (highTicketRevenue * 0.099) + (highTicketSales * 1) + 2.90;
-  const highTicketMonetizze = highTicketRevenue * 0.099;
+  // Fixed 50 sales for simulation
+  const fixedSales = 50;
+  const totalRevenue = productPrice * fixedSales;
+  const kiwifyFees = (totalRevenue * 0.0899) + (fixedSales * 2.49) + 3.50;
+  const hotmartFees = (totalRevenue * 0.099) + (fixedSales * 1);
+  const eduzzFees = (totalRevenue * 0.099) + (fixedSales * 1) + 2.90;
+  const monetizzeFees = totalRevenue * 0.099;
+  const maxSavings = Math.max(kiwifyFees, hotmartFees, eduzzFees, monetizzeFees);
 
   const activeProducts = [
     { name: "Beleza Liso Perfeito", description: "Curso completo de alisamento capilar", link: "/belezalisoperfeito" },
@@ -222,9 +216,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Calculator Section - Improved */}
+      {/* Calculator Section */}
       <section className="py-20 sm:py-24 bg-zinc-900/50">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-[#00D26A]/10 border border-[#00D26A]/40 px-4 py-2 mb-6">
               <Calculator className="w-5 h-5 text-[#00D26A]" />
@@ -238,133 +232,102 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Low Ticket Simulation */}
-          <div className="mb-12">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/40 px-4 py-2 mb-3">
-                <span className="text-blue-400 font-bold text-sm tracking-wide uppercase">📦 Produto Low Ticket</span>
+          {/* Price Input */}
+          <Card className="bg-zinc-900 border border-zinc-800 mb-10 max-w-md mx-auto">
+            <CardContent className="p-6">
+              <div className="text-center mb-4">
+                <Label className="text-white font-bold text-base tracking-tight">Valor do seu produto</Label>
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Produto de <span className="text-blue-400">R$10</span> • 100 vendas = R${lowTicketRevenue.toLocaleString('pt-BR')}
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
-              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-                <CardContent className="p-3 sm:p-4">
-                  <h4 className="text-white font-bold text-sm mb-1">Kiwify</h4>
-                  <p className="text-red-400 text-[10px] mb-2 font-semibold">8.99% + R$2.49</p>
-                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
-                  <p className="text-red-400 font-black text-sm">-R$ {lowTicketKiwify.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-                <CardContent className="p-3 sm:p-4">
-                  <h4 className="text-white font-bold text-sm mb-1">Hotmart</h4>
-                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9% + R$1</p>
-                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
-                  <p className="text-red-400 font-black text-sm">-R$ {lowTicketHotmart.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-                <CardContent className="p-3 sm:p-4">
-                  <h4 className="text-white font-bold text-sm mb-1">Eduzz</h4>
-                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9% + R$1</p>
-                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
-                  <p className="text-red-400 font-black text-sm">-R$ {lowTicketEduzz.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-                <CardContent className="p-3 sm:p-4">
-                  <h4 className="text-white font-bold text-sm mb-1">Monetizze</h4>
-                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9%</p>
-                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
-                  <p className="text-red-400 font-black text-sm">-R$ {lowTicketMonetizze.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-[#00D26A]/10 border-2 border-[#00D26A] relative col-span-2 md:col-span-1">
-                <div className="absolute -top-2 -right-2 bg-[#00D26A] text-zinc-950 px-2 py-0.5 text-[10px] font-black">
-                  MELHOR
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-bold text-lg">R$</span>
+                <Input
+                  type="number"
+                  value={productPrice}
+                  onChange={(e) => setProductPrice(Number(e.target.value) || 0)}
+                  className="bg-zinc-800 border-zinc-700 text-white text-2xl font-black pl-14 h-16 text-center"
+                />
+              </div>
+              <div className="mt-4 p-4 bg-zinc-800/50 border border-zinc-700">
+                <div className="flex justify-between items-center">
+                  <span className="text-zinc-500 font-semibold">Vendas simuladas:</span>
+                  <span className="text-white font-black text-xl">50 vendas</span>
                 </div>
-                <CardContent className="p-3 sm:p-4">
-                  <h4 className="text-[#00D26A] font-bold text-sm mb-1">Acessar.click</h4>
-                  <p className="text-[#00D26A] text-[10px] mb-2 font-semibold">0% taxa</p>
-                  <p className="text-zinc-500 text-[10px] font-semibold">Você recebe</p>
-                  <p className="text-[#00D26A] font-black text-sm">R$ {lowTicketRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </CardContent>
-              </Card>
-            </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-zinc-500 font-semibold">Faturamento total:</span>
+                  <span className="text-[#00D26A] font-black text-xl">R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Comparison Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
+            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+              <CardContent className="p-3 sm:p-4">
+                <h4 className="text-white font-bold text-sm mb-1">Kiwify</h4>
+                <p className="text-red-400 text-[10px] mb-2 font-semibold">8.99% + R$2.49</p>
+                <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                <p className="text-red-400 font-black text-sm">-R$ {kiwifyFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                <p className="text-zinc-600 text-[10px] mt-2 font-semibold">Você recebe</p>
+                <p className="text-white font-bold text-sm">R$ {(totalRevenue - kiwifyFees).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+              <CardContent className="p-3 sm:p-4">
+                <h4 className="text-white font-bold text-sm mb-1">Hotmart</h4>
+                <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9% + R$1</p>
+                <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                <p className="text-red-400 font-black text-sm">-R$ {hotmartFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                <p className="text-zinc-600 text-[10px] mt-2 font-semibold">Você recebe</p>
+                <p className="text-white font-bold text-sm">R$ {(totalRevenue - hotmartFees).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+              <CardContent className="p-3 sm:p-4">
+                <h4 className="text-white font-bold text-sm mb-1">Eduzz</h4>
+                <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9% + R$1</p>
+                <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                <p className="text-red-400 font-black text-sm">-R$ {eduzzFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                <p className="text-zinc-600 text-[10px] mt-2 font-semibold">Você recebe</p>
+                <p className="text-white font-bold text-sm">R$ {(totalRevenue - eduzzFees).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+              <CardContent className="p-3 sm:p-4">
+                <h4 className="text-white font-bold text-sm mb-1">Monetizze</h4>
+                <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9%</p>
+                <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                <p className="text-red-400 font-black text-sm">-R$ {monetizzeFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                <p className="text-zinc-600 text-[10px] mt-2 font-semibold">Você recebe</p>
+                <p className="text-white font-bold text-sm">R$ {(totalRevenue - monetizzeFees).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#00D26A]/10 border-2 border-[#00D26A] relative col-span-2 md:col-span-1">
+              <div className="absolute -top-2 -right-2 bg-[#00D26A] text-zinc-950 px-2 py-0.5 text-[10px] font-black">
+                MELHOR
+              </div>
+              <CardContent className="p-3 sm:p-4">
+                <h4 className="text-[#00D26A] font-bold text-sm mb-1">Acessar.click</h4>
+                <p className="text-[#00D26A] text-[10px] mb-2 font-semibold">0% taxa</p>
+                <p className="text-zinc-500 text-[10px] font-semibold">Você perde</p>
+                <p className="text-[#00D26A] font-black text-sm">R$ 0,00</p>
+                <p className="text-zinc-500 text-[10px] mt-2 font-semibold">Você recebe</p>
+                <p className="text-[#00D26A] font-black text-sm">R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* High Ticket Simulation */}
-          <div>
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/40 px-4 py-2 mb-3">
-                <span className="text-yellow-400 font-bold text-sm tracking-wide uppercase">💎 Produto High Ticket</span>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Produto de <span className="text-yellow-400">R$997</span> • 100 vendas = R${highTicketRevenue.toLocaleString('pt-BR')}
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
-              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-                <CardContent className="p-3 sm:p-4">
-                  <h4 className="text-white font-bold text-sm mb-1">Kiwify</h4>
-                  <p className="text-red-400 text-[10px] mb-2 font-semibold">8.99% + R$2.49</p>
-                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
-                  <p className="text-red-400 font-black text-sm">-R$ {highTicketKiwify.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-                <CardContent className="p-3 sm:p-4">
-                  <h4 className="text-white font-bold text-sm mb-1">Hotmart</h4>
-                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9% + R$1</p>
-                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
-                  <p className="text-red-400 font-black text-sm">-R$ {highTicketHotmart.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-                <CardContent className="p-3 sm:p-4">
-                  <h4 className="text-white font-bold text-sm mb-1">Eduzz</h4>
-                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9% + R$1</p>
-                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
-                  <p className="text-red-400 font-black text-sm">-R$ {highTicketEduzz.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-                <CardContent className="p-3 sm:p-4">
-                  <h4 className="text-white font-bold text-sm mb-1">Monetizze</h4>
-                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9%</p>
-                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
-                  <p className="text-red-400 font-black text-sm">-R$ {highTicketMonetizze.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-[#00D26A]/10 border-2 border-[#00D26A] relative col-span-2 md:col-span-1">
-                <div className="absolute -top-2 -right-2 bg-[#00D26A] text-zinc-950 px-2 py-0.5 text-[10px] font-black">
-                  MELHOR
-                </div>
-                <CardContent className="p-3 sm:p-4">
-                  <h4 className="text-[#00D26A] font-bold text-sm mb-1">Acessar.click</h4>
-                  <p className="text-[#00D26A] text-[10px] mb-2 font-semibold">0% taxa</p>
-                  <p className="text-zinc-500 text-[10px] font-semibold">Você recebe</p>
-                  <p className="text-[#00D26A] font-black text-sm">R$ {highTicketRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Savings Highlight */}
-            <div className="mt-10 text-center">
-              <Card className="bg-[#00D26A]/5 border border-[#00D26A]/30 inline-block">
-                <CardContent className="p-6 sm:p-8">
-                  <p className="text-zinc-500 mb-2 font-semibold tracking-tight">Com High Ticket você economiza até:</p>
-                  <p className="text-4xl sm:text-5xl md:text-6xl font-black text-[#00D26A] tracking-tighter">
-                    R$ {highTicketKiwify.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </p>
-                  <p className="text-zinc-500 mt-2 text-sm font-medium">Em apenas 100 vendas!</p>
-                </CardContent>
-              </Card>
-            </div>
+          {/* Savings Highlight */}
+          <div className="mt-10 text-center">
+            <Card className="bg-[#00D26A]/5 border border-[#00D26A]/30 inline-block">
+              <CardContent className="p-6 sm:p-8">
+                <p className="text-zinc-500 mb-2 font-semibold tracking-tight">Com Acessar.click você economiza:</p>
+                <p className="text-4xl sm:text-5xl md:text-6xl font-black text-[#00D26A] tracking-tighter">
+                  R$ {maxSavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+                <p className="text-zinc-500 mt-2 text-sm font-medium">Em apenas 50 vendas!</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
