@@ -169,8 +169,8 @@ const ClientDashboard = () => {
       return;
     }
     
-    // TESTE: R$1 (100 centavos) - Valor oficial: 24700 (R$247)
-    const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%2030%20DIAS%20-%20${encodeURIComponent(clientData.full_name)}","price":100,"quantity":1}]&redirect_url=${encodeURIComponent(`${window.location.origin}/cliente/obrigado`)}`;
+    // Valor oficial: R$247 (24700 centavos)
+    const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%2030%20DIAS%20-%20${encodeURIComponent(clientData.full_name)}","price":24700,"quantity":1}]&redirect_url=${encodeURIComponent(`${window.location.origin}/cliente/obrigado`)}`;
     window.open(paymentLink, '_blank');
   };
 
@@ -188,8 +188,8 @@ const ClientDashboard = () => {
       return;
     }
     
-    // TESTE: R$2 (200 centavos) - Valor oficial: 79700 (R$797)
-    const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%20ANUAL%20-%20${encodeURIComponent(clientData.full_name)}","price":200,"quantity":1}]&redirect_url=${encodeURIComponent(`${window.location.origin}/cliente/obrigado`)}`;
+    // Valor oficial: R$797 (79700 centavos)
+    const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%20ANUAL%20-%20${encodeURIComponent(clientData.full_name)}","price":79700,"quantity":1}]&redirect_url=${encodeURIComponent(`${window.location.origin}/cliente/obrigado`)}`;
     window.open(paymentLink, '_blank');
   };
 
