@@ -1,392 +1,365 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
+  Check, 
   ArrowRight, 
   Zap, 
-  CreditCard, 
-  Users, 
-  BarChart3, 
   Shield, 
-  Clock,
-  CheckCircle2,
-  Sparkles,
-  Globe,
-  TrendingUp,
-  DollarSign,
-  Percent,
-  Building2,
-  Palette,
-  Headphones,
-  FileText,
-  Send,
-  ChevronDown,
+  Clock, 
+  Users, 
+  TrendingUp, 
+  CreditCard,
   Star,
-  BadgeCheck
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-// Fee comparison data (based on real platform fees)
-const feeComparison = [
-  { platform: 'acessar.click', fee: 0, withdrawal: 0, color: '#00D26A', highlight: true },
-  { platform: 'Kiwify', fee: 8.99, withdrawal: 1.99, color: '#6366F1' },
-  { platform: 'Hotmart', fee: 9.9, withdrawal: 1.99, color: '#F97316' },
-  { platform: 'Eduzz', fee: 9.9, withdrawal: 3.99, color: '#3B82F6' },
-  { platform: 'Monetizze', fee: 9.9, withdrawal: 2.99, color: '#8B5CF6' },
-];
-
-// Calculate earnings comparison
-const calculateEarnings = (salesValue: number, salesCount: number) => {
-  return feeComparison.map(platform => {
-    const totalSales = salesValue * salesCount;
-    const platformFee = (platform.fee / 100) * totalSales;
-    const withdrawalFee = platform.withdrawal * salesCount;
-    const annualFee = platform.platform === 'acessar.click' ? 497 : 0;
-    const netEarnings = totalSales - platformFee - withdrawalFee - annualFee;
-    return {
-      ...platform,
-      totalSales,
-      platformFee,
-      withdrawalFee,
-      annualFee,
-      netEarnings: Math.max(0, netEarnings)
-    };
-  });
-};
-
-const features = [
-  {
-    icon: Zap,
-    title: "Receba em 8 Segundos",
-    description: "Com Infinit Nitro, seu dinheiro cai na conta em até 8 segundos após a venda."
-  },
-  {
-    icon: Percent,
-    title: "Zero Taxas por Venda",
-    description: "Taxa fixa anual. Venda R$1.000 ou R$1.000.000 — você recebe 100% de cada venda."
-  },
-  {
-    icon: Palette,
-    title: "Criamos Seu Site",
-    description: "Desenvolvemos sua página de vendas profissional completa em até 24 horas."
-  },
-  {
-    icon: Users,
-    title: "Área de Membros",
-    description: "Sistema completo com login, dashboard, módulos e controle de alunos."
-  },
-  {
-    icon: BarChart3,
-    title: "Facebook Pixel",
-    description: "Configure seu pixel e rastreie todas as conversões automaticamente."
-  },
-  {
-    icon: Shield,
-    title: "100% Automatizado",
-    description: "Pagamento libera acesso instantâneo. Zero trabalho manual para você."
-  }
-];
-
-const steps = [
-  { number: "1", title: "Faça seu Cadastro", description: "Preencha seus dados e realize o pagamento seguro via InfinitePay" },
-  { number: "2", title: "Descreva seu Produto", description: "Conte-nos sobre seu curso, comunidade ou serviço — nós criamos tudo" },
-  { number: "3", title: "Receba em 24h", description: "Sua área de membros + página de vendas prontas para faturar" },
-  { number: "4", title: "Adicione Conteúdo", description: "Acesse o painel admin e adicione seus vídeos, materiais e módulos" },
-];
-
-const activeProducts = [
-  { 
-    name: "Beleza Liso Perfeito", 
-    category: "Curso de Cabeleireira",
-    link: "/belezalisoperfeito",
-    gradient: "from-pink-500 to-rose-500"
-  },
-  { 
-    name: "SpotMusic", 
-    category: "Comunidade de Música",
-    link: "/comunidademusica",
-    gradient: "from-green-500 to-emerald-500"
-  },
-];
-
-const PAYMENT_LINK = "https://checkout.infinitepay.io/paguemro?items=[{%22name%22:%22AREA%20DE%20MEMBROS%20ANUAL%22,%22price%22:49700,%22quantity%22:1}]&redirect_url=https://acessar.click/onboarding";
+  ChevronRight,
+  Calculator,
+  DollarSign,
+  Palette,
+  BarChart3
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
-  const [salesValue] = useState(97);
-  const [salesCount] = useState(100);
-  const earnings = calculateEarnings(salesValue, salesCount);
-  const ourEarnings = earnings[0].netEarnings;
-  const kiwifyEarnings = earnings[1].netEarnings;
-  const savings = ourEarnings - kiwifyEarnings;
+  const [productPrice, setProductPrice] = useState(97);
+  const [salesCount, setSalesCount] = useState(100);
+
+  // Fee calculations
+  const totalRevenue = productPrice * salesCount;
+  
+  // Kiwify: 8.99% + R$2.49 per sale + R$3.50 withdrawal fee
+  const kiwifyFees = (totalRevenue * 0.0899) + (salesCount * 2.49) + 3.50;
+  const kiwifyNet = totalRevenue - kiwifyFees;
+  
+  // Hotmart: 9.9% + R$1 per sale
+  const hotmartFees = (totalRevenue * 0.099) + (salesCount * 1);
+  const hotmartNet = totalRevenue - hotmartFees;
+  
+  // Eduzz: 9.9% + R$1 per sale + R$2.90 withdrawal
+  const eduzzFees = (totalRevenue * 0.099) + (salesCount * 1) + 2.90;
+  const eduzzNet = totalRevenue - eduzzFees;
+  
+  // Monetizze: 9.9%
+  const monetizzeFees = totalRevenue * 0.099;
+  const monetizzeNet = totalRevenue - monetizzeFees;
+  
+  // Acessar.click: 0%
+  const acessarNet = totalRevenue;
+  const maxSavings = Math.max(kiwifyFees, hotmartFees, eduzzFees, monetizzeFees);
+
+  const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"AREA%20DE%20MEMBROS%20ANUAL","price":99700,"quantity":1}]&redirect_url=https://acessar.click/onboarding`;
+
+  const activeProducts = [
+    { name: "Beleza Liso Perfeito", description: "Curso completo de alisamento", price: "R$ 47", link: "/belezalisoperfeito" },
+    { name: "SpotMusic", description: "Comunidade de música", price: "R$ 47", link: "/comunidademusica" }
+  ];
 
   return (
-    <div className="min-h-screen bg-zinc-950 font-body">
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#00D26A]/20 rounded-full blur-[120px] animate-pulse" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#00D26A]/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
-        </div>
-
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 opacity-[0.03]">
-          <div className="h-full w-full" style={{
-            backgroundImage: 'linear-gradient(rgba(0,210,106,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0,210,106,0.3) 1px, transparent 1px)',
-            backgroundSize: '60px 60px'
-          }} />
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 md:py-24">
-          {/* Header */}
-          <header className="flex justify-between items-center mb-16">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#00D26A] rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-zinc-950" />
-              </div>
-              <span className="text-2xl font-bold text-white">
-                acessar<span className="text-[#00D26A]">.</span>click
-              </span>
+    <div className="min-h-screen bg-black text-white overflow-x-hidden font-sans">
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-950/50 via-black to-emerald-950/30" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl animate-pulse delay-1000" />
+        
+        <div className="relative z-10 max-w-6xl mx-auto text-center">
+          {/* Logos */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
+            <div className="bg-white/5 backdrop-blur-sm px-6 py-3 rounded-xl border border-white/10">
+              <span className="text-xl font-black tracking-tight">acessar<span className="text-green-400">.click</span></span>
             </div>
-            <div className="flex items-center gap-2 text-zinc-400 text-sm">
-              <span>Powered by</span>
-              <div className="flex items-center gap-1 text-[#00D26A] font-semibold">
-                <CreditCard className="w-4 h-4" />
-                InfinitePay
+            <span className="text-white/30 text-xl">+</span>
+            <div className="bg-white/5 backdrop-blur-sm px-5 py-3 rounded-xl border border-white/10 flex items-center gap-2">
+              <div className="w-8 h-8 bg-[#00D26A] rounded-lg flex items-center justify-center">
+                <CreditCard className="w-4 h-4 text-black" />
               </div>
+              <span className="font-bold text-[#00D26A]">InfinitePay</span>
             </div>
-          </header>
-
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className="space-y-8">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 bg-[#00D26A]/10 border border-[#00D26A]/30 rounded-full px-4 py-2">
-                <BadgeCheck className="w-4 h-4 text-[#00D26A]" />
-                <span className="text-sm text-[#00D26A] font-medium">Venda sem taxas • Receba na hora</span>
-              </div>
-
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                Sua <span className="text-[#00D26A]">Área de Membros</span> sem taxas por venda
-              </h1>
-
-              <p className="text-xl text-zinc-400 leading-relaxed">
-                Receba <span className="text-white font-semibold">100% de cada venda</span> direto na sua conta InfinitePay. 
-                Criamos seu site de vendas completo em até 24 horas.
-              </p>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a href={PAYMENT_LINK} target="_blank" rel="noopener noreferrer">
-                  <Button 
-                    size="lg" 
-                    className="bg-[#00D26A] hover:bg-[#00D26A]/90 text-zinc-950 px-8 py-6 text-lg font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-[0_0_40px_rgba(0,210,106,0.3)]"
-                  >
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Criar Minha Área de Membros
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </a>
-              </div>
-
-              {/* Price Tag */}
-              <div className="flex items-center gap-6">
-                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-                  <p className="text-zinc-500 text-sm">Plano Anual</p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-bold text-white">R$497</span>
-                    <span className="text-zinc-500">/ano</span>
-                  </div>
-                  <p className="text-[#00D26A] text-sm font-medium">12x R$41,42</p>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-zinc-300">
-                    <CheckCircle2 className="w-4 h-4 text-[#00D26A]" />
-                    <span className="text-sm">Site de vendas incluso</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-zinc-300">
-                    <CheckCircle2 className="w-4 h-4 text-[#00D26A]" />
-                    <span className="text-sm">Área de membros completa</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-zinc-300">
-                    <CheckCircle2 className="w-4 h-4 text-[#00D26A]" />
-                    <span className="text-sm">Zero taxas por venda</span>
-                  </div>
-                </div>
-              </div>
+            <span className="text-white/30 text-xl">+</span>
+            <div className="bg-white/5 backdrop-blur-sm px-5 py-3 rounded-xl border border-white/10 flex items-center gap-2">
+              <svg viewBox="0 0 24 24" className="w-7 h-7 fill-blue-500">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              <span className="font-bold text-sm text-white">Meta Pixel</span>
             </div>
+          </div>
 
-            {/* Right - InfinitePay Card */}
+          {/* Main Headline */}
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-none tracking-tighter uppercase">
+            <span className="text-white">VENDA SEM</span>
+            <br />
+            <span className="text-green-400 relative inline-block">
+              TAXA
+              <span className="absolute -right-6 -top-2 text-xs bg-green-500 text-black px-2 py-1 rounded-full font-black">0%</span>
+            </span>
+          </h1>
+
+          {/* Instant Payment Badge */}
+          <div className="inline-flex items-center gap-4 bg-gradient-to-r from-yellow-500/10 to-green-500/10 border-2 border-yellow-400/50 px-8 py-5 rounded-2xl mb-10">
             <div className="relative">
-              <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
-                {/* InfinitePay Header */}
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-[#00D26A] rounded-xl flex items-center justify-center">
-                      <CreditCard className="w-6 h-6 text-zinc-950" />
-                    </div>
-                    <div>
-                      <p className="text-white font-bold text-lg">InfinitePay</p>
-                      <p className="text-[#00D26A] text-sm font-medium">Infinit Nitro</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-zinc-500 text-xs">Recebimento em</p>
-                    <p className="text-[#00D26A] font-bold text-2xl">8s</p>
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-zinc-800/50 rounded-xl p-4">
-                    <p className="text-zinc-500 text-xs mb-1">Taxa por venda</p>
-                    <p className="text-[#00D26A] font-bold text-2xl">0%</p>
-                  </div>
-                  <div className="bg-zinc-800/50 rounded-xl p-4">
-                    <p className="text-zinc-500 text-xs mb-1">Taxa de saque</p>
-                    <p className="text-[#00D26A] font-bold text-2xl">R$0</p>
-                  </div>
-                </div>
-
-                {/* Comparison Highlight */}
-                <div className="bg-[#00D26A]/10 border border-[#00D26A]/30 rounded-xl p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-zinc-400 text-sm">Com {salesCount} vendas de R${salesValue}</p>
-                      <p className="text-white font-bold text-xl">Você recebe R${ourEarnings.toLocaleString('pt-BR')}</p>
-                    </div>
-                    <TrendingUp className="w-8 h-8 text-[#00D26A]" />
-                  </div>
-                  <p className="text-[#00D26A] text-sm mt-2">
-                    +R${savings.toLocaleString('pt-BR')} a mais que na Kiwify
-                  </p>
-                </div>
-              </div>
-
-              {/* Floating Elements */}
-              <div className="absolute -top-4 -right-4 bg-[#00D26A] text-zinc-950 px-4 py-2 rounded-full text-sm font-bold shadow-lg animate-bounce">
-                RECEBA NA HORA
-              </div>
+              <Zap className="w-10 h-10 text-yellow-400" />
+              <div className="absolute inset-0 w-10 h-10 bg-yellow-400/50 rounded-full blur-xl animate-pulse" />
+            </div>
+            <div className="text-left">
+              <p className="text-yellow-400 font-black text-2xl tracking-tight">RECEBA EM 8 SEGUNDOS</p>
+              <p className="text-white/60 text-sm font-semibold">Direto na sua conta InfinitePay Nitro</p>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Fee Comparison Section */}
-      <section className="py-20 bg-zinc-900/50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Compare e <span className="text-[#00D26A]">economize milhares</span>
-            </h2>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-              Veja quanto você perde em taxas nas outras plataformas. 
-              Com acessar.click, cada centavo é seu.
-            </p>
-          </div>
+          <p className="text-lg md:text-xl text-white/70 mb-10 max-w-3xl mx-auto font-medium leading-relaxed">
+            Sistema completo: <strong className="text-green-400">área de membros</strong> + <strong className="text-green-400">página de vendas</strong> + <strong className="text-green-400">Facebook Pixel</strong>
+            <br />Nós criamos tudo. Você só adiciona seu conteúdo.
+          </p>
 
-          {/* Comparison Table */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden mb-12">
-            <div className="grid grid-cols-5 gap-4 p-4 bg-zinc-800/50 text-center text-sm font-medium text-zinc-400">
-              <div>Plataforma</div>
-              <div>Taxa por Venda</div>
-              <div>Taxa de Saque</div>
-              <div>Você Recebe*</div>
-              <div>Diferença</div>
+          {/* Price */}
+          <div className="mb-10">
+            <div className="flex items-center justify-center gap-4 mb-3">
+              <span className="text-2xl text-white/40 line-through font-bold">R$ 2.000</span>
+              <span className="bg-red-500 text-white px-4 py-1.5 rounded-full text-sm font-black animate-pulse">-50% OFF</span>
             </div>
-            {earnings.map((platform, index) => (
-              <div 
-                key={platform.platform}
-                className={`grid grid-cols-5 gap-4 p-4 text-center items-center ${
-                  platform.highlight ? 'bg-[#00D26A]/10 border-l-4 border-[#00D26A]' : 'border-b border-zinc-800'
-                }`}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: platform.color }}
-                  />
-                  <span className={platform.highlight ? 'text-[#00D26A] font-bold' : 'text-white'}>
-                    {platform.platform}
-                  </span>
-                  {platform.highlight && <BadgeCheck className="w-4 h-4 text-[#00D26A]" />}
-                </div>
-                <div className={platform.highlight ? 'text-[#00D26A] font-bold' : 'text-zinc-300'}>
-                  {platform.fee}%
-                </div>
-                <div className={platform.highlight ? 'text-[#00D26A] font-bold' : 'text-zinc-300'}>
-                  {platform.withdrawal > 0 ? `R$${platform.withdrawal}` : 'Grátis'}
-                </div>
-                <div className={platform.highlight ? 'text-[#00D26A] font-bold text-lg' : 'text-white'}>
-                  R${platform.netEarnings.toLocaleString('pt-BR')}
-                </div>
-                <div className={platform.highlight ? 'text-[#00D26A] font-bold' : 'text-red-400'}>
-                  {platform.highlight ? '+R$' + savings.toLocaleString('pt-BR') : '-R$' + (ourEarnings - platform.netEarnings).toLocaleString('pt-BR')}
-                </div>
-              </div>
-            ))}
+            <div className="flex items-baseline justify-center gap-1">
+              <span className="text-green-400 text-4xl font-black">R$</span>
+              <span className="text-8xl md:text-9xl font-black text-white tracking-tighter">997</span>
+              <span className="text-white/50 text-xl font-bold">/ano</span>
+            </div>
+            <p className="text-white/50 mt-3 font-bold text-lg">VENDAS ILIMITADAS • 100% DO LUCRO É SEU</p>
           </div>
 
-          <p className="text-center text-zinc-500 text-sm">
-            * Simulação com {salesCount} vendas de R${salesValue} cada. Taxa anual de R$497 já descontada.
+          <a href={paymentLink} target="_blank" rel="noopener noreferrer">
+            <Button 
+              size="lg" 
+              className="bg-green-500 hover:bg-green-400 text-black font-black text-xl px-14 py-8 rounded-2xl shadow-2xl shadow-green-500/40 transform hover:scale-105 transition-all duration-300 uppercase tracking-wide"
+            >
+              QUERO COMEÇAR AGORA
+              <ArrowRight className="ml-3 w-6 h-6" />
+            </Button>
+          </a>
+
+          <p className="mt-8 text-white/40 text-sm font-semibold tracking-wide">
+            ✓ ÁREA PRONTA EM 24H • ✓ SUPORTE INCLUÍDO • ✓ AUTOMAÇÃO COMPLETA
           </p>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 bg-zinc-950">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* Interactive Calculator Section */}
+      <section className="py-24 px-4 bg-gradient-to-b from-black via-zinc-950 to-black">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Como <span className="text-[#00D26A]">funciona</span>
+            <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 px-5 py-2.5 rounded-full mb-6">
+              <Calculator className="w-5 h-5 text-green-400" />
+              <span className="text-green-400 font-black text-sm tracking-wide uppercase">SIMULADOR DE ECONOMIA</span>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-black mb-4 tracking-tighter uppercase">
+              CALCULE <span className="text-red-500">QUANTO VOCÊ PERDE</span>
             </h2>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-              Nós criamos tudo para você. Página de vendas, área de membros, 
-              integração de pagamento. Você só adiciona seu conteúdo.
+            <p className="text-lg text-white/50 font-semibold">
+              Nas outras plataformas vs Acessar.click
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6">
-            {steps.map((step, index) => (
-              <div key={index} className="relative">
-                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 hover:border-[#00D26A]/50 transition-all duration-300">
-                  <div className="w-12 h-12 bg-[#00D26A] text-zinc-950 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
-                    {step.number}
+          {/* Calculator Inputs */}
+          <Card className="bg-zinc-900/80 border-2 border-green-500/40 mb-12 max-w-2xl mx-auto">
+            <CardContent className="p-8">
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <Label className="text-white font-black text-base mb-3 block uppercase tracking-wide">
+                    <DollarSign className="w-4 h-4 inline mr-2 text-green-400" />
+                    Preço do Produto
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-black">R$</span>
+                    <Input
+                      type="number"
+                      value={productPrice}
+                      onChange={(e) => setProductPrice(Number(e.target.value) || 0)}
+                      className="bg-black border-2 border-white/20 text-white text-2xl font-black pl-12 h-16 rounded-xl focus:border-green-500"
+                    />
                   </div>
-                  <h3 className="text-white font-bold text-lg mb-2">{step.title}</h3>
-                  <p className="text-zinc-400 text-sm">{step.description}</p>
                 </div>
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2">
-                    <ArrowRight className="w-6 h-6 text-[#00D26A]" />
-                  </div>
-                )}
+                <div>
+                  <Label className="text-white font-black text-base mb-3 block uppercase tracking-wide">
+                    <TrendingUp className="w-4 h-4 inline mr-2 text-green-400" />
+                    Quantidade de Vendas
+                  </Label>
+                  <Input
+                    type="number"
+                    value={salesCount}
+                    onChange={(e) => setSalesCount(Number(e.target.value) || 0)}
+                    className="bg-black border-2 border-white/20 text-white text-2xl font-black h-16 rounded-xl focus:border-green-500"
+                  />
+                </div>
               </div>
+              <div className="mt-6 p-6 bg-black/60 rounded-xl border border-white/10">
+                <p className="text-white/50 font-bold uppercase text-sm tracking-wide">Faturamento Total:</p>
+                <p className="text-5xl font-black text-white tracking-tight">
+                  R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Comparison Cards */}
+          <div className="grid md:grid-cols-5 gap-3">
+            {/* Kiwify */}
+            <Card className="bg-zinc-900/60 border border-red-500/40 hover:border-red-500/70 transition-all">
+              <CardContent className="p-5">
+                <h3 className="text-white font-black text-base mb-1">Kiwify</h3>
+                <p className="text-red-400 text-xs font-bold mb-4">8.99% + R$2.49/venda + R$3.50 saque</p>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-white/40 text-xs font-bold uppercase">Taxas</p>
+                    <p className="text-red-400 font-black text-xl">-R$ {kiwifyFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/40 text-xs font-bold uppercase">Você Recebe</p>
+                    <p className="text-white font-black text-lg">R$ {kiwifyNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Hotmart */}
+            <Card className="bg-zinc-900/60 border border-red-500/40 hover:border-red-500/70 transition-all">
+              <CardContent className="p-5">
+                <h3 className="text-white font-black text-base mb-1">Hotmart</h3>
+                <p className="text-red-400 text-xs font-bold mb-4">9.9% + R$1/venda</p>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-white/40 text-xs font-bold uppercase">Taxas</p>
+                    <p className="text-red-400 font-black text-xl">-R$ {hotmartFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/40 text-xs font-bold uppercase">Você Recebe</p>
+                    <p className="text-white font-black text-lg">R$ {hotmartNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Eduzz */}
+            <Card className="bg-zinc-900/60 border border-red-500/40 hover:border-red-500/70 transition-all">
+              <CardContent className="p-5">
+                <h3 className="text-white font-black text-base mb-1">Eduzz</h3>
+                <p className="text-red-400 text-xs font-bold mb-4">9.9% + R$1/venda + saque</p>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-white/40 text-xs font-bold uppercase">Taxas</p>
+                    <p className="text-red-400 font-black text-xl">-R$ {eduzzFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/40 text-xs font-bold uppercase">Você Recebe</p>
+                    <p className="text-white font-black text-lg">R$ {eduzzNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Monetizze */}
+            <Card className="bg-zinc-900/60 border border-red-500/40 hover:border-red-500/70 transition-all">
+              <CardContent className="p-5">
+                <h3 className="text-white font-black text-base mb-1">Monetizze</h3>
+                <p className="text-red-400 text-xs font-bold mb-4">9.9% por venda</p>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-white/40 text-xs font-bold uppercase">Taxas</p>
+                    <p className="text-red-400 font-black text-xl">-R$ {monetizzeFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div>
+                    <p className="text-white/40 text-xs font-bold uppercase">Você Recebe</p>
+                    <p className="text-white font-black text-lg">R$ {monetizzeNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Acessar.click */}
+            <Card className="bg-gradient-to-br from-green-900/60 to-emerald-900/40 border-2 border-green-400 hover:border-green-300 transition-all relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-green-400 text-black px-3 py-1 text-xs font-black uppercase">
+                Melhor
+              </div>
+              <CardContent className="p-5">
+                <h3 className="text-green-400 font-black text-base mb-1">Acessar.click</h3>
+                <p className="text-green-300 text-xs font-bold mb-4">0% taxa • 0% saque</p>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-white/40 text-xs font-bold uppercase">Taxas</p>
+                    <p className="text-green-400 font-black text-xl">R$ 0,00</p>
+                  </div>
+                  <div>
+                    <p className="text-white/40 text-xs font-bold uppercase">Você Recebe</p>
+                    <p className="text-green-400 font-black text-lg">R$ {acessarNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Savings Highlight */}
+          <div className="mt-12 text-center">
+            <Card className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-2 border-green-400/60 inline-block">
+              <CardContent className="p-10">
+                <p className="text-white/50 font-black uppercase tracking-wide mb-3">Com Acessar.click você economiza até:</p>
+                <p className="text-6xl md:text-7xl font-black text-green-400 tracking-tight">
+                  R$ {maxSavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
+                <p className="text-white/50 font-bold mt-3 uppercase text-sm">em taxas nas suas vendas</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-24 px-4 bg-black">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl md:text-6xl font-black text-center mb-16 tracking-tighter uppercase">
+            O QUE VOCÊ <span className="text-green-400">RECEBE</span>
+          </h2>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { icon: <Palette className="w-9 h-9" />, title: "PÁGINA DE VENDAS", description: "Site profissional de alta conversão" },
+              { icon: <Users className="w-9 h-9" />, title: "ÁREA DE MEMBROS", description: "Sistema completo para seu conteúdo" },
+              { icon: <BarChart3 className="w-9 h-9" />, title: "FACEBOOK PIXEL", description: "Rastreamento de conversões automático" },
+              { icon: <Zap className="w-9 h-9" />, title: "RECEBA EM 8s", description: "Pagamento instantâneo InfinitePay" },
+              { icon: <Star className="w-9 h-9" />, title: "VENDAS ILIMITADAS", description: "Sem limite, sem taxas por transação" },
+              { icon: <Clock className="w-9 h-9" />, title: "PRONTO EM 24H", description: "Sua área funcionando rapidamente" }
+            ].map((benefit, index) => (
+              <Card key={index} className="bg-zinc-900/40 border border-white/10 hover:border-green-500/50 transition-all group">
+                <CardContent className="p-7">
+                  <div className="text-green-400 mb-4 group-hover:scale-110 transition-transform">{benefit.icon}</div>
+                  <h3 className="text-lg font-black text-white mb-2 tracking-tight">{benefit.title}</h3>
+                  <p className="text-white/50 font-semibold text-sm">{benefit.description}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 bg-zinc-900/50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Tudo <span className="text-[#00D26A]">incluso</span> no seu plano
-            </h2>
-          </div>
+      {/* How It Works */}
+      <section className="py-24 px-4 bg-gradient-to-b from-black to-zinc-950">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-4xl md:text-6xl font-black text-center mb-16 tracking-tighter uppercase">
+            COMO <span className="text-green-400">FUNCIONA</span>
+          </h2>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 hover:border-[#00D26A]/50 transition-all duration-300 group"
-              >
-                <div className="w-12 h-12 bg-[#00D26A]/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-[#00D26A]/20 transition-colors">
-                  <feature.icon className="w-6 h-6 text-[#00D26A]" />
+          <div className="space-y-6">
+            {[
+              { step: "1", title: "CRIE SUA CONTA INFINITEPAY", description: "Conta bancária digital para receber pagamentos instantâneos." },
+              { step: "2", title: "FAÇA O PAGAMENTO", description: "Assine o plano anual de R$997 e desbloqueie todas as funcionalidades." },
+              { step: "3", title: "PREENCHA O FORMULÁRIO", description: "Descreva seu produto, público-alvo e informações para criarmos sua página." },
+              { step: "4", title: "ADICIONE SEU CONTEÚDO", description: "Em 24h sua área estará pronta. Basta adicionar suas aulas e vídeos." }
+            ].map((item, index) => (
+              <div key={index} className="flex gap-6 items-start group">
+                <div className="w-14 h-14 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <span className="text-2xl font-black text-black">{item.step}</span>
                 </div>
-                <h3 className="text-white font-bold text-lg mb-2">{feature.title}</h3>
-                <p className="text-zinc-400">{feature.description}</p>
+                <div>
+                  <h3 className="text-xl font-black text-white mb-1 tracking-tight">{item.title}</h3>
+                  <p className="text-white/50 text-base font-semibold">{item.description}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -394,71 +367,50 @@ const Index = () => {
       </section>
 
       {/* InfinitePay Requirement */}
-      <section className="py-20 bg-zinc-950">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-gradient-to-r from-[#00D26A]/10 to-transparent border border-[#00D26A]/30 rounded-3xl p-8 md:p-12">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="w-20 h-20 bg-[#00D26A] rounded-2xl flex items-center justify-center flex-shrink-0">
-                <CreditCard className="w-10 h-10 text-zinc-950" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-white mb-3">
-                  Você precisa ter uma conta InfinitePay
-                </h3>
-                <p className="text-zinc-400 mb-4">
-                  Nossa área de membros se integra diretamente com a InfinitePay. 
-                  Ao vender, o dinheiro cai direto na sua conta — sem intermediários, sem espera.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center gap-2 text-[#00D26A]">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-sm font-medium">Infinit Nitro: 8 segundos</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[#00D26A]">
-                    <Shield className="w-4 h-4" />
-                    <span className="text-sm font-medium">100% Seguro</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[#00D26A]">
-                    <Building2 className="w-4 h-4" />
-                    <span className="text-sm font-medium">Conta bancária inclusa</span>
-                  </div>
-                </div>
-              </div>
+      <section className="py-16 px-4 bg-gradient-to-r from-green-900/30 to-emerald-900/20 border-y-2 border-green-500/40">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="w-14 h-14 bg-[#00D26A] rounded-xl flex items-center justify-center">
+              <CreditCard className="w-7 h-7 text-black" />
             </div>
+            <span className="text-2xl font-black text-[#00D26A]">InfinitePay</span>
+            <span className="bg-yellow-400 text-black px-4 py-1.5 rounded-full text-sm font-black uppercase">Nitro</span>
           </div>
+          <h3 className="text-2xl md:text-4xl font-black mb-4 tracking-tight">
+            RECEBIMENTO EM ATÉ <span className="text-yellow-400">8 SEGUNDOS</span>
+          </h3>
+          <p className="text-white/60 text-lg font-semibold max-w-2xl mx-auto">
+            Você precisa ter uma conta InfinitePay para receber seus pagamentos. 
+            Integração direta, sem intermediários.
+          </p>
         </div>
       </section>
 
       {/* Active Products */}
-      <section className="py-20 bg-zinc-900/50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Produtos <span className="text-[#00D26A]">ativos</span> em nossa plataforma
-            </h2>
-            <p className="text-zinc-400">
-              Veja exemplos reais funcionando agora mesmo
-            </p>
-          </div>
+      <section className="py-24 px-4 bg-black">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-black text-center mb-4 tracking-tighter uppercase">
+            PRODUTOS <span className="text-green-400">ATIVOS</span>
+          </h2>
+          <p className="text-white/50 text-center mb-12 font-semibold text-lg">
+            Exemplos funcionando em nossa plataforma
+          </p>
 
-          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
             {activeProducts.map((product, index) => (
-              <Link 
-                key={index}
-                to={product.link}
-                className="group"
-              >
-                <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 hover:border-[#00D26A]/50 transition-all duration-300 hover:scale-105">
-                  <div className={`w-12 h-12 bg-gradient-to-r ${product.gradient} rounded-xl flex items-center justify-center mb-4`}>
-                    <Star className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="text-white font-bold text-lg mb-1">{product.name}</h3>
-                  <p className="text-zinc-500 text-sm mb-4">{product.category}</p>
-                  <div className="flex items-center gap-2 text-[#00D26A] text-sm font-medium group-hover:gap-3 transition-all">
-                    <span>Ver página</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
-                </div>
+              <Link key={index} to={product.link}>
+                <Card className="bg-zinc-900/50 border border-white/10 hover:border-green-500/50 transition-all cursor-pointer group">
+                  <CardContent className="p-6 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-black text-white group-hover:text-green-400 transition-colors tracking-tight">
+                        {product.name}
+                      </h3>
+                      <p className="text-white/50 font-semibold text-sm">{product.description}</p>
+                      <p className="text-green-400 font-black mt-2">{product.price}</p>
+                    </div>
+                    <ChevronRight className="w-6 h-6 text-white/30 group-hover:text-green-400 group-hover:translate-x-1 transition-all" />
+                  </CardContent>
+                </Card>
               </Link>
             ))}
           </div>
@@ -466,69 +418,54 @@ const Index = () => {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-zinc-950">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="bg-gradient-to-b from-[#00D26A]/20 to-transparent rounded-3xl p-12 border border-[#00D26A]/20">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Pronto para <span className="text-[#00D26A]">faturar sem taxas</span>?
-            </h2>
-            <p className="text-zinc-400 text-lg mb-8 max-w-2xl mx-auto">
-              Nós criamos sua página de vendas e área de membros completa. 
-              Você só adiciona seu conteúdo e começa a vender.
-            </p>
-
-            <a href={PAYMENT_LINK} target="_blank" rel="noopener noreferrer">
-              <Button 
-                size="lg" 
-                className="bg-[#00D26A] hover:bg-[#00D26A]/90 text-zinc-950 px-12 py-6 text-xl font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-[0_0_60px_rgba(0,210,106,0.4)]"
-              >
-                <Zap className="w-6 h-6 mr-2" />
-                Criar Minha Área de Membros
-                <ArrowRight className="w-6 h-6 ml-2" />
-              </Button>
-            </a>
-
-            <div className="flex flex-wrap justify-center gap-6 mt-8 text-zinc-400 text-sm">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#00D26A]" />
-                <span>Página de vendas inclusa</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#00D26A]" />
-                <span>Pronto em 24h</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#00D26A]" />
-                <span>Suporte incluso</span>
-              </div>
+      <section className="py-24 px-4 bg-gradient-to-t from-green-950/40 to-black">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter uppercase">
+            COMECE A <span className="text-green-400">VENDER HOJE</span>
+          </h2>
+          <p className="text-lg text-white/60 mb-10 font-semibold">
+            Sistema completo • Automação total • Receba na hora
+          </p>
+          
+          <div className="mb-10">
+            <div className="flex items-center justify-center gap-4 mb-2">
+              <span className="text-xl text-white/40 line-through font-bold">R$ 2.000</span>
+            </div>
+            <div className="flex items-baseline justify-center gap-1">
+              <span className="text-green-400 text-3xl font-black">R$</span>
+              <span className="text-7xl md:text-8xl font-black text-white tracking-tighter">997</span>
+              <span className="text-white/50 text-lg font-bold">/ano</span>
             </div>
           </div>
+
+          <div className="flex flex-wrap justify-center gap-3 mb-10">
+            {["Vendas ilimitadas", "0% taxa de venda", "0% taxa de saque", "100% do lucro"].map((item, index) => (
+              <div key={index} className="flex items-center gap-2 bg-green-500/10 px-5 py-2.5 rounded-full border border-green-500/40">
+                <Check className="w-5 h-5 text-green-400" />
+                <span className="text-white font-black text-sm uppercase tracking-wide">{item}</span>
+              </div>
+            ))}
+          </div>
+
+          <a href={paymentLink} target="_blank" rel="noopener noreferrer">
+            <Button 
+              size="lg" 
+              className="bg-green-500 hover:bg-green-400 text-black font-black text-xl px-16 py-8 rounded-2xl shadow-2xl shadow-green-500/40 transform hover:scale-105 transition-all duration-300 uppercase tracking-wide"
+            >
+              QUERO MINHA ÁREA DE MEMBROS
+              <ArrowRight className="ml-3 w-6 h-6" />
+            </Button>
+          </a>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 bg-zinc-950 border-t border-zinc-900">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#00D26A] rounded-lg flex items-center justify-center">
-                <Zap className="w-4 h-4 text-zinc-950" />
-              </div>
-              <span className="text-lg font-bold text-white">
-                acessar<span className="text-[#00D26A]">.</span>click
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-zinc-500 text-sm">
-              <span>Pagamentos via</span>
-              <div className="flex items-center gap-1 text-[#00D26A] font-semibold">
-                <CreditCard className="w-4 h-4" />
-                InfinitePay
-              </div>
-            </div>
-            <p className="text-zinc-500 text-sm">
-              © 2024 acessar.click — Todos os direitos reservados
-            </p>
-          </div>
+      <footer className="py-12 px-4 bg-black border-t border-white/10">
+        <div className="max-w-6xl mx-auto text-center">
+          <p className="text-2xl font-black mb-4 tracking-tight">acessar<span className="text-green-400">.click</span></p>
+          <p className="text-white/40 font-semibold text-sm">
+            © 2024 Acessar.click — Todos os direitos reservados
+          </p>
         </div>
       </footer>
     </div>
