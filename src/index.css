@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -37,10 +37,10 @@
     --input: 0 0% 90%;
     --ring: 340 82% 52%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --font-heading: 'Playfair Display', serif;
-    --font-body: 'Poppins', sans-serif;
+    --font-heading: 'Space Grotesk', 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
 
     --gradient-primary: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(340, 82%, 40%) 100%);
     --gradient-gold: linear-gradient(135deg, hsl(45, 93%, 47%) 0%, hsl(35, 90%, 45%) 100%);
@@ -59,6 +59,11 @@
     --spotmusic-muted: 0 0% 55%;
     --spotmusic-green: 141 73% 42%;
     --spotmusic-amber: 38 92% 50%;
+    
+    /* acessar.click Theme */
+    --acessar-green: 152 76% 41%;
+    --acessar-dark: 0 0% 4%;
+    --acessar-card: 0 0% 8%;
   }
 
   .dark {
@@ -92,10 +97,13 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
+    letter-spacing: -0.02em;
   }
 }
 
