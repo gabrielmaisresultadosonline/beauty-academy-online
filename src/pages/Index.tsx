@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { 
   Check, 
   ArrowRight, 
@@ -17,33 +15,39 @@ import {
   BarChart3,
   Sparkles,
   BadgeCheck,
-  Play
+  Play,
+  Bot,
+  Rocket,
+  TrendingUp
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import infinitepayLogo from "@/assets/infinitepay-logo.png";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [productPrice, setProductPrice] = useState(97);
-  const [salesCount, setSalesCount] = useState(100);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
-  // Fee calculations
-  const totalRevenue = productPrice * salesCount;
-  const kiwifyFees = (totalRevenue * 0.0899) + (salesCount * 2.49) + 3.50;
-  const kiwifyNet = totalRevenue - kiwifyFees;
-  const hotmartFees = (totalRevenue * 0.099) + (salesCount * 1);
-  const hotmartNet = totalRevenue - hotmartFees;
-  const eduzzFees = (totalRevenue * 0.099) + (salesCount * 1) + 2.90;
-  const eduzzNet = totalRevenue - eduzzFees;
-  const monetizzeFees = totalRevenue * 0.099;
-  const monetizzeNet = totalRevenue - monetizzeFees;
-  const acessarNet = totalRevenue;
-  const maxSavings = Math.max(kiwifyFees, hotmartFees, eduzzFees, monetizzeFees);
+  // Low Ticket Simulation (R$10)
+  const lowTicketPrice = 10;
+  const lowTicketSales = 100;
+  const lowTicketRevenue = lowTicketPrice * lowTicketSales;
+  const lowTicketKiwify = (lowTicketRevenue * 0.0899) + (lowTicketSales * 2.49) + 3.50;
+  const lowTicketHotmart = (lowTicketRevenue * 0.099) + (lowTicketSales * 1);
+  const lowTicketEduzz = (lowTicketRevenue * 0.099) + (lowTicketSales * 1) + 2.90;
+  const lowTicketMonetizze = lowTicketRevenue * 0.099;
+
+  // High Ticket Simulation (R$997)
+  const highTicketPrice = 997;
+  const highTicketSales = 100;
+  const highTicketRevenue = highTicketPrice * highTicketSales;
+  const highTicketKiwify = (highTicketRevenue * 0.0899) + (highTicketSales * 2.49) + 3.50;
+  const highTicketHotmart = (highTicketRevenue * 0.099) + (highTicketSales * 1);
+  const highTicketEduzz = (highTicketRevenue * 0.099) + (highTicketSales * 1) + 2.90;
+  const highTicketMonetizze = highTicketRevenue * 0.099;
 
   const activeProducts = [
     { name: "Beleza Liso Perfeito", description: "Curso completo de alisamento capilar", link: "/belezalisoperfeito" },
@@ -82,7 +86,7 @@ const Index = () => {
               <div className="w-8 h-8 bg-[#00D26A] flex items-center justify-center">
                 <CreditCard className="w-4 h-4 text-zinc-950" />
               </div>
-              <span className="font-bold text-[#00D26A] tracking-tight">InfinitePay</span>
+              <span className="font-bold text-[#00D26A] tracking-tight">InfinitePay API</span>
             </div>
             <span className="text-zinc-700 font-light">+</span>
             <div className="flex items-center gap-2 bg-zinc-900/90 backdrop-blur-sm border border-zinc-800 px-5 py-3">
@@ -101,24 +105,39 @@ const Index = () => {
 
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
-            Sua <span className="text-[#00D26A]">Área de Membros</span>
+            <span className="text-[#00D26A]">Vendas Sem Taxas</span>
             <br className="hidden sm:block" />
-            <span className="sm:hidden"> </span>e página de vendas pronta
+            <span className="sm:hidden"> </span>E Recebimento na Hora
           </h1>
+
+          {/* Subheadline */}
+          <div className="mb-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
+              Sua <span className="text-[#00D26A]">Área de Membros</span> e página de vendas pronta
+            </h2>
+            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/40 px-5 py-2.5 mb-4">
+              <Bot className="w-5 h-5 text-purple-400" />
+              <span className="text-sm text-purple-400 font-bold tracking-wide">Criada por I.A • Inteligência Artificial</span>
+            </div>
+          </div>
 
           {/* Subheadline Features */}
           <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-2 sm:gap-4 mb-8">
-            <span className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">Sem taxas por venda</span>
+            <span className="text-lg sm:text-xl font-bold text-white tracking-tight">Sem taxas por venda</span>
             <span className="hidden sm:block text-zinc-700">•</span>
-            <span className="text-lg sm:text-xl md:text-2xl font-black text-yellow-400 tracking-tight">Recebimento na hora</span>
+            <span className="text-lg sm:text-xl font-black text-yellow-400 tracking-tight">Recebimento na hora</span>
             <span className="hidden sm:block text-zinc-700">•</span>
-            <span className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-tight">100% do lucro é seu</span>
+            <span className="text-lg sm:text-xl font-bold text-white tracking-tight">100% do lucro é seu</span>
           </div>
 
-          <p className="text-lg sm:text-xl md:text-2xl text-zinc-400 mb-8 max-w-3xl mx-auto leading-relaxed font-medium tracking-tight">
+          <p className="text-lg sm:text-xl text-zinc-400 mb-8 max-w-3xl mx-auto leading-relaxed font-medium tracking-tight">
             Receba <span className="text-[#00D26A] font-bold">100% de cada venda</span> direto na sua conta InfinitePay.
             <br className="hidden sm:block" />
-            <span className="sm:hidden"> </span>Criamos seu site completo em até 24 horas.
+            <span className="sm:hidden"> </span>Criamos seu site completo em até <span className="text-[#00D26A] font-bold">24 horas</span>.
+          </p>
+
+          <p className="text-base sm:text-lg text-zinc-500 mb-10 max-w-2xl mx-auto font-medium tracking-tight">
+            Você só vai precisar <span className="text-white font-bold">adicionar o conteúdo</span> depois em sua área de membros.
           </p>
 
           {/* Instant Payment Badge */}
@@ -133,32 +152,20 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Price */}
+          {/* CTA Button */}
           <div className="mb-10">
-            <div className="flex items-center justify-center gap-4 mb-3">
-              <span className="text-lg sm:text-xl text-zinc-500 line-through">R$ 2.000</span>
-              <span className="bg-red-500 text-white px-3 py-1 text-sm font-black tracking-tight">-50%</span>
-            </div>
-            <div className="flex items-baseline justify-center gap-2">
-              <span className="text-[#00D26A] text-2xl sm:text-3xl font-black">R$</span>
-              <span className="text-6xl sm:text-7xl md:text-8xl font-black text-white tracking-tighter">997</span>
-              <span className="text-zinc-500 text-lg sm:text-xl font-medium">/ano</span>
-            </div>
-            <p className="text-zinc-500 mt-3 font-semibold tracking-tight">12x de R$83,08 • Vendas ilimitadas</p>
+            <Button 
+              onClick={() => navigate('/cliente/auth')}
+              size="lg" 
+              className="bg-[#00D26A] hover:bg-[#00D26A]/90 text-zinc-950 px-8 sm:px-12 py-6 sm:py-7 text-lg sm:text-xl font-black tracking-tight hover:scale-[1.02] transition-all duration-300 shadow-[0_0_80px_rgba(0,210,106,0.35)] group"
+            >
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+              Criar Minha Área de Membros
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Button>
           </div>
 
-          {/* CTA Button */}
-          <Button 
-            onClick={() => navigate('/cliente/auth')}
-            size="lg" 
-            className="bg-[#00D26A] hover:bg-[#00D26A]/90 text-zinc-950 px-8 sm:px-12 py-6 sm:py-7 text-lg sm:text-xl font-black tracking-tight hover:scale-[1.02] transition-all duration-300 shadow-[0_0_80px_rgba(0,210,106,0.35)] group"
-          >
-            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-            Criar Minha Área de Membros
-            <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
-
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-8 text-zinc-500 text-sm font-medium">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-zinc-500 text-sm font-medium">
             <div className="flex items-center gap-2">
               <Check className="w-4 h-4 text-[#00D26A]" />
               <span>Site de vendas incluso</span>
@@ -175,7 +182,47 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Calculator Section */}
+      {/* Special Message for Beginners */}
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-zinc-950 to-zinc-900/50">
+        <div className="max-w-5xl mx-auto px-4">
+          <Card className="bg-gradient-to-r from-[#00D26A]/10 to-purple-500/10 border-2 border-[#00D26A]/30 overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#00D26A]/5 via-transparent to-purple-500/5" />
+            <CardContent className="p-8 sm:p-12 relative z-10">
+              <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+                <div className="flex-shrink-0">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#00D26A]/20 flex items-center justify-center">
+                    <Rocket className="w-10 h-10 sm:w-12 sm:h-12 text-[#00D26A]" />
+                  </div>
+                </div>
+                <div className="text-center md:text-left">
+                  <div className="inline-flex items-center gap-2 bg-yellow-500/20 border border-yellow-400/40 px-4 py-1.5 mb-4">
+                    <Star className="w-4 h-4 text-yellow-400" />
+                    <span className="text-xs text-yellow-400 font-bold uppercase tracking-wide">Especial para você que está iniciando</span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-black text-white mb-4 tracking-tight">
+                    Sem taxas de pagamento, você consegue <span className="text-[#00D26A]">investir mais</span>
+                  </h3>
+                  <p className="text-zinc-400 text-base sm:text-lg font-medium leading-relaxed">
+                    Com <span className="text-[#00D26A] font-bold">0% de taxas</span>, todo o dinheiro das suas vendas pode ser reinvestido em <span className="text-white font-bold">tráfego pago</span> e <span className="text-white font-bold">estratégias de marketing</span>. Cresça mais rápido do que seus concorrentes.
+                  </p>
+                  <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
+                    <div className="flex items-center gap-2 text-[#00D26A]">
+                      <TrendingUp className="w-5 h-5" />
+                      <span className="font-bold text-sm">Mais verba para anúncios</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[#00D26A]">
+                      <Sparkles className="w-5 h-5" />
+                      <span className="font-bold text-sm">Escale mais rápido</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Calculator Section - Improved */}
       <section className="py-20 sm:py-24 bg-zinc-900/50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
@@ -191,153 +238,194 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Calculator Inputs */}
-          <Card className="bg-zinc-900 border border-zinc-800 mb-10 max-w-xl mx-auto">
-            <CardContent className="p-6">
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div>
-                  <Label className="text-white font-bold text-sm tracking-tight">Preço do Produto</Label>
-                  <div className="relative mt-2">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">R$</span>
-                    <Input
-                      type="number"
-                      value={productPrice}
-                      onChange={(e) => setProductPrice(Number(e.target.value) || 0)}
-                      className="bg-zinc-800 border-zinc-700 text-white text-xl font-bold pl-12 h-14"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-white font-bold text-sm tracking-tight">Quantidade de Vendas</Label>
-                  <Input
-                    type="number"
-                    value={salesCount}
-                    onChange={(e) => setSalesCount(Number(e.target.value) || 0)}
-                    className="bg-zinc-800 border-zinc-700 text-white text-xl font-bold h-14 mt-2"
-                  />
-                </div>
+          {/* Low Ticket Simulation */}
+          <div className="mb-12">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/40 px-4 py-2 mb-3">
+                <span className="text-blue-400 font-bold text-sm tracking-wide uppercase">📦 Produto Low Ticket</span>
               </div>
-              <div className="mt-4 p-4 bg-zinc-800/50 border border-zinc-700">
-                <p className="text-zinc-500 text-sm font-semibold tracking-tight">Faturamento Total</p>
-                <p className="text-3xl font-black text-white tracking-tight">
-                  R$ {totalRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Produto de <span className="text-blue-400">R$10</span> • 100 vendas = R${lowTicketRevenue.toLocaleString('pt-BR')}
+              </h3>
+            </div>
 
-          {/* Comparison Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
-            {/* Kiwify */}
-            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-              <CardContent className="p-3 sm:p-4">
-                <h3 className="text-white font-bold text-sm sm:text-base mb-1 tracking-tight">Kiwify</h3>
-                <p className="text-red-400 text-[10px] sm:text-xs mb-3 font-semibold">8.99% + R$2.49 + saque</p>
-                <div className="space-y-2">
-                  <div>
-                    <p className="text-zinc-600 text-[10px] sm:text-xs font-semibold">Taxas</p>
-                    <p className="text-red-400 font-black text-sm sm:text-base">-R$ {kiwifyFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                  <div>
-                    <p className="text-zinc-600 text-[10px] sm:text-xs font-semibold">Você recebe</p>
-                    <p className="text-white font-bold text-sm sm:text-base">R$ {kiwifyNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
+              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+                <CardContent className="p-3 sm:p-4">
+                  <h4 className="text-white font-bold text-sm mb-1">Kiwify</h4>
+                  <p className="text-red-400 text-[10px] mb-2 font-semibold">8.99% + R$2.49</p>
+                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                  <p className="text-red-400 font-black text-sm">-R$ {lowTicketKiwify.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+                <CardContent className="p-3 sm:p-4">
+                  <h4 className="text-white font-bold text-sm mb-1">Hotmart</h4>
+                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9% + R$1</p>
+                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                  <p className="text-red-400 font-black text-sm">-R$ {lowTicketHotmart.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+                <CardContent className="p-3 sm:p-4">
+                  <h4 className="text-white font-bold text-sm mb-1">Eduzz</h4>
+                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9% + R$1</p>
+                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                  <p className="text-red-400 font-black text-sm">-R$ {lowTicketEduzz.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+                <CardContent className="p-3 sm:p-4">
+                  <h4 className="text-white font-bold text-sm mb-1">Monetizze</h4>
+                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9%</p>
+                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                  <p className="text-red-400 font-black text-sm">-R$ {lowTicketMonetizze.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-[#00D26A]/10 border-2 border-[#00D26A] relative col-span-2 md:col-span-1">
+                <div className="absolute -top-2 -right-2 bg-[#00D26A] text-zinc-950 px-2 py-0.5 text-[10px] font-black">
+                  MELHOR
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Hotmart */}
-            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-              <CardContent className="p-3 sm:p-4">
-                <h3 className="text-white font-bold text-sm sm:text-base mb-1 tracking-tight">Hotmart</h3>
-                <p className="text-red-400 text-[10px] sm:text-xs mb-3 font-semibold">9.9% + R$1/venda</p>
-                <div className="space-y-2">
-                  <div>
-                    <p className="text-zinc-600 text-[10px] sm:text-xs font-semibold">Taxas</p>
-                    <p className="text-red-400 font-black text-sm sm:text-base">-R$ {hotmartFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                  <div>
-                    <p className="text-zinc-600 text-[10px] sm:text-xs font-semibold">Você recebe</p>
-                    <p className="text-white font-bold text-sm sm:text-base">R$ {hotmartNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Eduzz */}
-            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-              <CardContent className="p-3 sm:p-4">
-                <h3 className="text-white font-bold text-sm sm:text-base mb-1 tracking-tight">Eduzz</h3>
-                <p className="text-red-400 text-[10px] sm:text-xs mb-3 font-semibold">9.9% + R$1 + saque</p>
-                <div className="space-y-2">
-                  <div>
-                    <p className="text-zinc-600 text-[10px] sm:text-xs font-semibold">Taxas</p>
-                    <p className="text-red-400 font-black text-sm sm:text-base">-R$ {eduzzFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                  <div>
-                    <p className="text-zinc-600 text-[10px] sm:text-xs font-semibold">Você recebe</p>
-                    <p className="text-white font-bold text-sm sm:text-base">R$ {eduzzNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Monetizze */}
-            <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
-              <CardContent className="p-3 sm:p-4">
-                <h3 className="text-white font-bold text-sm sm:text-base mb-1 tracking-tight">Monetizze</h3>
-                <p className="text-red-400 text-[10px] sm:text-xs mb-3 font-semibold">9.9%</p>
-                <div className="space-y-2">
-                  <div>
-                    <p className="text-zinc-600 text-[10px] sm:text-xs font-semibold">Taxas</p>
-                    <p className="text-red-400 font-black text-sm sm:text-base">-R$ {monetizzeFees.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                  <div>
-                    <p className="text-zinc-600 text-[10px] sm:text-xs font-semibold">Você recebe</p>
-                    <p className="text-white font-bold text-sm sm:text-base">R$ {monetizzeNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Acessar.click */}
-            <Card className="bg-[#00D26A]/10 border-2 border-[#00D26A] relative col-span-2 md:col-span-1">
-              <div className="absolute -top-2 -right-2 bg-[#00D26A] text-zinc-950 px-2 py-0.5 text-[10px] sm:text-xs font-black tracking-tight">
-                MELHOR
-              </div>
-              <CardContent className="p-3 sm:p-4">
-                <h3 className="text-[#00D26A] font-bold text-sm sm:text-base mb-1 tracking-tight">Acessar.click</h3>
-                <p className="text-[#00D26A] text-[10px] sm:text-xs mb-3 font-semibold">0% taxa • 0% saque</p>
-                <div className="space-y-2">
-                  <div>
-                    <p className="text-zinc-500 text-[10px] sm:text-xs font-semibold">Taxas</p>
-                    <p className="text-[#00D26A] font-black text-sm sm:text-base">R$ 0,00</p>
-                  </div>
-                  <div>
-                    <p className="text-zinc-500 text-[10px] sm:text-xs font-semibold">Você recebe</p>
-                    <p className="text-[#00D26A] font-black text-sm sm:text-base">R$ {acessarNet.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                <CardContent className="p-3 sm:p-4">
+                  <h4 className="text-[#00D26A] font-bold text-sm mb-1">Acessar.click</h4>
+                  <p className="text-[#00D26A] text-[10px] mb-2 font-semibold">0% taxa</p>
+                  <p className="text-zinc-500 text-[10px] font-semibold">Você recebe</p>
+                  <p className="text-[#00D26A] font-black text-sm">R$ {lowTicketRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
-          {/* Savings Highlight */}
-          <div className="mt-10 text-center">
-            <Card className="bg-[#00D26A]/5 border border-[#00D26A]/30 inline-block">
-              <CardContent className="p-6 sm:p-8">
-                <p className="text-zinc-500 mb-2 font-semibold tracking-tight">Com Acessar.click você economiza até:</p>
-                <p className="text-4xl sm:text-5xl md:text-6xl font-black text-[#00D26A] tracking-tighter">
-                  R$ {maxSavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </p>
-              </CardContent>
-            </Card>
+          {/* High Ticket Simulation */}
+          <div>
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/40 px-4 py-2 mb-3">
+                <span className="text-yellow-400 font-bold text-sm tracking-wide uppercase">💎 Produto High Ticket</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Produto de <span className="text-yellow-400">R$997</span> • 100 vendas = R${highTicketRevenue.toLocaleString('pt-BR')}
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-3">
+              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+                <CardContent className="p-3 sm:p-4">
+                  <h4 className="text-white font-bold text-sm mb-1">Kiwify</h4>
+                  <p className="text-red-400 text-[10px] mb-2 font-semibold">8.99% + R$2.49</p>
+                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                  <p className="text-red-400 font-black text-sm">-R$ {highTicketKiwify.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+                <CardContent className="p-3 sm:p-4">
+                  <h4 className="text-white font-bold text-sm mb-1">Hotmart</h4>
+                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9% + R$1</p>
+                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                  <p className="text-red-400 font-black text-sm">-R$ {highTicketHotmart.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+                <CardContent className="p-3 sm:p-4">
+                  <h4 className="text-white font-bold text-sm mb-1">Eduzz</h4>
+                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9% + R$1</p>
+                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                  <p className="text-red-400 font-black text-sm">-R$ {highTicketEduzz.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-zinc-900 border border-zinc-800 hover:border-red-500/40 transition-all">
+                <CardContent className="p-3 sm:p-4">
+                  <h4 className="text-white font-bold text-sm mb-1">Monetizze</h4>
+                  <p className="text-red-400 text-[10px] mb-2 font-semibold">9.9%</p>
+                  <p className="text-zinc-600 text-[10px] font-semibold">Você perde</p>
+                  <p className="text-red-400 font-black text-sm">-R$ {highTicketMonetizze.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-[#00D26A]/10 border-2 border-[#00D26A] relative col-span-2 md:col-span-1">
+                <div className="absolute -top-2 -right-2 bg-[#00D26A] text-zinc-950 px-2 py-0.5 text-[10px] font-black">
+                  MELHOR
+                </div>
+                <CardContent className="p-3 sm:p-4">
+                  <h4 className="text-[#00D26A] font-bold text-sm mb-1">Acessar.click</h4>
+                  <p className="text-[#00D26A] text-[10px] mb-2 font-semibold">0% taxa</p>
+                  <p className="text-zinc-500 text-[10px] font-semibold">Você recebe</p>
+                  <p className="text-[#00D26A] font-black text-sm">R$ {highTicketRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Savings Highlight */}
+            <div className="mt-10 text-center">
+              <Card className="bg-[#00D26A]/5 border border-[#00D26A]/30 inline-block">
+                <CardContent className="p-6 sm:p-8">
+                  <p className="text-zinc-500 mb-2 font-semibold tracking-tight">Com High Ticket você economiza até:</p>
+                  <p className="text-4xl sm:text-5xl md:text-6xl font-black text-[#00D26A] tracking-tighter">
+                    R$ {highTicketKiwify.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-zinc-500 mt-2 text-sm font-medium">Em apenas 100 vendas!</p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* Pricing Section */}
       <section className="py-20 sm:py-24 bg-zinc-950">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/40 px-4 py-2 mb-6">
+            <span className="text-yellow-400 font-bold text-sm tracking-wide uppercase">💰 Investimento</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-8 tracking-tight">
+            Quanto custa para <span className="text-[#00D26A]">começar</span>?
+          </h2>
+          
+          <Card className="bg-zinc-900 border-2 border-[#00D26A]/50 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-[#00D26A]/5 to-transparent pointer-events-none" />
+            <CardContent className="p-8 sm:p-12 relative z-10">
+              <div className="mb-6">
+                <div className="flex items-center justify-center gap-4 mb-3">
+                  <span className="text-lg sm:text-xl text-zinc-500 line-through">R$ 2.000</span>
+                  <span className="bg-red-500 text-white px-3 py-1 text-sm font-black tracking-tight">-50%</span>
+                </div>
+                <div className="flex items-baseline justify-center gap-2">
+                  <span className="text-[#00D26A] text-2xl sm:text-3xl font-black">R$</span>
+                  <span className="text-6xl sm:text-7xl md:text-8xl font-black text-white tracking-tighter">997</span>
+                  <span className="text-zinc-500 text-lg sm:text-xl font-medium">/ano</span>
+                </div>
+                <p className="text-zinc-500 mt-3 font-semibold tracking-tight">12x de R$83,08 • Vendas ilimitadas</p>
+              </div>
+
+              <div className="grid sm:grid-cols-3 gap-4 mb-8">
+                <div className="bg-zinc-800/50 p-4">
+                  <Check className="w-6 h-6 text-[#00D26A] mx-auto mb-2" />
+                  <p className="text-white font-bold text-sm">Site de vendas completo</p>
+                </div>
+                <div className="bg-zinc-800/50 p-4">
+                  <Check className="w-6 h-6 text-[#00D26A] mx-auto mb-2" />
+                  <p className="text-white font-bold text-sm">Área de membros pronta</p>
+                </div>
+                <div className="bg-zinc-800/50 p-4">
+                  <Check className="w-6 h-6 text-[#00D26A] mx-auto mb-2" />
+                  <p className="text-white font-bold text-sm">Pronto em 24 horas</p>
+                </div>
+              </div>
+
+              <Button 
+                onClick={() => navigate('/cliente/auth')}
+                size="lg" 
+                className="bg-[#00D26A] hover:bg-[#00D26A]/90 text-zinc-950 px-10 sm:px-12 py-5 sm:py-6 text-lg sm:text-xl font-black tracking-tight hover:scale-[1.02] transition-all duration-300 shadow-[0_0_80px_rgba(0,210,106,0.4)] group w-full sm:w-auto"
+              >
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                Criar Minha Área de Membros
+                <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-20 sm:py-24 bg-zinc-900/50">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-black text-center mb-12 tracking-tight">
             Como <span className="text-[#00D26A]">funciona</span>
@@ -372,7 +460,7 @@ const Index = () => {
       </section>
 
       {/* Features */}
-      <section className="py-20 sm:py-24 bg-zinc-900/50">
+      <section className="py-20 sm:py-24 bg-zinc-950">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-center mb-14 tracking-tight">
             Tudo <span className="text-[#00D26A]">incluso</span> no seu plano
@@ -402,7 +490,7 @@ const Index = () => {
       </section>
 
       {/* InfinitePay Requirement */}
-      <section className="py-16 sm:py-20 bg-zinc-950">
+      <section className="py-16 sm:py-20 bg-zinc-900/50">
         <div className="max-w-4xl mx-auto px-4">
           <Card className="bg-white border-0 overflow-hidden shadow-2xl">
             <CardContent className="p-6 sm:p-8 md:p-10">
@@ -476,7 +564,7 @@ const Index = () => {
       </section>
 
       {/* Active Products */}
-      <section className="py-20 sm:py-24 bg-zinc-900/50">
+      <section className="py-20 sm:py-24 bg-zinc-950">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-center mb-4 tracking-tight">
             Produtos <span className="text-[#00D26A]">ativos</span> em nossa plataforma
@@ -512,7 +600,7 @@ const Index = () => {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 sm:py-24 bg-zinc-950">
+      <section className="py-20 sm:py-24 bg-zinc-900/50">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Card className="bg-zinc-900 border border-[#00D26A]/30 relative overflow-hidden">
             {/* Background glow effect */}
@@ -526,17 +614,6 @@ const Index = () => {
                 Nós criamos sua página de vendas e área de membros completa.
                 Você só adiciona seu conteúdo e começa a vender.
               </p>
-
-              <div className="mb-8">
-                <div className="flex items-center justify-center gap-4 mb-2">
-                  <span className="text-base sm:text-lg text-zinc-500 line-through">R$ 2.000</span>
-                </div>
-                <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-[#00D26A] text-xl sm:text-2xl font-black">R$</span>
-                  <span className="text-5xl sm:text-6xl font-black text-white tracking-tighter">997</span>
-                  <span className="text-zinc-500 text-base sm:text-lg font-medium">/ano</span>
-                </div>
-              </div>
 
               <Button 
                 onClick={() => navigate('/cliente/auth')}
