@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { trackFacebookEvent } from '@/components/FacebookPixel';
+import { FacebookPixel, trackFacebookEvent } from '@/components/FacebookPixel';
 import { 
   Scissors, Play, Lock, LogOut, Crown, ChevronRight, 
   BookOpen, Clock, Award, Sparkles, Camera, Upload, CheckCircle2, Loader2
@@ -206,7 +206,9 @@ export default function BelezaDashboard() {
   // Premium upgrade prompt
   if (!enrollment?.is_premium) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200 relative overflow-hidden">
+      <>
+        <FacebookPixel productSlug="belezalisoperfeito" />
+        <div className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200 relative overflow-hidden">
         {/* Floating hair styling images background */}
         <div className="absolute inset-0 opacity-20">
           {[...Array(12)].map((_, i) => (
@@ -328,6 +330,7 @@ export default function BelezaDashboard() {
           }
         `}</style>
       </div>
+      </>
     );
   }
 
