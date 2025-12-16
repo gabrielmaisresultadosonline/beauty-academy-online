@@ -107,8 +107,8 @@ const Index = () => {
             Você só vai precisar <span className="text-white font-bold">adicionar o conteúdo</span> depois em sua área de membros.
           </p>
 
-          {/* CTA Button */}
-          <div className="mb-10">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
             <Button 
               onClick={() => navigate('/cliente/auth')}
               size="lg" 
@@ -117,6 +117,15 @@ const Index = () => {
               <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
               Criar Minha Área de Membros
               <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Button>
+            <Button 
+              onClick={() => navigate('/demonstracao')}
+              size="lg" 
+              className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-6 sm:py-7 text-lg sm:text-xl font-black tracking-tight hover:scale-[1.02] transition-all duration-300 shadow-[0_0_60px_rgba(236,72,153,0.3)] group"
+            >
+              <Play className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+              Ver Demo
+              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 ml-1 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
 
