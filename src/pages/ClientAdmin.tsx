@@ -16,7 +16,7 @@ import {
   Zap, LogOut, Users, CreditCard, Settings, BarChart3, 
   CheckCircle, Clock, AlertTriangle, Save, Eye, Calendar,
   DollarSign, TrendingUp, FileText, Phone, Globe, Link2,
-  X, RefreshCw, ExternalLink
+  X, RefreshCw, ExternalLink, Copy, Info
 } from "lucide-react";
 
 interface PlatformClient {
@@ -660,60 +660,145 @@ const ClientAdmin = () => {
 
           {/* Settings Tab */}
           <TabsContent value="settings">
-            <Card className="bg-zinc-900 border-white/10">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Settings className="w-5 h-5 text-green-400" />
-                  Configurações da Página Principal
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="pixelCode" className="text-white">Código do Facebook Pixel</Label>
-                  <Textarea
-                    id="pixelCode"
-                    placeholder="Cole aqui o código completo do seu Facebook Pixel..."
-                    value={settings.facebook_pixel_code || ''}
-                    onChange={(e) => setSettings({...settings, facebook_pixel_code: e.target.value})}
-                    className="bg-black border-white/20 text-white min-h-[150px] font-mono text-sm"
-                  />
-                  <p className="text-xs text-white/40">
-                    Cole o código completo do Pixel do Facebook (incluindo as tags script)
-                  </p>
-                </div>
+            <div className="space-y-6">
+              {/* Facebook Pixel */}
+              <Card className="bg-zinc-900 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-green-400" />
+                    Facebook Pixel
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="pixelCode" className="text-white">Código do Facebook Pixel</Label>
+                    <Textarea
+                      id="pixelCode"
+                      placeholder="Cole aqui o código completo do seu Facebook Pixel..."
+                      value={settings.facebook_pixel_code || ''}
+                      onChange={(e) => setSettings({...settings, facebook_pixel_code: e.target.value})}
+                      className="bg-black border-white/20 text-white min-h-[150px] font-mono text-sm"
+                    />
+                    <p className="text-xs text-white/40">
+                      Cole o código completo do Pixel do Facebook (incluindo as tags script)
+                    </p>
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="paymentLink" className="text-white">Link de Pagamento InfinitePay</Label>
-                  <Input
-                    id="paymentLink"
-                    placeholder="https://checkout.infinitepay.io/..."
-                    value={settings.infinitepay_link || ''}
-                    onChange={(e) => setSettings({...settings, infinitepay_link: e.target.value})}
-                    className="bg-black border-white/20 text-white"
-                  />
-                </div>
+                  <Button 
+                    onClick={handleSaveSettings}
+                    disabled={savingSettings}
+                    className="bg-green-500 hover:bg-green-400 text-black font-bold"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    {savingSettings ? 'Salvando...' : 'Salvar Pixel'}
+                  </Button>
+                </CardContent>
+              </Card>
 
-                <div className="space-y-2">
-                  <Label htmlFor="thankYouUrl" className="text-white">URL de Obrigado (após pagamento)</Label>
-                  <Input
-                    id="thankYouUrl"
-                    placeholder="https://acessar.click/cliente/obrigado"
-                    value={settings.thank_you_url || ''}
-                    onChange={(e) => setSettings({...settings, thank_you_url: e.target.value})}
-                    className="bg-black border-white/20 text-white"
-                  />
-                </div>
+              {/* URLs Fixas */}
+              <Card className="bg-zinc-900 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Link2 className="w-5 h-5 text-green-400" />
+                    URLs do Sistema (Fixas)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
+                    <div className="flex items-start gap-2">
+                      <Info className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-blue-200 text-sm">
+                        Essas URLs são <strong>geradas automaticamente</strong> pelo sistema. Use-as para configurar o redirecionamento no InfinitePay.
+                      </p>
+                    </div>
+                  </div>
 
-                <Button 
-                  onClick={handleSaveSettings}
-                  disabled={savingSettings}
-                  className="bg-green-500 hover:bg-green-400 text-black font-bold"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  {savingSettings ? 'Salvando na nuvem...' : 'Salvar Configurações'}
-                </Button>
-              </CardContent>
-            </Card>
+                  <div className="space-y-2">
+                    <Label className="text-white">URL de Obrigado - Plano Mensal</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        readOnly
+                        value={`${window.location.origin}/cliente/obrigado?plan=trial`}
+                        className="bg-black/50 border-white/10 text-white/80 font-mono text-sm"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/cliente/obrigado?plan=trial`);
+                          toast.success("URL copiada!");
+                        }}
+                        className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-white">URL de Obrigado - Plano Anual</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        readOnly
+                        value={`${window.location.origin}/cliente/obrigado?plan=annual`}
+                        className="bg-black/50 border-white/10 text-white/80 font-mono text-sm"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/cliente/obrigado?plan=annual`);
+                          toast.success("URL copiada!");
+                        }}
+                        className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Como funciona o pagamento */}
+              <Card className="bg-zinc-900 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-green-400" />
+                    Como Funciona o Pagamento
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                    <h4 className="text-green-400 font-bold mb-2">Links Dinâmicos</h4>
+                    <p className="text-white/80 text-sm mb-3">
+                      Os links de pagamento são <strong>gerados automaticamente</strong> quando o cliente clica em "Assinar". 
+                      Cada link inclui:
+                    </p>
+                    <ul className="text-white/70 text-sm space-y-1 ml-4">
+                      <li>• Nome completo do cliente</li>
+                      <li>• Valor do plano escolhido (Mensal: R$247 / Anual: R$797)</li>
+                      <li>• URL de redirecionamento após pagamento</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                    <h4 className="text-amber-400 font-bold mb-2">Configuração no InfinitePay</h4>
+                    <p className="text-white/80 text-sm">
+                      No seu painel InfinitePay, você <strong>não precisa</strong> configurar nada especial. 
+                      O sistema usa o checkout dinâmico que cria os links automaticamente com seu username: 
+                      <code className="bg-black/30 px-2 py-0.5 rounded ml-1">paguemro</code>
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-white">Exemplo de Link Gerado (Mensal)</Label>
+                    <div className="bg-black/50 border border-white/10 rounded-lg p-3 font-mono text-xs text-white/60 break-all">
+                      https://checkout.infinitepay.io/paguemro?items=[{`{"name":"AREA DE MEMBROS 30 DIAS - Nome do Cliente","price":24700,"quantity":1}`}]&redirect_url=...
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </main>
