@@ -221,6 +221,39 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Highlighted Purpose Section */}
+      <section className="py-12 md:py-16 bg-gradient-to-r from-pink-500 via-rose-500 to-pink-600">
+        <div className="container">
+          <div className="text-center text-white">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold font-heading mb-6">
+              Escolha o Seu Caminho
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {/* Option 1 - Save Money */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/20 hover:bg-white/20 transition-all">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Heart className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-3">Faça em Você Mesma</h3>
+                <p className="text-white/90 text-lg">
+                  Aprenda para fazer em você mesma e <span className="font-bold text-yellow-300">economize milhares de reais</span> em salão todo ano!
+                </p>
+              </div>
+              {/* Option 2 - Make Money */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-white/20 hover:bg-white/20 transition-all">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-3">Trabalhe e Fature</h3>
+                <p className="text-white/90 text-lg">
+                  Aprenda para trabalhar e <span className="font-bold text-yellow-300">faturar fazendo em outros cabelos</span> como profissional!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-16 md:py-24 bg-muted/30">
         <div className="container">
