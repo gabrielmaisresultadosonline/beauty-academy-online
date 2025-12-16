@@ -26,20 +26,26 @@ const ClientObrigado = () => {
           return;
         }
 
-        // Busca o plano do localStorage (setado na página de preços)
-        const storedPlan = localStorage.getItem('pending_plan_type');
-        const detectedPlan = storedPlan || 'trial';
+        // Busca os dados do cliente incluindo o plano pendente (da nuvem)
+        const { data: clientData, error: fetchError } = await supabase
+          .from('platform_clients')
+          .select('pending_plan_type')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        if (fetchError) throw fetchError;
+
+        // Usa o plano pendente salvo no banco ou default para trial
+        const detectedPlan = clientData?.pending_plan_type || 'trial';
         setPlanType(detectedPlan);
-        
-        // Limpa o localStorage após usar
-        localStorage.removeItem('pending_plan_type');
 
         const now = new Date();
         let updateData: any = {
           is_paid: true,
           paid_at: now.toISOString(),
           plan_type: detectedPlan,
-          site_blocked: false
+          site_blocked: false,
+          pending_plan_type: null // Limpa o plano pendente após ativar
         };
 
         if (detectedPlan === 'trial') {
