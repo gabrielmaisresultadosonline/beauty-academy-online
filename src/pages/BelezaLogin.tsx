@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,6 +78,15 @@ export default function BelezaLogin() {
   };
 
   return (
+    <>
+      <Helmet>
+        <title>Login | Curso de Cabeleireira Completo - Comunidade da Cabeleireira</title>
+        <meta name="description" content="Acesse sua conta no curso de cabeleireira completo. Aprenda técnicas profissionais com acesso vitalício." />
+        <meta property="og:title" content="Login | Comunidade da Cabeleireira" />
+        <meta property="og:description" content="Acesse sua conta no curso de cabeleireira completo com acesso vitalício." />
+        <meta property="og:url" content="https://acessar.click/belezalisoperfeito/login" />
+        <link rel="canonical" href="https://acessar.click/belezalisoperfeito/login" />
+      </Helmet>
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-50 to-pink-200 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Link 
@@ -173,5 +183,6 @@ export default function BelezaLogin() {
         </div>
       </div>
     </div>
+    </>
   );
 }
