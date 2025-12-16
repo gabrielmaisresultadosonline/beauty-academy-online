@@ -208,6 +208,66 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_clients: {
+        Row: {
+          additional_notes: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          infinitepay_username: string | null
+          is_paid: boolean | null
+          paid_at: string | null
+          product_description: string | null
+          product_name: string | null
+          product_price: number | null
+          product_type: string | null
+          site_status: string | null
+          target_audience: string | null
+          updated_at: string
+          user_id: string
+          whatsapp: string
+        }
+        Insert: {
+          additional_notes?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          infinitepay_username?: string | null
+          is_paid?: boolean | null
+          paid_at?: string | null
+          product_description?: string | null
+          product_name?: string | null
+          product_price?: number | null
+          product_type?: string | null
+          site_status?: string | null
+          target_audience?: string | null
+          updated_at?: string
+          user_id: string
+          whatsapp: string
+        }
+        Update: {
+          additional_notes?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          infinitepay_username?: string | null
+          is_paid?: boolean | null
+          paid_at?: string | null
+          product_description?: string | null
+          product_name?: string | null
+          product_price?: number | null
+          product_type?: string | null
+          site_status?: string | null
+          target_audience?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       platform_settings: {
         Row: {
           created_at: string
