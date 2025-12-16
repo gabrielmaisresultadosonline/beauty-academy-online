@@ -6,6 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import BelezaLisoPerfeito from "./pages/BelezaLisoPerfeito";
+import BelezaLogin from "./pages/BelezaLogin";
+import BelezaDashboard from "./pages/BelezaDashboard";
+import BelezaAdmin from "./pages/BelezaAdmin";
+import BelezaObrigado from "./pages/BelezaObrigado";
 import ComunidadeMusica from "./pages/ComunidadeMusica";
 import SpotMusicLogin from "./pages/SpotMusicLogin";
 import SpotMusicDashboard from "./pages/SpotMusicDashboard";
@@ -25,6 +29,10 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/belezalisoperfeito" element={<BelezaLisoPerfeito />} />
+            <Route path="/belezalisoperfeito/login" element={<BelezaLogin />} />
+            <Route path="/belezalisoperfeito/dashboard" element={<BelezaDashboard />} />
+            <Route path="/belezalisoperfeito/admin" element={<BelezaAdmin />} />
+            <Route path="/belezalisoperfeito/obrigado" element={<BelezaObrigado />} />
             <Route path="/comunidademusica" element={<ComunidadeMusica />} />
             <Route path="/comunidademusica/login" element={<SpotMusicLogin />} />
             <Route path="/comunidademusica/dashboard" element={<SpotMusicDashboard />} />

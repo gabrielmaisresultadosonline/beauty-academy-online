@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import CountdownTimer from '@/components/CountdownTimer';
 import WhatsAppProof from '@/components/WhatsAppProof';
@@ -25,7 +26,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 
-const KIWIFY_LINK = 'https://pay.kiwify.com.br/AFMNBej';
+const REGISTER_LINK = '/belezalisoperfeito/login';
 
 const scrollToPrice = () => {
   const priceSection = document.getElementById('preco');
@@ -134,11 +135,19 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background font-body">
       {/* Header Badge */}
-      <div className="gradient-primary py-2 text-center">
-        <p className="text-primary-foreground text-sm font-medium flex items-center justify-center gap-2">
-          <CheckCircle2 className="w-4 h-4" />
-          RECONHECIDO PELO MEC
-        </p>
+      <div className="gradient-primary py-2">
+        <div className="container flex items-center justify-between">
+          <p className="text-primary-foreground text-sm font-medium flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4" />
+            RECONHECIDO PELO MEC
+          </p>
+          <Link 
+            to="/belezalisoperfeito/login" 
+            className="text-primary-foreground/90 hover:text-primary-foreground text-sm font-medium underline"
+          >
+            Área do Aluno
+          </Link>
+        </div>
       </div>
 
       {/* Hero Section */}
@@ -157,9 +166,11 @@ const Index = () => {
                 Tudo que você precisa para se tornar uma profissional de sucesso na área de cabeleiraria. Aprenda com especialistas e comece sua transformação hoje!
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="cta" size="xl" onClick={scrollToPrice}>
-                  QUERO ME INSCREVER
-                  <ArrowRight className="w-5 h-5" />
+                <Button variant="cta" size="xl" asChild>
+                  <Link to={REGISTER_LINK}>
+                    QUERO ME INSCREVER
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
                 </Button>
               </div>
               <div className="flex items-center gap-6 pt-4">
@@ -310,10 +321,10 @@ const Index = () => {
                 Pagamento único. Acesso vitalício a todo o conteúdo.
               </p>
               <Button variant="cta" size="xl" className="w-full" asChild>
-                <a href={KIWIFY_LINK} target="_blank" rel="noopener noreferrer">
-                  COMPRAR POR R$47
+                <Link to={REGISTER_LINK}>
+                  GARANTIR MINHA VAGA POR R$47
                   <ArrowRight className="w-5 h-5" />
-                </a>
+                </Link>
               </Button>
               <div className="flex items-center justify-center gap-4 mt-6 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
@@ -357,10 +368,10 @@ const Index = () => {
               Não perca mais tempo. Milhares de mulheres já transformaram suas vidas com o nosso curso. Agora é a sua vez!
             </p>
             <Button variant="secondary" size="xl" className="text-foreground" asChild>
-              <a href={KIWIFY_LINK} target="_blank" rel="noopener noreferrer">
+              <Link to={REGISTER_LINK}>
                 GARANTIR MINHA VAGA
                 <ArrowRight className="w-5 h-5" />
-              </a>
+              </Link>
             </Button>
           </div>
         </div>
