@@ -286,129 +286,126 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-20 sm:py-24 bg-zinc-950">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/40 px-4 py-2 mb-6">
-            <span className="text-yellow-400 font-bold text-sm tracking-wide uppercase">💰 Investimento</span>
+      {/* Instant Payment Section */}
+      <section className="py-16 sm:py-20 bg-zinc-950">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 bg-[#00D26A]/10 border border-[#00D26A]/40 px-4 py-2 mb-6">
+              <Zap className="w-5 h-5 text-[#00D26A]" />
+              <span className="text-[#00D26A] font-bold text-sm tracking-wide uppercase">Recebimento Instantâneo</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 tracking-tight">
+              Receba suas vendas <span className="text-[#00D26A]">na hora</span>
+            </h2>
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto font-medium">
+              Sem burocracia. Sem esperar 14 ou 30 dias. O dinheiro cai direto na sua conta.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-8 tracking-tight">
+
+          <div className="grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <Card className="bg-zinc-900 border border-zinc-800 hover:border-[#00D26A]/50 transition-all">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-[#00D26A]/20 flex items-center justify-center mx-auto mb-4">
+                  <CreditCard className="w-8 h-8 text-[#00D26A]" />
+                </div>
+                <h3 className="text-white font-black text-xl mb-2">Vendas no Cartão</h3>
+                <p className="text-zinc-400 text-sm mb-4">Crédito ou débito</p>
+                <div className="bg-[#00D26A]/10 border border-[#00D26A]/30 py-3 px-4">
+                  <span className="text-[#00D26A] font-black text-lg">RECEBIMENTO NA HORA</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-zinc-900 border border-zinc-800 hover:border-[#00D26A]/50 transition-all">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-[#00D26A]/20 flex items-center justify-center mx-auto mb-4">
+                  <Zap className="w-8 h-8 text-[#00D26A]" />
+                </div>
+                <h3 className="text-white font-black text-xl mb-2">Vendas no PIX</h3>
+                <p className="text-zinc-400 text-sm mb-4">Pagamento instantâneo</p>
+                <div className="bg-[#00D26A]/10 border border-[#00D26A]/30 py-3 px-4">
+                  <span className="text-[#00D26A] font-black text-lg">RECEBIMENTO NA HORA</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <p className="text-center text-zinc-500 mt-8 font-medium">
+            Com <span className="text-[#00D26A] font-bold">InfinitePay</span> integrado, você recebe em até 8 segundos. Sem burocracia.
+          </p>
+        </div>
+      </section>
+
+      {/* Pricing Section - CTA only */}
+      <section className="py-20 sm:py-24 bg-zinc-900/50">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/40 px-4 py-2 mb-6">
+            <span className="text-yellow-400 font-bold text-sm tracking-wide uppercase">💰 Comece Agora</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6 tracking-tight">
             Tenha seu site e área de membros <span className="text-[#00D26A]">prontos</span>
           </h2>
-          <p className="text-zinc-400 text-lg sm:text-xl max-w-3xl mx-auto mb-10 font-medium">
-            Abra as portas para não depender mais de áreas de membros com taxas altíssimas que não te ajudam em nada
+          <p className="text-zinc-400 text-lg sm:text-xl max-w-3xl mx-auto mb-8 font-medium">
+            Crie sua conta gratuitamente e escolha o plano ideal para você
           </p>
-          
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Plano Inicial - 30 dias */}
-            <Card className="bg-zinc-900 border-2 border-[#00D26A] relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 bg-[#00D26A] py-2">
-                <span className="text-zinc-950 font-black text-sm tracking-wide uppercase">🚀 Primeiros 30 Dias</span>
+
+          <div className="bg-zinc-900 border border-zinc-800 p-6 sm:p-8 max-w-2xl mx-auto mb-8">
+            <h3 className="text-white font-bold text-lg mb-4">O que você recebe:</h3>
+            <div className="grid sm:grid-cols-2 gap-3 text-left mb-6">
+              <div className="flex items-center gap-3">
+                <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
+                <span className="text-zinc-300 text-sm">Hospedagem do site inclusa</span>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-b from-[#00D26A]/10 to-transparent pointer-events-none" />
-              <CardContent className="p-8 pt-14 relative z-10">
-                <div className="mb-6">
-                  <div className="flex items-center justify-center gap-3 mb-2">
-                    <span className="text-lg text-zinc-500 line-through">R$ 497</span>
-                    <span className="bg-red-500 text-white px-2 py-0.5 text-xs font-black">-50%</span>
-                  </div>
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-[#00D26A] text-xl font-black">R$</span>
-                    <span className="text-5xl sm:text-6xl font-black text-white tracking-tighter">247</span>
-                  </div>
-                  <p className="text-zinc-400 mt-2 text-sm font-semibold">Pagamento único para começar</p>
-                </div>
-
-                <div className="space-y-3 mb-6 text-left">
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
-                    <span className="text-white text-sm font-medium">Site de vendas completo</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
-                    <span className="text-white text-sm font-medium">Área de membros pronta</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
-                    <span className="text-white text-sm font-medium">Pronto em 24 horas</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
-                    <span className="text-white text-sm font-medium">InfinitePay integrado</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
-                    <span className="text-white text-sm font-medium">Pixel do Facebook ativo</span>
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={() => navigate('/cliente/auth')}
-                  size="lg" 
-                  className="bg-[#00D26A] hover:bg-[#00D26A]/90 text-zinc-950 px-8 py-5 text-lg font-black tracking-tight hover:scale-[1.02] transition-all duration-300 shadow-[0_0_60px_rgba(0,210,106,0.4)] group w-full"
-                >
-                  <Zap className="w-5 h-5 mr-2" />
-                  Começar Agora
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Plano Anual - Após 30 dias */}
-            <Card className="bg-zinc-900/50 border border-zinc-800 relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 bg-zinc-800 py-2">
-                <span className="text-zinc-400 font-bold text-sm tracking-wide uppercase">📅 Após 30 Dias</span>
+              <div className="flex items-center gap-3">
+                <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
+                <span className="text-zinc-300 text-sm">Página de vendas profissional</span>
               </div>
-              <CardContent className="p-8 pt-14 relative z-10">
-                <div className="mb-6">
-                  <div className="flex items-center justify-center gap-3 mb-2">
-                    <span className="text-lg text-zinc-600 line-through">R$ 1.497</span>
-                    <span className="bg-zinc-700 text-zinc-300 px-2 py-0.5 text-xs font-bold">Desconto</span>
-                  </div>
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-zinc-400 text-xl font-black">R$</span>
-                    <span className="text-5xl sm:text-6xl font-black text-zinc-300 tracking-tighter">797</span>
-                    <span className="text-zinc-500 text-base font-medium">/ano</span>
-                  </div>
-                  <p className="text-zinc-500 mt-2 text-sm font-semibold">Para manter seu site ativo</p>
-                </div>
-
-                <div className="space-y-3 mb-6 text-left">
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-zinc-500 flex-shrink-0" />
-                    <span className="text-zinc-400 text-sm font-medium">Renovação anual</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-zinc-500 flex-shrink-0" />
-                    <span className="text-zinc-400 text-sm font-medium">Site sempre online</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-zinc-500 flex-shrink-0" />
-                    <span className="text-zinc-400 text-sm font-medium">Suporte contínuo</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-zinc-500 flex-shrink-0" />
-                    <span className="text-zinc-400 text-sm font-medium">Vendas ilimitadas</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-zinc-500 flex-shrink-0" />
-                    <span className="text-zinc-400 text-sm font-medium">0% de taxas por venda</span>
-                  </div>
-                </div>
-
-                <div className="bg-zinc-800/50 border border-zinc-700 p-4">
-                  <p className="text-zinc-400 text-xs font-medium">
-                    ⚠️ Após 1 ano, se não renovar, o acesso ao site é bloqueado até novo pagamento.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+              <div className="flex items-center gap-3">
+                <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
+                <span className="text-zinc-300 text-sm">Área de membros completa</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
+                <span className="text-zinc-300 text-sm">InfinitePay integrado</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
+                <span className="text-zinc-300 text-sm">Pixel do Facebook ativo</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="w-5 h-5 text-[#00D26A] flex-shrink-0" />
+                <span className="text-zinc-300 text-sm">Pronto em 24 horas</span>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-zinc-400 mb-6">
+              <div className="flex items-center gap-2">
+                <span className="text-[#00D26A] font-bold">Mensal:</span>
+                <span>R$247/mês</span>
+              </div>
+              <span className="hidden sm:block text-zinc-600">•</span>
+              <div className="flex items-center gap-2">
+                <span className="text-[#00D26A] font-bold">Anual:</span>
+                <span>12x de R$81 (R$797/ano)</span>
+              </div>
+            </div>
           </div>
+
+          <Button 
+            onClick={() => navigate('/cliente/auth')}
+            size="lg" 
+            className="bg-[#00D26A] hover:bg-[#00D26A]/90 text-zinc-950 px-10 sm:px-12 py-5 sm:py-6 text-lg sm:text-xl font-black tracking-tight hover:scale-[1.02] transition-all duration-300 shadow-[0_0_80px_rgba(0,210,106,0.4)] group"
+          >
+            <Zap className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+            CRIAR MINHA CONTA GRÁTIS
+            <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 group-hover:translate-x-1 transition-transform" />
+          </Button>
+          <p className="text-zinc-500 text-sm mt-4">Cadastre-se e escolha seu plano depois</p>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-20 sm:py-24 bg-zinc-900/50">
+      <section className="py-20 sm:py-24 bg-zinc-950">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-3xl sm:text-4xl font-black text-center mb-12 tracking-tight">
             Como <span className="text-[#00D26A]">funciona</span>
@@ -416,10 +413,10 @@ const Index = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { step: "1", title: "Cadastre-se", description: "Crie sua conta com nome, email, WhatsApp e senha" },
-              { step: "2", title: "Faça o pagamento", description: "Pague R$997/ano via InfinitePay" },
+              { step: "1", title: "Cadastre-se", description: "Crie sua conta grátis com nome, email e senha" },
+              { step: "2", title: "Escolha o plano", description: "Mensal R$247 ou Anual 12x R$81" },
               { step: "3", title: "Descreva seu produto", description: "Conte-nos sobre seu curso ou serviço" },
-              { step: "4", title: "Receba em 24h", description: "Sua área de membros pronta para usar" }
+              { step: "4", title: "Receba em 24h", description: "Sua área de membros pronta para vender" }
             ].map((item, index) => (
               <div key={index} className="relative group">
                 <Card className="bg-zinc-900 border border-zinc-800 hover:border-[#00D26A]/50 transition-all h-full group-hover:translate-y-[-4px]">

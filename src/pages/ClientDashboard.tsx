@@ -310,42 +310,78 @@ const ClientDashboard = () => {
 
         {/* Payment Status - Not Paid Yet */}
         {!clientData?.is_paid ? (
-          <Card className="bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-2 border-green-500/50 mb-8">
-            <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row items-center gap-6">
-                <div className="w-20 h-20 bg-green-500/20 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <CreditCard className="w-10 h-10 text-green-400" />
+          <div className="space-y-6 mb-8">
+            <h2 className="text-xl font-black text-white">Escolha seu plano:</h2>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Plano Mensal */}
+              <Card className="bg-zinc-900 border-2 border-[#00D26A] relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 bg-[#00D26A] py-2 text-center">
+                  <span className="text-zinc-950 font-black text-xs tracking-wide uppercase">MENSAL</span>
                 </div>
-                <div className="flex-1 text-center md:text-left">
-                  <div className="inline-flex items-center gap-2 bg-green-500/20 px-3 py-1 rounded-full mb-3">
-                    <span className="text-green-400 font-bold text-sm">🚀 PRIMEIROS 30 DIAS</span>
+                <CardContent className="p-6 pt-12">
+                  <div className="text-center mb-4">
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-[#00D26A] text-lg font-black">R$</span>
+                      <span className="text-4xl font-black text-white">247</span>
+                      <span className="text-zinc-500 text-sm">/mês</span>
+                    </div>
                   </div>
-                  <h2 className="text-2xl font-black text-white mb-2">Ative sua Área de Membros</h2>
-                  <p className="text-white/60 mb-4">
-                    Tenha seu site de vendas + área de membros completa em até 24h por apenas <span className="text-green-400 font-bold">R$247</span>
-                  </p>
-                  <div className="flex flex-wrap gap-3 justify-center md:justify-start mb-6">
-                    <span className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-sm font-bold">
-                      ✓ Site completo
-                    </span>
-                    <span className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-sm font-bold">
-                      ✓ InfinitePay integrado
-                    </span>
-                    <span className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-sm font-bold">
-                      ✓ Pixel ativo
-                    </span>
+                  <div className="space-y-2 mb-4 text-sm">
+                    <div className="flex items-center gap-2 text-zinc-300">
+                      <Check className="w-4 h-4 text-[#00D26A]" />
+                      <span>Hospedagem do site</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-zinc-300">
+                      <Check className="w-4 h-4 text-[#00D26A]" />
+                      <span>Página de vendas</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-zinc-300">
+                      <Check className="w-4 h-4 text-[#00D26A]" />
+                      <span>Área de membros</span>
+                    </div>
                   </div>
-                  <Button
-                    onClick={handleTrialPayment}
-                    className="bg-green-500 hover:bg-green-400 text-black font-black px-8 py-6 text-lg"
-                  >
-                    PAGAR R$247 E COMEÇAR
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                  <Button onClick={handleTrialPayment} className="w-full bg-[#00D26A] hover:bg-[#00D26A]/90 text-black font-black">
+                    ASSINAR MENSAL
                   </Button>
+                </CardContent>
+              </Card>
+
+              {/* Plano Anual */}
+              <Card className="bg-zinc-900 border border-yellow-500/50 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 bg-yellow-500 py-2 text-center">
+                  <span className="text-zinc-950 font-black text-xs tracking-wide uppercase">⭐ ANUAL - ECONOMIA</span>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+                <CardContent className="p-6 pt-12">
+                  <div className="text-center mb-4">
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-yellow-400 text-sm font-bold">12x de</span>
+                      <span className="text-yellow-400 text-lg font-black">R$</span>
+                      <span className="text-4xl font-black text-white">81</span>
+                    </div>
+                    <p className="text-zinc-500 text-xs">ou R$797 à vista</p>
+                  </div>
+                  <div className="space-y-2 mb-4 text-sm">
+                    <div className="flex items-center gap-2 text-zinc-300">
+                      <Check className="w-4 h-4 text-yellow-400" />
+                      <span>Tudo do mensal</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-zinc-300">
+                      <Check className="w-4 h-4 text-yellow-400" />
+                      <span>Economia de R$2.167/ano</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-zinc-300">
+                      <Check className="w-4 h-4 text-yellow-400" />
+                      <span>Suporte prioritário</span>
+                    </div>
+                  </div>
+                  <Button onClick={handleAnnualPayment} className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-black">
+                    ASSINAR ANUAL
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         ) : (
           <>
             {/* Plan Status Card */}
