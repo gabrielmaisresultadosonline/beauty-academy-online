@@ -17,9 +17,17 @@ import {
   Crown,
   LogOut,
   Settings,
-  Loader2
+  Loader2,
+  Lock
 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import FloatingAlbumCovers from '@/components/FloatingAlbumCovers';
+import album1 from '@/assets/album-1.png';
+import album2 from '@/assets/album-2.png';
+import album3 from '@/assets/album-3.png';
+import album4 from '@/assets/album-4.png';
+
+const previewAlbums = [album1, album2, album3, album4];
 
 interface Album {
   id: string;
@@ -136,38 +144,110 @@ export default function SpotMusicDashboard() {
     );
   }
 
-  // Show upgrade prompt if not premium
+  // Show upgrade prompt if not premium - with preview
   if (!isPremium && !isAdmin) {
+    const userName = user?.user_metadata?.full_name || 'Cliente';
+    const paymentLink = `https://checkout.infinitepay.io/paguemro?items=[{"name":"SPOTMUSIC - ${encodeURIComponent(userName)}","price":100,"quantity":1}]&redirect_url=${encodeURIComponent('https://acessar.click/comunidademusica/obrigado')}`;
+
     return (
-      <div className="min-h-screen bg-spotmusic-dark flex items-center justify-center p-4">
-        <Card className="max-w-md w-full bg-spotmusic-card border-spotmusic-border text-center">
-          <CardContent className="p-8 space-y-6">
-            <Crown className="w-16 h-16 text-spotmusic-amber mx-auto" />
-            <h2 className="text-2xl font-bold text-spotmusic-foreground">Acesso Premium Necessário</h2>
-            <p className="text-spotmusic-muted">
-              Para acessar todo o conteúdo do SpotMusic, você precisa ativar seu acesso premium.
-            </p>
-            <div className="space-y-3">
-              <Button 
-                onClick={() => {
-                  const link = `https://checkout.infinitepay.io/paguemro?items=[{"name":"SPOTMUSIC","price":4700,"quantity":1}]&redirect_url=${encodeURIComponent(window.location.origin + '/comunidademusica/obrigado')}`;
-                  window.location.href = link;
-                }}
-                className="w-full bg-spotmusic-green hover:bg-spotmusic-green/90 text-spotmusic-dark font-semibold"
-              >
-                Ativar Premium - R$47,00
-              </Button>
-              <Button 
-                variant="ghost" 
-                onClick={handleSignOut}
-                className="w-full text-spotmusic-muted hover:text-spotmusic-foreground"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sair
-              </Button>
+      <div className="min-h-screen bg-spotmusic-dark relative overflow-hidden">
+        {/* Floating Album Covers Background */}
+        <FloatingAlbumCovers />
+        
+        {/* Content Overlay */}
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
+          {/* Premium CTA Card */}
+          <Card className="max-w-lg w-full bg-spotmusic-card/95 backdrop-blur-md border-spotmusic-amber/30 text-center shadow-2xl">
+            <CardContent className="p-8 space-y-6">
+              <div className="relative">
+                <Crown className="w-20 h-20 text-spotmusic-amber mx-auto animate-pulse" />
+                <div className="absolute inset-0 w-20 h-20 mx-auto bg-spotmusic-amber/20 rounded-full blur-xl" />
+              </div>
+              
+              <div>
+                <h2 className="text-3xl font-bold text-spotmusic-foreground mb-2">
+                  Olá, {userName}!
+                </h2>
+                <p className="text-spotmusic-amber font-semibold text-lg">
+                  Ative seu Acesso Premium
+                </p>
+              </div>
+              
+              <p className="text-spotmusic-muted">
+                Desbloqueie acesso ilimitado a todas as músicas do Spotify, YouTube Music, Deezer e Apple Music em um só lugar!
+              </p>
+
+              <div className="bg-spotmusic-darker/50 rounded-lg p-4 space-y-2">
+                <div className="flex items-center gap-2 text-spotmusic-foreground">
+                  <Music className="w-4 h-4 text-spotmusic-green" />
+                  <span className="text-sm">Milhares de músicas disponíveis</span>
+                </div>
+                <div className="flex items-center gap-2 text-spotmusic-foreground">
+                  <Crown className="w-4 h-4 text-spotmusic-amber" />
+                  <span className="text-sm">Acesso vitalício - pague uma vez</span>
+                </div>
+                <div className="flex items-center gap-2 text-spotmusic-foreground">
+                  <Play className="w-4 h-4 text-spotmusic-blue" />
+                  <span className="text-sm">Atualizações semanais</span>
+                </div>
+              </div>
+              
+              <div className="space-y-3 pt-2">
+                <Button 
+                  onClick={() => {
+                    window.location.href = paymentLink;
+                  }}
+                  className="w-full bg-gradient-to-r from-spotmusic-green to-spotmusic-green/80 hover:from-spotmusic-green/90 hover:to-spotmusic-green/70 text-spotmusic-dark font-bold text-lg py-6 shadow-lg shadow-spotmusic-green/30"
+                >
+                  <Crown className="w-5 h-5 mr-2" />
+                  ATIVAR PREMIUM - R$1,00
+                </Button>
+                <p className="text-xs text-spotmusic-muted">
+                  Pagamento seguro via InfinitePay
+                </p>
+                <Button 
+                  variant="ghost" 
+                  onClick={handleSignOut}
+                  className="w-full text-spotmusic-muted hover:text-spotmusic-foreground"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sair da conta
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Preview Section Below */}
+          <div className="mt-8 w-full max-w-4xl">
+            <h3 className="text-xl font-semibold text-spotmusic-foreground mb-4 text-center flex items-center justify-center gap-2">
+              <Lock className="w-5 h-5 text-spotmusic-amber" />
+              Prévia do Conteúdo Premium
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {previewAlbums.map((albumSrc, i) => (
+                <Card 
+                  key={i}
+                  className="bg-spotmusic-card/60 backdrop-blur border-spotmusic-border/50 cursor-not-allowed group relative overflow-hidden"
+                >
+                  <CardContent className="p-3">
+                    <div className="aspect-square bg-spotmusic-darker rounded-md mb-2 overflow-hidden relative">
+                      <img 
+                        src={albumSrc}
+                        alt={`Album ${i + 1}`}
+                        className="w-full h-full object-cover opacity-60 blur-[1px]"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                        <Lock className="w-8 h-8 text-spotmusic-amber" />
+                      </div>
+                    </div>
+                    <h4 className="font-medium text-spotmusic-foreground/60 text-sm truncate">Álbum Bloqueado</h4>
+                    <p className="text-xs text-spotmusic-muted truncate">Ative o Premium</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
