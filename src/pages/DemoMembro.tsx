@@ -657,28 +657,39 @@ const DemoMembro = () => {
         ) : (
           // Modules Carousel View
           <div className="animate-fade-in">
+            {/* Welcome Banner Image */}
+            <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-pink-100 mb-8">
+              <div className="aspect-video relative bg-gradient-to-br from-pink-300 via-rose-200 to-amber-200">
+                <img 
+                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200&q=80" 
+                  alt="Bem-vindo"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div 
+                    className="w-20 h-20 rounded-full flex items-center justify-center shadow-2xl bg-white/90 hover:scale-110 transition-transform cursor-pointer"
+                  >
+                    <Play className="w-8 h-8 ml-1" style={{ color: settings.primaryColor }} />
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+                  <span 
+                    className="px-3 py-1 rounded-full text-xs font-bold text-white mb-3 inline-block"
+                    style={{ backgroundColor: settings.primaryColor }}
+                  >
+                    VÍDEO DE BOAS-VINDAS
+                  </span>
+                  <h1 className="text-2xl md:text-4xl font-bold text-white">{settings.welcomeTitle}</h1>
+                  <p className="text-white/80 mt-2 text-sm md:text-base max-w-2xl">{settings.welcomeText}</p>
+                </div>
+              </div>
+            </div>
+
             <h2 className="text-gray-900 font-bold text-xl mb-6 flex items-center gap-2">
               <BookOpen className="w-6 h-6" style={{ color: settings.primaryColor }} />
               Módulos do Curso
             </h2>
-
-            {/* Global buttons before modules */}
-            {buttons.filter(b => b.position === "before" && !modules.some(m => m.id === b.moduleId)).map((button) => (
-              <a
-                key={button.id}
-                href={button.url || "#"}
-                target={button.url ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                className="block mb-6"
-              >
-                <Button 
-                  className="w-full py-6 text-white font-bold text-lg rounded-2xl shadow-lg hover:opacity-90 transition-all"
-                  style={{ backgroundColor: button.color }}
-                >
-                  {button.text}
-                </Button>
-              </a>
-            ))}
 
             {/* Modules Carousel */}
             <Carousel
@@ -760,77 +771,24 @@ const DemoMembro = () => {
               ))}
             </div>
 
-            {/* All Modules Grid (desktop view below carousel) */}
-            <div className="mt-12">
-              <h3 className="text-gray-900 font-bold text-lg mb-4">Todos os Módulos</h3>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {modules.map((module, index) => (
-                  <div key={module.id}>
-                    {/* Buttons BEFORE module */}
-                    {getButtonsForModule(module.id, "before").map((button) => (
-                      <a
-                        key={button.id}
-                        href={button.url || "#"}
-                        target={button.url ? "_blank" : undefined}
-                        rel="noopener noreferrer"
-                        className="block mb-3"
-                      >
-                        <Button 
-                          className="w-full py-4 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-all text-sm"
-                          style={{ backgroundColor: button.color }}
-                        >
-                          {button.text}
-                        </Button>
-                      </a>
-                    ))}
-
-                    <Card 
-                      className="bg-white border-pink-100 overflow-hidden cursor-pointer hover:shadow-lg transition-all shadow-sm group"
-                      onClick={() => handleOpenModuleDetail(module)}
-                    >
-                      <div className="flex items-center gap-4 p-4">
-                        <div 
-                          className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 relative"
-                          style={{ backgroundColor: settings.primaryColor + "15" }}
-                        >
-                          {module.coverUrl ? (
-                            <img src={module.coverUrl} alt={module.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <span className="font-bold text-xl" style={{ color: settings.primaryColor }}>{index + 1}</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-gray-900 font-bold text-sm line-clamp-2 group-hover:text-pink-600 transition-colors">
-                            {module.title}
-                          </h4>
-                          <p className="text-gray-400 text-xs mt-1">{module.lessons.length} aulas</p>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0 group-hover:text-pink-500 transition-colors" />
-                      </div>
-                    </Card>
-
-                    {/* Buttons AFTER module */}
-                    {getButtonsForModule(module.id, "after").map((button) => (
-                      <a
-                        key={button.id}
-                        href={button.url || "#"}
-                        target={button.url ? "_blank" : undefined}
-                        rel="noopener noreferrer"
-                        className="block mt-3"
-                      >
-                        <Button 
-                          className="w-full py-4 text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition-all text-sm"
-                          style={{ backgroundColor: button.color }}
-                        >
-                          {button.text}
-                        </Button>
-                      </a>
-                    ))}
-                  </div>
-                ))}
-              </div>
+            {/* All Buttons below modules */}
+            <div className="mt-10 space-y-4">
+              {buttons.map((button) => (
+                <a
+                  key={button.id}
+                  href={button.url || "#"}
+                  target={button.url ? "_blank" : undefined}
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <Button 
+                    className="w-full py-6 text-white font-bold text-lg rounded-2xl shadow-lg hover:opacity-90 hover:scale-[1.02] transition-all"
+                    style={{ backgroundColor: button.color }}
+                  >
+                    {button.text}
+                  </Button>
+                </a>
+              ))}
             </div>
           </div>
         )}
