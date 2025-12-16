@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Scissors, Play, Lock, LogOut, Crown, ChevronRight, 
-  BookOpen, Clock, Award, Sparkles 
+  BookOpen, Clock, Award, Sparkles, Camera, Upload, CheckCircle2, Loader2
 } from 'lucide-react';
 
 interface Module {
@@ -36,6 +36,7 @@ export default function BelezaDashboard() {
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -104,6 +105,41 @@ export default function BelezaDashboard() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/belezalisoperfeito');
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploadingPhoto(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('certificate-photos')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('certificate-photos')
+        .getPublicUrl(fileName);
+
+      const { error: updateError } = await supabase
+        .from('course_enrollments')
+        .update({ certificate_photo_url: publicUrl })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      setEnrollment({ ...enrollment, certificate_photo_url: publicUrl });
+      toast({ title: "Foto enviada com sucesso!", description: "Aguarde a emissão do seu certificado." });
+    } catch (error: any) {
+      toast({ title: "Erro ao enviar foto", description: error.message, variant: "destructive" });
+    } finally {
+      setUploadingPhoto(false);
+    }
   };
 
   const getPaymentLink = () => {
@@ -322,6 +358,105 @@ export default function BelezaDashboard() {
             <h1 className="text-3xl font-bold text-gray-900 mb-8">
               Bem-vinda ao Curso, {profile?.full_name?.split(' ')[0]}! 🎉
             </h1>
+
+            {/* Certificate Section */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border-2 border-amber-200">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full flex items-center justify-center">
+                  <Award className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Seu Certificado</h2>
+                  <p className="text-sm text-gray-600">Certificado de Conclusão incluso</p>
+                </div>
+              </div>
+
+              {enrollment?.certificate_issued_at ? (
+                // Certificate issued
+                <div className="bg-green-50 rounded-xl p-6 text-center">
+                  <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-green-700 mb-2">Certificado Emitido!</h3>
+                  <p className="text-green-600 mb-4">
+                    Emitido em {new Date(enrollment.certificate_issued_at).toLocaleDateString('pt-BR')}
+                  </p>
+                  {enrollment.certificate_url && (
+                    <a
+                      href={enrollment.certificate_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full transition-colors"
+                    >
+                      <Award className="w-5 h-5" />
+                      Baixar Certificado
+                    </a>
+                  )}
+                </div>
+              ) : enrollment?.certificate_photo_url ? (
+                // Photo uploaded, waiting for certificate
+                <div className="bg-amber-50 rounded-xl p-6">
+                  <div className="flex flex-col md:flex-row items-center gap-6">
+                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-amber-300">
+                      <img 
+                        src={enrollment.certificate_photo_url} 
+                        alt="Sua foto" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="text-center md:text-left">
+                      <h3 className="text-lg font-bold text-amber-700 mb-2">
+                        Foto Enviada com Sucesso!
+                      </h3>
+                      <p className="text-amber-600">
+                        Aguarde a emissão do seu certificado. Você será notificada quando estiver pronto.
+                      </p>
+                      <label className="mt-4 inline-flex items-center gap-2 text-sm text-amber-700 hover:text-amber-800 cursor-pointer">
+                        <Camera className="w-4 h-4" />
+                        Enviar outra foto
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePhotoUpload}
+                          className="hidden"
+                          disabled={uploadingPhoto}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // No photo yet
+                <div className="bg-pink-50 rounded-xl p-6 text-center">
+                  <Camera className="w-16 h-16 text-pink-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
+                    Envie sua foto para o certificado
+                  </h3>
+                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                    Para emitirmos seu certificado personalizado, precisamos de uma foto sua. 
+                    Escolha uma foto profissional de boa qualidade.
+                  </p>
+                  <label className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold px-8 py-4 rounded-full cursor-pointer transition-all transform hover:scale-105">
+                    {uploadingPhoto ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Enviando...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-5 h-5" />
+                        Enviar Minha Foto
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      className="hidden"
+                      disabled={uploadingPhoto}
+                    />
+                  </label>
+                </div>
+              )}
+            </div>
 
             {modules.length === 0 ? (
               <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
