@@ -137,13 +137,13 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Curso de Cabeleireira Completo | Comunidade da Beleza - Acesso Vitalício</title>
-        <meta name="description" content="Curso completo de cabeleireira com acesso vitalício. Aprenda técnicas profissionais de alisamento, colorimetria, corte e muito mais. Comunidade da Beleza." />
-        <meta property="og:title" content="Curso de Cabeleireira Completo | Comunidade da Beleza" />
+        <title>Curso de Cabeleireira Completo | Comunidade da Cabeleireira - Acesso Vitalício</title>
+        <meta name="description" content="Curso completo de cabeleireira com acesso vitalício. Aprenda técnicas profissionais de alisamento, colorimetria, corte e muito mais. Comunidade da Cabeleireira." />
+        <meta property="og:title" content="Curso de Cabeleireira Completo | Comunidade da Cabeleireira" />
         <meta property="og:description" content="Acesso vitalício ao curso completo de cabeleireira. Aprenda técnicas profissionais e transforme sua carreira!" />
         <meta property="og:url" content="https://acessar.click/belezalisoperfeito" />
         <meta property="og:type" content="website" />
-        <meta name="twitter:title" content="Curso de Cabeleireira Completo | Comunidade da Beleza" />
+        <meta name="twitter:title" content="Curso de Cabeleireira Completo | Comunidade da Cabeleireira" />
         <meta name="twitter:description" content="Acesso vitalício ao curso completo de cabeleireira. Transforme sua carreira!" />
         <link rel="canonical" href="https://acessar.click/belezalisoperfeito" />
       </Helmet>
@@ -171,11 +171,11 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="space-y-6 animate-fade-in">
               <span className="inline-block bg-accent text-accent-foreground px-4 py-2 rounded-full text-sm font-medium">
-                CURSO COMPLETO ONLINE
+                COMUNIDADE DA CABELEIREIRA • ACESSO VITALÍCIO
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading text-foreground leading-tight">
-                Comunidade da{' '}
-                <span className="text-gradient">Cabeleireira</span>
+                Curso de Cabeleireira{' '}
+                <span className="text-gradient">Completo</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
                 Curso completo com conhecimentos atualizados mensalmente. Aprenda com especialistas e faça parte da maior comunidade de cabeleireiras do Brasil!
