@@ -28,7 +28,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 
-const REGISTER_LINK = '/belezalisoperfeito/login';
+const REGISTER_LINK = '/belezalisoperfeito/login?mode=signup';
 
 const scrollToPrice = () => {
   const priceSection = document.getElementById('preco');
