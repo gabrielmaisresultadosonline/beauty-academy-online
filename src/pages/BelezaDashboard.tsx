@@ -62,7 +62,7 @@ export default function BelezaDashboard() {
     setProfile(profileData);
 
     // Get enrollment
-    const { data: enrollmentData } = await supabase
+    let { data: enrollmentData } = await supabase
       .from('course_enrollments')
       .select('*')
       .eq('user_id', user.id)
@@ -75,10 +75,41 @@ export default function BelezaDashboard() {
         .insert({ user_id: user.id, is_premium: false })
         .select()
         .single();
-      setEnrollment(newEnrollment);
-    } else {
-      setEnrollment(enrollmentData);
+      enrollmentData = newEnrollment;
     }
+
+    // CRITICAL: Check if user has completed payment but is not premium (cross-device fix)
+    if (enrollmentData && !enrollmentData.is_premium) {
+      const { data: paymentData } = await supabase
+        .from('course_payments')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'completed')
+        .maybeSingle();
+      
+      // If payment exists, auto-activate premium from cloud data
+      if (paymentData) {
+        const { data: updatedEnrollment } = await supabase
+          .from('course_enrollments')
+          .update({
+            is_premium: true,
+            premium_activated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id)
+          .select()
+          .single();
+        
+        if (updatedEnrollment) {
+          enrollmentData = updatedEnrollment;
+          toast({ 
+            title: "Acesso Premium Ativado!", 
+            description: "Seu pagamento foi reconhecido automaticamente." 
+          });
+        }
+      }
+    }
+
+    setEnrollment(enrollmentData);
 
     // Load content if premium
     if (enrollmentData?.is_premium) {
