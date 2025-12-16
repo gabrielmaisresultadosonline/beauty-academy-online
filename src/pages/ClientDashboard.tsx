@@ -272,21 +272,32 @@ const ClientDashboard = () => {
               <p className="text-white/60 mb-6">
                 Como administrador, você tem acesso a todas as áreas de membros da plataforma.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col gap-4">
                 <Button
-                  onClick={() => navigate('/comunidademusica/admin')}
-                  className="bg-green-500 hover:bg-green-400 text-black font-black px-6 py-4"
+                  onClick={() => navigate('/cliente/admin')}
+                  className="bg-green-500 hover:bg-green-400 text-black font-black px-8 py-6 text-lg"
                 >
-                  SpotMusic Admin
-                  <ArrowRight className="ml-2 w-4 h-4" />
+                  PAINEL ADMIN MASTER
+                  <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-                <Button
-                  onClick={() => navigate('/belezalisoperfeito/admin')}
-                  className="bg-amber-500 hover:bg-amber-400 text-black font-black px-6 py-4"
-                >
-                  Beleza Admin
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
+                  <Button
+                    onClick={() => navigate('/comunidademusica/admin')}
+                    variant="outline"
+                    className="border-green-500/50 text-green-400 hover:bg-green-500/20"
+                  >
+                    SpotMusic Admin
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                  <Button
+                    onClick={() => navigate('/belezalisoperfeito/admin')}
+                    variant="outline"
+                    className="border-amber-500/50 text-amber-400 hover:bg-amber-500/20"
+                  >
+                    Beleza Admin
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
