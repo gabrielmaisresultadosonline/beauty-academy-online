@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
 import PlatformAuth from "./pages/PlatformAuth";
 import ClientDashboard from "./pages/ClientDashboard";
+import ClientAdmin from "./pages/ClientAdmin";
 import ClientObrigado from "./pages/ClientObrigado";
 import BelezaLisoPerfeito from "./pages/BelezaLisoPerfeito";
 import BelezaLogin from "./pages/BelezaLogin";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/cliente/auth" element={<PlatformAuth />} />
             <Route path="/cliente/dashboard" element={<ClientDashboard />} />
+            <Route path="/cliente/admin" element={<ClientAdmin />} />
             <Route path="/cliente/obrigado" element={<ClientObrigado />} />
             <Route path="/belezalisoperfeito" element={<BelezaLisoPerfeito />} />
             <Route path="/belezalisoperfeito/login" element={<BelezaLogin />} />
