@@ -22,6 +22,7 @@ import {
   BadgeCheck
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import infinitepayLogo from "@/assets/infinitepay-logo.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -399,11 +400,15 @@ const Index = () => {
       {/* InfinitePay Requirement */}
       <section className="py-16 bg-zinc-950">
         <div className="max-w-4xl mx-auto px-4">
-          <Card className="bg-gradient-to-r from-[#00D26A]/10 to-transparent border border-[#00D26A]/30">
+          <Card className="bg-zinc-900 border border-zinc-800 overflow-hidden">
             <CardContent className="p-8 md:p-10">
               <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="w-20 h-20 bg-[#00D26A] rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <CreditCard className="w-10 h-10 text-zinc-950" />
+                <div className="flex-shrink-0">
+                  <img 
+                    src={infinitepayLogo} 
+                    alt="InfinitePay" 
+                    className="h-20 w-auto"
+                  />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white mb-3">
@@ -414,13 +419,13 @@ const Index = () => {
                     Ao vender, o dinheiro cai direto na sua conta — sem intermediários.
                   </p>
                   <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2 text-[#00D26A]">
-                      <Clock className="w-4 h-4" />
-                      <span className="text-sm font-medium">Infinit Nitro: 8 segundos</span>
+                    <div className="flex items-center gap-2 bg-[#00D26A]/10 px-3 py-1.5 rounded-full">
+                      <Zap className="w-4 h-4 text-[#00D26A]" />
+                      <span className="text-sm font-semibold text-[#00D26A]">Infinit Nitro: 8 segundos</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[#00D26A]">
-                      <Shield className="w-4 h-4" />
-                      <span className="text-sm font-medium">100% Seguro</span>
+                    <div className="flex items-center gap-2 bg-[#00D26A]/10 px-3 py-1.5 rounded-full">
+                      <Shield className="w-4 h-4 text-[#00D26A]" />
+                      <span className="text-sm font-semibold text-[#00D26A]">100% Seguro</span>
                     </div>
                   </div>
                 </div>
@@ -444,15 +449,23 @@ const Index = () => {
             {activeProducts.map((product, index) => (
               <Link key={index} to={product.link} className="group">
                 <Card className="bg-zinc-900 border border-zinc-800 hover:border-[#00D26A]/50 transition-all hover:scale-105">
-                  <CardContent className="p-6 flex items-center justify-between">
-                    <div>
-                      <h3 className="text-white font-bold text-lg group-hover:text-[#00D26A] transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-zinc-500 text-sm">{product.description}</p>
-                      <p className="text-[#00D26A] font-bold mt-2">{product.price}</p>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="w-12 h-12 bg-[#00D26A]/10 rounded-xl flex items-center justify-center">
+                        <Star className="w-6 h-6 text-[#00D26A]" />
+                      </div>
+                      <div className="bg-[#00D26A] text-zinc-950 px-4 py-1.5 rounded-full font-bold text-lg">
+                        {product.price}
+                      </div>
                     </div>
-                    <ChevronRight className="w-6 h-6 text-zinc-600 group-hover:text-[#00D26A] group-hover:translate-x-1 transition-all" />
+                    <h3 className="text-white font-bold text-xl group-hover:text-[#00D26A] transition-colors mb-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-zinc-400 text-sm mb-4">{product.description}</p>
+                    <div className="flex items-center gap-2 text-[#00D26A] font-medium">
+                      <span>Ver página de vendas</span>
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-all" />
+                    </div>
                   </CardContent>
                 </Card>
               </Link>
