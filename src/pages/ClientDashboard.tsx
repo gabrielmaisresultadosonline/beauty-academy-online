@@ -55,13 +55,15 @@ const ClientDashboard = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [paymentLink, setPaymentLink] = useState("");
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!session) {
         navigate('/cliente/auth');
       } else {
         setTimeout(() => {
-          fetchClientData(session.user.id);
+          checkAdminAndFetchData(session.user.id);
         }, 0);
       }
     });
@@ -70,12 +72,25 @@ const ClientDashboard = () => {
       if (!session) {
         navigate('/cliente/auth');
       } else {
-        fetchClientData(session.user.id);
+        checkAdminAndFetchData(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const checkAdminAndFetchData = async (userId: string) => {
+    // Check if user is admin
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+    
+    setIsAdmin(!!roleData);
+    await fetchClientData(userId);
+  };
 
   const fetchClientData = async (userId: string) => {
     try {
@@ -83,7 +98,7 @@ const ClientDashboard = () => {
         .from('platform_clients')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -219,6 +234,77 @@ const ClientDashboard = () => {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-green-400 font-bold">Carregando...</div>
+      </div>
+    );
+  }
+
+  // Admin without client data - show admin panel option
+  if (!clientData && isAdmin) {
+    return (
+      <div className="min-h-screen bg-black">
+        <header className="bg-zinc-900/50 border-b border-white/10">
+          <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+                <Zap className="w-5 h-5 text-black" />
+              </div>
+              <span className="text-xl font-black text-white">acessar<span className="text-green-400">.click</span></span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sair
+            </Button>
+          </div>
+        </header>
+
+        <main className="max-w-4xl mx-auto px-4 py-12">
+          <Card className="bg-green-900/20 border-2 border-green-500/50">
+            <CardContent className="p-8 text-center">
+              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="w-10 h-10 text-green-400" />
+              </div>
+              <h2 className="text-2xl font-black text-white mb-4">Você é Admin Master</h2>
+              <p className="text-white/60 mb-6">
+                Como administrador, você tem acesso a todas as áreas de membros da plataforma.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  onClick={() => navigate('/comunidademusica/admin')}
+                  className="bg-green-500 hover:bg-green-400 text-black font-black px-6 py-4"
+                >
+                  SpotMusic Admin
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+                <Button
+                  onClick={() => navigate('/belezalisoperfeito/admin')}
+                  className="bg-amber-500 hover:bg-amber-400 text-black font-black px-6 py-4"
+                >
+                  Beleza Admin
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
+
+  // No client data found
+  if (!clientData) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-white/60 mb-4">Nenhum dado encontrado</div>
+          <Button onClick={handleLogout} variant="outline" className="border-white/20 text-white">
+            Voltar
+          </Button>
+        </div>
       </div>
     );
   }
