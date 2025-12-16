@@ -47,6 +47,50 @@ export type Database = {
         }
         Relationships: []
       }
+      client_payments: {
+        Row: {
+          amount: number
+          client_id: string
+          created_at: string
+          id: string
+          payment_provider: string | null
+          payment_reference: string | null
+          plan_type: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          client_id: string
+          created_at?: string
+          id?: string
+          payment_provider?: string | null
+          payment_reference?: string | null
+          plan_type?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string
+          created_at?: string
+          id?: string
+          payment_provider?: string | null
+          payment_reference?: string | null
+          plan_type?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_payments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "platform_clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_enrollments: {
         Row: {
           created_at: string
@@ -213,17 +257,26 @@ export type Database = {
           additional_notes: string | null
           created_at: string
           email: string
+          existing_site_url: string | null
           full_name: string
           id: string
           infinitepay_username: string | null
           is_paid: boolean | null
           paid_at: string | null
+          payment_link: string | null
+          phone_number: string | null
+          plan_amount: number | null
+          plan_type: string | null
           product_description: string | null
           product_name: string | null
           product_price: number | null
           product_type: string | null
+          site_blocked: boolean | null
+          site_description_count: number | null
           site_status: string | null
+          subscription_ends_at: string | null
           target_audience: string | null
+          trial_ends_at: string | null
           updated_at: string
           user_id: string
           whatsapp: string
@@ -232,17 +285,26 @@ export type Database = {
           additional_notes?: string | null
           created_at?: string
           email: string
+          existing_site_url?: string | null
           full_name: string
           id?: string
           infinitepay_username?: string | null
           is_paid?: boolean | null
           paid_at?: string | null
+          payment_link?: string | null
+          phone_number?: string | null
+          plan_amount?: number | null
+          plan_type?: string | null
           product_description?: string | null
           product_name?: string | null
           product_price?: number | null
           product_type?: string | null
+          site_blocked?: boolean | null
+          site_description_count?: number | null
           site_status?: string | null
+          subscription_ends_at?: string | null
           target_audience?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
           user_id: string
           whatsapp: string
@@ -251,17 +313,26 @@ export type Database = {
           additional_notes?: string | null
           created_at?: string
           email?: string
+          existing_site_url?: string | null
           full_name?: string
           id?: string
           infinitepay_username?: string | null
           is_paid?: boolean | null
           paid_at?: string | null
+          payment_link?: string | null
+          phone_number?: string | null
+          plan_amount?: number | null
+          plan_type?: string | null
           product_description?: string | null
           product_name?: string | null
           product_price?: number | null
           product_type?: string | null
+          site_blocked?: boolean | null
+          site_description_count?: number | null
           site_status?: string | null
+          subscription_ends_at?: string | null
           target_audience?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
           user_id?: string
           whatsapp?: string
