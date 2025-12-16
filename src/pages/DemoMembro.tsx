@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
-  ArrowLeft, Play, Clock, Settings, X,
-  ChevronDown, ChevronUp, Bell, CheckCircle
+  Play, Clock, Settings, ChevronDown, ChevronUp, 
+  Bell, CheckCircle, Crown, Sparkles, LogOut
 } from "lucide-react";
 
 interface DemoModule {
@@ -12,20 +12,44 @@ interface DemoModule {
   title: string;
   description: string;
   coverUrl: string;
+  showPlayButton: boolean;
+  showDescription: boolean;
   lessons: DemoLesson[];
 }
 
 interface DemoLesson {
   id: string;
   title: string;
+  description: string;
   videoUrl: string;
+  videoType: "youtube" | "file";
+  coverUrl: string;
+  showCover: boolean;
+  showDescription: boolean;
   duration: string;
+}
+
+interface DemoButton {
+  id: string;
+  text: string;
+  url: string;
+  color: string;
+  position: "before" | "after";
+  moduleId: string;
 }
 
 interface DemoSettings {
   siteName: string;
   primaryColor: string;
+  secondaryColor: string;
   logoUrl: string;
+  welcomeVideoUrl: string;
+  welcomeVideoType: "youtube" | "file" | "none";
+  welcomeTitle: string;
+  welcomeText: string;
+  showWelcomeSection: boolean;
+  facebookPixelCode: string;
+  infinitepayLink: string;
 }
 
 interface DemoNotice {
@@ -39,10 +63,19 @@ interface DemoNotice {
 const DemoMembro = () => {
   const navigate = useNavigate();
   const [modules, setModules] = useState<DemoModule[]>([]);
+  const [buttons, setButtons] = useState<DemoButton[]>([]);
   const [settings, setSettings] = useState<DemoSettings>({
     siteName: "Minha Área de Membros",
-    primaryColor: "#00D26A",
-    logoUrl: ""
+    primaryColor: "#EC4899",
+    secondaryColor: "#F59E0B",
+    logoUrl: "",
+    welcomeVideoUrl: "",
+    welcomeVideoType: "none",
+    welcomeTitle: "Bem-vindo(a) ao Curso!",
+    welcomeText: "Estamos muito felizes em ter você aqui.",
+    showWelcomeSection: true,
+    facebookPixelCode: "",
+    infinitepayLink: ""
   });
   const [notices, setNotices] = useState<DemoNotice[]>([]);
   const [selectedModule, setSelectedModule] = useState<DemoModule | null>(null);
@@ -61,6 +94,7 @@ const DemoMembro = () => {
     const savedModules = localStorage.getItem("demo_modules");
     const savedSettings = localStorage.getItem("demo_settings");
     const savedNotices = localStorage.getItem("demo_notices");
+    const savedButtons = localStorage.getItem("demo_buttons");
     const savedDismissed = localStorage.getItem("demo_dismissed_notices");
     
     if (savedModules) {
@@ -70,25 +104,20 @@ const DemoMembro = () => {
         setExpandedModules([parsed[0].id]);
       }
     }
-    if (savedSettings) setSettings(JSON.parse(savedSettings));
+    if (savedSettings) setSettings({ ...settings, ...JSON.parse(savedSettings) });
+    if (savedButtons) setButtons(JSON.parse(savedButtons));
     if (savedNotices) {
       const parsedNotices: DemoNotice[] = JSON.parse(savedNotices);
       setNotices(parsedNotices);
       
-      // Get dismissed notices
       const dismissed = savedDismissed ? JSON.parse(savedDismissed) : [];
       setDismissedNotices(dismissed);
       
-      // Determine which popup notices to show
       const activeNotices = parsedNotices.filter(n => n.active);
       const popupNotices = activeNotices.filter(n => {
-        if (n.type === "once") {
-          return !dismissed.includes(n.id);
-        }
-        if (n.type === "per_access") {
-          return true; // Show every time
-        }
-        return false; // "always" type is shown as banner, not popup
+        if (n.type === "once") return !dismissed.includes(n.id);
+        if (n.type === "per_access") return true;
+        return false;
       });
       
       setShowPopupNotices(popupNotices);
@@ -121,32 +150,41 @@ const DemoMembro = () => {
     setShowPopupNotices(prev => prev.filter(n => n.id !== noticeId));
   };
 
-  // Get "always" type notices for banner display
+  const handleLogout = () => {
+    localStorage.removeItem("demo_authenticated");
+    navigate("/demonstracao");
+  };
+
   const alwaysNotices = notices.filter(n => n.active && n.type === "always");
 
+  const getButtonsForModule = (moduleId: string, position: "before" | "after") => {
+    return buttons.filter(b => b.moduleId === moduleId && b.position === position);
+  };
+
   return (
-    <div className="min-h-screen bg-zinc-950">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50">
       {/* Popup Notices */}
       {showPopupNotices.length > 0 && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <Card className="bg-zinc-900 border-zinc-700 max-w-md w-full animate-scale-in">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <Card className="bg-white border-pink-200 max-w-md w-full shadow-2xl animate-scale-in">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <Bell className="w-5 h-5" style={{ color: settings.primaryColor }} />
-                  <h3 className="text-white font-bold">{showPopupNotices[0].title}</h3>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: settings.primaryColor + "20" }}>
+                    <Bell className="w-5 h-5" style={{ color: settings.primaryColor }} />
+                  </div>
+                  <h3 className="text-gray-900 font-bold">{showPopupNotices[0].title}</h3>
                 </div>
-                <span className={`px-2 py-0.5 rounded text-xs ${
-                  showPopupNotices[0].type === "once" ? "bg-blue-500/20 text-blue-400" :
-                  "bg-orange-500/20 text-orange-400"
+                <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                  showPopupNotices[0].type === "once" ? "bg-blue-100 text-blue-600" : "bg-orange-100 text-orange-600"
                 }`}>
                   {showPopupNotices[0].type === "once" ? "Novo" : "Lembrete"}
                 </span>
               </div>
-              <p className="text-zinc-300 mb-6">{showPopupNotices[0].message}</p>
+              <p className="text-gray-600 mb-6">{showPopupNotices[0].message}</p>
               <Button 
                 onClick={() => handleDismissNotice(showPopupNotices[0].id, showPopupNotices[0].type)}
-                className="w-full text-black font-bold"
+                className="w-full text-white font-bold"
                 style={{ backgroundColor: settings.primaryColor }}
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
@@ -158,32 +196,39 @@ const DemoMembro = () => {
       )}
 
       {/* Header */}
-      <header 
-        className="border-b border-zinc-800 px-4 py-4"
-        style={{ backgroundColor: settings.primaryColor + "10" }}
-      >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="bg-white border-b border-pink-100 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {settings.logoUrl ? (
-              <img src={settings.logoUrl} alt="Logo" className="h-8" />
+              <img src={settings.logoUrl} alt="Logo" className="h-10 object-contain" />
             ) : (
               <div 
-                className="w-8 h-8 rounded-full flex items-center justify-center text-black font-black"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black"
                 style={{ backgroundColor: settings.primaryColor }}
               >
                 {settings.siteName.charAt(0)}
               </div>
             )}
-            <h1 className="text-xl font-black text-white">{settings.siteName}</h1>
+            <div>
+              <span className="font-bold text-gray-900">{settings.siteName}</span>
+              <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full" style={{ backgroundColor: settings.secondaryColor + "20", color: settings.secondaryColor }}>
+                PREMIUM
+              </span>
+            </div>
           </div>
-          <Button 
-            onClick={handleBackToAdmin} 
-            variant="outline" 
-            className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
-          >
-            <Settings className="w-4 h-4 mr-2" />
-            Voltar ao Admin
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={handleBackToAdmin} 
+              variant="outline" 
+              className="border-pink-200 text-gray-600 hover:bg-pink-50"
+            >
+              <Settings className="w-4 h-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Admin</span>
+            </Button>
+            <Button onClick={handleLogout} variant="ghost" className="text-gray-600">
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -193,16 +238,16 @@ const DemoMembro = () => {
           {alwaysNotices.map((notice) => (
             <div 
               key={notice.id}
-              className="rounded-lg p-4 mb-3 border flex items-start gap-3"
+              className="rounded-2xl p-4 mb-3 border flex items-start gap-3 shadow-sm"
               style={{ 
-                backgroundColor: settings.primaryColor + "15",
-                borderColor: settings.primaryColor + "40"
+                backgroundColor: settings.primaryColor + "10",
+                borderColor: settings.primaryColor + "30"
               }}
             >
               <Bell className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: settings.primaryColor }} />
               <div>
-                <h4 className="text-white font-bold text-sm">{notice.title}</h4>
-                <p className="text-zinc-300 text-sm">{notice.message}</p>
+                <h4 className="text-gray-900 font-bold text-sm">{notice.title}</h4>
+                <p className="text-gray-600 text-sm">{notice.message}</p>
               </div>
             </div>
           ))}
@@ -210,80 +255,177 @@ const DemoMembro = () => {
       )}
 
       <div className="max-w-7xl mx-auto p-4 md:p-6">
-        {/* Banner informativo */}
+        {/* Info Banner */}
         <div 
-          className="rounded-lg p-4 mb-6 border"
+          className="rounded-2xl p-4 mb-6 border shadow-sm"
           style={{ 
-            backgroundColor: settings.primaryColor + "10",
-            borderColor: settings.primaryColor + "30"
+            backgroundColor: settings.primaryColor + "08",
+            borderColor: settings.primaryColor + "20"
           }}
         >
-          <p style={{ color: settings.primaryColor }} className="text-sm font-medium">
+          <p className="text-sm font-medium" style={{ color: settings.primaryColor }}>
             <strong>Visualização do Membro:</strong> Esta é a visão do seu cliente ao acessar a área de membros.
           </p>
         </div>
 
+        {/* Welcome Section */}
+        {settings.showWelcomeSection && (
+          <div className="bg-white rounded-3xl shadow-lg p-6 md:p-8 mb-8 border border-pink-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: settings.secondaryColor + "20" }}
+              >
+                <Crown className="w-6 h-6" style={{ color: settings.secondaryColor }} />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{settings.welcomeTitle}</h1>
+                <p className="text-gray-600">{settings.welcomeText}</p>
+              </div>
+            </div>
+            
+            {settings.welcomeVideoType !== "none" && settings.welcomeVideoUrl && (
+              <div className="aspect-video bg-black rounded-2xl overflow-hidden mt-4">
+                {settings.welcomeVideoType === "youtube" ? (
+                  <iframe
+                    src={settings.welcomeVideoUrl}
+                    className="w-full h-full"
+                    allowFullScreen
+                    allow="autoplay; fullscreen"
+                  />
+                ) : (
+                  <video
+                    src={settings.welcomeVideoUrl}
+                    controls
+                    className="w-full h-full"
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* New content banner */}
+        <div 
+          className="rounded-2xl p-4 mb-8 flex items-center gap-4 border shadow-sm"
+          style={{ 
+            backgroundColor: settings.secondaryColor + "10",
+            borderColor: settings.secondaryColor + "30"
+          }}
+        >
+          <div 
+            className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: settings.secondaryColor + "20" }}
+          >
+            <Sparkles className="w-6 h-6" style={{ color: settings.secondaryColor }} />
+          </div>
+          <div>
+            <h3 className="font-bold text-gray-900">Estamos incluindo novos conteúdos</h3>
+            <p className="text-sm text-gray-600">Aguarde por favor, em breve teremos mais módulos e aulas!</p>
+          </div>
+        </div>
+
         {modules.length === 0 ? (
-          <Card className="bg-zinc-900 border-zinc-800 p-12 text-center">
-            <p className="text-zinc-400 text-lg mb-4">Nenhum conteúdo disponível ainda.</p>
-            <Button onClick={handleBackToAdmin} style={{ backgroundColor: settings.primaryColor }} className="text-black font-bold">
+          <Card className="bg-white border-pink-100 p-12 text-center shadow-lg">
+            <Crown className="w-16 h-16 mx-auto mb-4" style={{ color: settings.primaryColor }} />
+            <p className="text-gray-500 text-lg mb-4">Nenhum conteúdo disponível ainda.</p>
+            <Button onClick={handleBackToAdmin} style={{ backgroundColor: settings.primaryColor }} className="text-white font-bold">
               Adicionar Conteúdo
             </Button>
           </Card>
+        ) : selectedLesson ? (
+          // Video Player View
+          <div>
+            <button
+              onClick={() => setSelectedLesson(null)}
+              className="flex items-center gap-2 hover:opacity-80 mb-6 font-medium"
+              style={{ color: settings.primaryColor }}
+            >
+              <ChevronDown className="w-4 h-4 rotate-90" />
+              Voltar aos módulos
+            </button>
+            
+            <div className="bg-white rounded-3xl shadow-lg overflow-hidden border border-pink-100">
+              <div className="aspect-video bg-black">
+                {selectedLesson.videoType === "youtube" || selectedLesson.videoUrl.includes("youtube") || selectedLesson.videoUrl.includes("embed") ? (
+                  <iframe
+                    src={selectedLesson.videoUrl}
+                    className="w-full h-full"
+                    allowFullScreen
+                    allow="autoplay; fullscreen"
+                  />
+                ) : (
+                  <video
+                    src={selectedLesson.videoUrl}
+                    controls
+                    className="w-full h-full"
+                  />
+                )}
+              </div>
+              <div className="p-6">
+                <h1 className="text-2xl font-bold text-gray-900">{selectedLesson.title}</h1>
+                {selectedLesson.showDescription && selectedLesson.description && (
+                  <p className="text-gray-600 mt-2">{selectedLesson.description}</p>
+                )}
+                <p className="text-gray-500 text-sm mt-2">{selectedModule?.title}</p>
+              </div>
+            </div>
+          </div>
         ) : (
+          // Modules View
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Sidebar - Lista de Módulos */}
             <div className="lg:col-span-1 space-y-4">
-              <h2 className="text-white font-bold text-lg">Conteúdo do Curso</h2>
+              <h2 className="text-gray-900 font-bold text-lg">Conteúdo do Curso</h2>
               <div className="space-y-2">
                 {modules.map((module) => (
-                  <Card key={module.id} className="bg-zinc-900 border-zinc-800 overflow-hidden">
+                  <Card key={module.id} className="bg-white border-pink-100 overflow-hidden shadow-sm">
                     <button
                       onClick={() => toggleModule(module.id)}
-                      className="w-full p-4 flex items-center justify-between text-left hover:bg-zinc-800/50 transition-colors"
+                      className="w-full p-4 flex items-center justify-between text-left hover:bg-pink-50/50 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <div 
-                          className="w-10 h-10 rounded-lg flex items-center justify-center"
-                          style={{ backgroundColor: settings.primaryColor + "20" }}
+                          className="w-10 h-10 rounded-xl flex items-center justify-center"
+                          style={{ backgroundColor: settings.primaryColor + "15" }}
                         >
                           <Play className="w-5 h-5" style={{ color: settings.primaryColor }} />
                         </div>
                         <div>
-                          <h3 className="text-white font-bold text-sm">{module.title}</h3>
-                          <p className="text-zinc-500 text-xs">{module.lessons.length} aulas</p>
+                          <h3 className="text-gray-900 font-bold text-sm">{module.title}</h3>
+                          <p className="text-gray-500 text-xs">{module.lessons.length} aulas</p>
                         </div>
                       </div>
                       {expandedModules.includes(module.id) ? (
-                        <ChevronUp className="w-5 h-5 text-zinc-500" />
+                        <ChevronUp className="w-5 h-5 text-gray-400" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-zinc-500" />
+                        <ChevronDown className="w-5 h-5 text-gray-400" />
                       )}
                     </button>
                     
                     {expandedModules.includes(module.id) && module.lessons.length > 0 && (
-                      <div className="border-t border-zinc-800">
+                      <div className="border-t border-pink-100">
                         {module.lessons.map((lesson, index) => (
                           <button
                             key={lesson.id}
                             onClick={() => handleSelectLesson(module, lesson)}
-                            className={`w-full p-3 pl-6 flex items-center gap-3 text-left hover:bg-zinc-800/50 transition-colors ${
-                              selectedLesson?.id === lesson.id ? "bg-zinc-800" : ""
+                            className={`w-full p-3 pl-6 flex items-center gap-3 text-left hover:bg-pink-50/50 transition-colors ${
+                              selectedLesson?.id === lesson.id ? "bg-pink-50" : ""
                             }`}
                           >
                             <span 
                               className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
                               style={{ 
                                 backgroundColor: selectedLesson?.id === lesson.id ? settings.primaryColor : "transparent",
-                                color: selectedLesson?.id === lesson.id ? "black" : settings.primaryColor,
-                                border: `1px solid ${settings.primaryColor}`
+                                color: selectedLesson?.id === lesson.id ? "white" : settings.primaryColor,
+                                border: `2px solid ${settings.primaryColor}`
                               }}
                             >
                               {index + 1}
                             </span>
                             <div className="flex-1">
-                              <p className="text-zinc-300 text-sm">{lesson.title}</p>
-                              <p className="text-zinc-500 text-xs flex items-center gap-1">
+                              <p className="text-gray-700 text-sm font-medium">{lesson.title}</p>
+                              <p className="text-gray-400 text-xs flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
                                 {lesson.duration}
                               </p>
@@ -297,72 +439,100 @@ const DemoMembro = () => {
               </div>
             </div>
 
-            {/* Main Content - Player */}
+            {/* Main Content - Modules Grid */}
             <div className="lg:col-span-2">
-              {selectedLesson ? (
-                <div className="space-y-4">
-                  <div className="aspect-video bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800">
-                    <iframe
-                      src={selectedLesson.videoUrl}
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                  <div>
-                    <h2 className="text-white text-2xl font-bold">{selectedLesson.title}</h2>
-                    <p className="text-zinc-500">{selectedModule?.title}</p>
-                  </div>
-                </div>
-              ) : (
-                <Card className="bg-zinc-900 border-zinc-800 aspect-video flex items-center justify-center">
-                  <div className="text-center">
-                    <Play className="w-16 h-16 mx-auto mb-4" style={{ color: settings.primaryColor }} />
-                    <p className="text-zinc-400">Selecione uma aula para começar</p>
-                  </div>
-                </Card>
-              )}
-
-              {/* Module Cards Grid */}
-              {!selectedLesson && (
-                <div className="mt-6">
-                  <h2 className="text-white font-bold text-lg mb-4">Módulos Disponíveis</h2>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {modules.map((module) => (
-                      <Card 
-                        key={module.id} 
-                        className="bg-zinc-900 border-zinc-800 overflow-hidden cursor-pointer hover:border-zinc-700 transition-colors"
-                        onClick={() => {
-                          toggleModule(module.id);
-                          if (module.lessons.length > 0) {
-                            handleSelectLesson(module, module.lessons[0]);
-                          }
-                        }}
+              <h2 className="text-gray-900 font-bold text-lg mb-4">Módulos Disponíveis</h2>
+              <div className="space-y-4">
+                {modules.map((module) => (
+                  <div key={module.id}>
+                    {/* Buttons BEFORE module */}
+                    {getButtonsForModule(module.id, "before").map((button) => (
+                      <a
+                        key={button.id}
+                        href={button.url || "#"}
+                        target={button.url ? "_blank" : undefined}
+                        rel="noopener noreferrer"
+                        className="block mb-4"
                       >
-                        <div className="aspect-video relative">
+                        <Button 
+                          className="w-full py-6 text-white font-bold text-lg rounded-2xl shadow-lg hover:opacity-90 transition-all"
+                          style={{ backgroundColor: button.color }}
+                        >
+                          {button.text}
+                        </Button>
+                      </a>
+                    ))}
+
+                    {/* Module Card */}
+                    <Card 
+                      className="bg-white border-pink-100 overflow-hidden cursor-pointer hover:shadow-xl transition-all shadow-lg group"
+                      style={{ borderColor: settings.primaryColor + "30" }}
+                      onClick={() => {
+                        if (!expandedModules.includes(module.id)) {
+                          toggleModule(module.id);
+                        }
+                        if (module.lessons.length > 0) {
+                          handleSelectLesson(module, module.lessons[0]);
+                        }
+                      }}
+                    >
+                      <div className="aspect-video relative bg-gradient-to-br from-pink-200 to-rose-300">
+                        {module.coverUrl && (
                           <img 
                             src={module.coverUrl} 
                             alt={module.title}
                             className="w-full h-full object-cover"
                           />
-                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        )}
+                        {module.showPlayButton && (
+                          <div className="absolute inset-0 flex items-center justify-center">
                             <div 
-                              className="w-14 h-14 rounded-full flex items-center justify-center"
+                              className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform"
                               style={{ backgroundColor: settings.primaryColor }}
                             >
-                              <Play className="w-6 h-6 text-black ml-1" />
+                              <Play className="w-7 h-7 text-white ml-1" />
                             </div>
                           </div>
+                        )}
+                        <div 
+                          className="absolute top-3 right-3 px-3 py-1.5 rounded-full flex items-center gap-1.5 text-sm font-bold shadow-lg text-white"
+                          style={{ backgroundColor: settings.primaryColor }}
+                        >
+                          <Play className="w-4 h-4 fill-white" />
+                          <span className="hidden sm:inline">Assistir</span>
                         </div>
-                        <CardContent className="p-4">
-                          <h3 className="text-white font-bold">{module.title}</h3>
-                          <p className="text-zinc-500 text-sm">{module.lessons.length} aulas</p>
-                        </CardContent>
-                      </Card>
+                      </div>
+                      <CardContent className="p-5">
+                        <h3 className="text-gray-900 font-bold text-lg">{module.title}</h3>
+                        {module.showDescription && module.description && (
+                          <p className="text-gray-500 text-sm mt-1">{module.description}</p>
+                        )}
+                        <p className="text-sm mt-2 font-medium" style={{ color: settings.primaryColor }}>
+                          {module.lessons.length} aulas disponíveis
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    {/* Buttons AFTER module */}
+                    {getButtonsForModule(module.id, "after").map((button) => (
+                      <a
+                        key={button.id}
+                        href={button.url || "#"}
+                        target={button.url ? "_blank" : undefined}
+                        rel="noopener noreferrer"
+                        className="block mt-4"
+                      >
+                        <Button 
+                          className="w-full py-6 text-white font-bold text-lg rounded-2xl shadow-lg hover:opacity-90 transition-all"
+                          style={{ backgroundColor: button.color }}
+                        >
+                          {button.text}
+                        </Button>
+                      </a>
                     ))}
                   </div>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           </div>
         )}
