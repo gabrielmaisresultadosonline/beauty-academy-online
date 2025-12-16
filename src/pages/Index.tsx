@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -50,6 +51,19 @@ const Index = () => {
   ];
 
   return (
+    <>
+      <Helmet>
+        <title>Acessar.click | Área de Membros Sem Taxas</title>
+        <meta name="description" content="Crie sua área de membros e página de vendas em 24 horas. Zero taxas por venda, recebimento instantâneo via InfinitePay." />
+        <meta property="og:title" content="Acessar.click | Área de Membros Sem Taxas" />
+        <meta property="og:description" content="Crie sua área de membros e página de vendas em 24 horas. Zero taxas por venda!" />
+        <meta property="og:url" content="https://acessar.click" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Acessar.click | Área de Membros Sem Taxas" />
+        <meta name="twitter:description" content="Crie sua área de membros em 24 horas. Zero taxas por venda!" />
+        <link rel="canonical" href="https://acessar.click" />
+      </Helmet>
     <div className="min-h-screen bg-zinc-950 text-white overflow-x-hidden font-body">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
@@ -693,6 +707,7 @@ const Index = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 
