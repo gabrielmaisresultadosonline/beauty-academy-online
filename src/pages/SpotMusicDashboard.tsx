@@ -38,7 +38,7 @@ interface Track {
   album_id: string | null;
 }
 
-export default function Dashboard() {
+export default function SpotMusicDashboard() {
   const { user, isLoading, isPremium, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -52,7 +52,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      navigate('/auth');
+      navigate('/comunidademusica/login');
     }
   }, [user, isLoading, navigate]);
 
@@ -150,7 +150,7 @@ export default function Dashboard() {
             <div className="space-y-3">
               <Button 
                 onClick={() => {
-                  const link = `https://checkout.infinitepay.io/paguemro?items=[{"name":"SPOTMUSIC","price":4700,"quantity":1}]&redirect_url=${encodeURIComponent(window.location.origin + '/obrigado')}`;
+                  const link = `https://checkout.infinitepay.io/paguemro?items=[{"name":"SPOTMUSIC","price":4700,"quantity":1}]&redirect_url=${encodeURIComponent(window.location.origin + '/comunidademusica/obrigado')}`;
                   window.location.href = link;
                 }}
                 className="w-full bg-spotmusic-green hover:bg-spotmusic-green/90 text-spotmusic-dark font-semibold"
@@ -215,7 +215,7 @@ export default function Dashboard() {
           {isAdmin && (
             <Button 
               variant="ghost" 
-              onClick={() => navigate('/admin')}
+              onClick={() => navigate('/comunidademusica/admin')}
               className="w-full justify-start text-spotmusic-muted hover:text-spotmusic-foreground"
             >
               <Settings className="w-4 h-4 mr-2" />
