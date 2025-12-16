@@ -283,18 +283,6 @@ const Index = () => {
             </Card>
           </div>
 
-          {/* Savings Highlight */}
-          <div className="mt-10 text-center">
-            <Card className="bg-[#00D26A]/5 border border-[#00D26A]/30 inline-block">
-              <CardContent className="p-6 sm:p-8">
-                <p className="text-zinc-500 mb-2 font-semibold tracking-tight">Com Acessar.click você economiza:</p>
-                <p className="text-4xl sm:text-5xl md:text-6xl font-black text-[#00D26A] tracking-tighter">
-                  R$ {maxSavings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </p>
-                <p className="text-zinc-500 mt-2 text-sm font-medium">Em apenas 50 vendas!</p>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </section>
 
