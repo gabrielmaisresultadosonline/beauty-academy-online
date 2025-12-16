@@ -356,13 +356,13 @@ const Index = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-16 md:py-24" id="preco">
+      <section className="py-16 md:py-24 px-4" id="preco">
         <div className="container">
-          <div className="max-w-xl mx-auto text-center">
+          <div className="max-w-xl mx-auto text-center px-0">
             <span className="inline-block bg-destructive/10 text-destructive px-4 py-2 rounded-full text-sm font-bold mb-6 animate-pulse-slow">
               DESCONTO DE 87%
             </span>
-            <div className="bg-card rounded-3xl p-8 md:p-12 shadow-card border border-border/50">
+            <div className="bg-card rounded-3xl p-4 sm:p-8 md:p-12 shadow-card border border-border/50">
               <h3 className="text-2xl font-heading font-bold text-foreground mb-2">INVESTIMENTO</h3>
               <p className="text-muted-foreground line-through text-lg mb-2">De R$ 197,00</p>
               <div className="flex items-baseline justify-center gap-2 mb-2">
@@ -370,17 +370,17 @@ const Index = () => {
                 <span className="text-7xl font-bold font-heading text-primary">25</span>
                 <span className="text-2xl font-bold text-foreground">,00</span>
               </div>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-muted-foreground mb-4 text-sm sm:text-base">
                 Pagamento único • Acesso vitalício • Certificado incluso • Conteúdo atualizado mensalmente
               </p>
               <div className="flex items-center justify-center gap-2 mb-6 text-success">
                 <Award className="w-5 h-5" />
-                <span className="font-medium">Comunidade + Certificado Inclusos</span>
+                <span className="font-medium text-sm sm:text-base">Comunidade + Certificado Inclusos</span>
               </div>
-              <Button variant="cta" size="xl" className="w-full whitespace-normal text-center h-auto py-4" asChild>
-                <Link to={REGISTER_LINK} className="flex items-center justify-center gap-2">
-                  <span className="text-sm sm:text-base md:text-lg">GARANTIR MINHA VAGA POR R$25</span>
-                  <ArrowRight className="w-5 h-5 flex-shrink-0" />
+              <Button variant="cta" size="xl" className="w-full h-auto py-3 sm:py-4 px-2 sm:px-6 !whitespace-normal overflow-hidden" asChild>
+                <Link to={REGISTER_LINK} className="flex items-center justify-center gap-1 sm:gap-2 w-full text-center">
+                  <span className="text-[11px] xs:text-xs sm:text-sm md:text-base lg:text-lg font-bold leading-tight break-words">GARANTIR MINHA VAGA POR R$25</span>
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 hidden sm:block" />
                 </Link>
               </Button>
               <div className="flex items-center justify-center gap-4 mt-6 text-sm text-muted-foreground">
@@ -428,9 +428,9 @@ const Index = () => {
             <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto text-lg">
               Não perca mais tempo. Milhares de mulheres já transformaram suas vidas com o nosso curso. Agora é a sua vez!
             </p>
-            <Button variant="secondary" size="xl" className="text-foreground whitespace-normal text-center h-auto py-4" asChild>
-              <Link to={REGISTER_LINK} className="flex items-center justify-center gap-2">
-                <span className="text-sm sm:text-base md:text-lg">GARANTIR MINHA VAGA</span>
+            <Button variant="secondary" size="xl" className="text-foreground !whitespace-normal text-center h-auto py-4 px-4 sm:px-8" asChild>
+              <Link to={REGISTER_LINK} className="flex items-center justify-center gap-2 w-full">
+                <span className="text-sm sm:text-base md:text-lg font-bold">GARANTIR MINHA VAGA</span>
                 <ArrowRight className="w-5 h-5 flex-shrink-0" />
               </Link>
             </Button>
