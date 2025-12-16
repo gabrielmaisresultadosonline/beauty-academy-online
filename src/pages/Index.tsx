@@ -411,65 +411,68 @@ const Index = () => {
         <div className="max-w-4xl mx-auto px-4">
           <Card className="bg-white border-0 overflow-hidden shadow-2xl">
             <CardContent className="p-8 md:p-10">
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="flex-shrink-0">
-                  <img 
-                    src={infinitepayLogo} 
-                    alt="InfinitePay" 
-                    className="h-24 w-auto"
-                  />
+              {/* Logo em cima */}
+              <div className="flex justify-center mb-6">
+                <img 
+                  src={infinitepayLogo} 
+                  alt="InfinitePay" 
+                  className="h-20 w-auto"
+                />
+              </div>
+              
+              {/* Informações abaixo */}
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-zinc-900 mb-3">
+                  Você precisa ter uma conta InfinitePay
+                </h3>
+                <p className="text-zinc-600 text-base max-w-xl mx-auto">
+                  Nossa área de membros se integra diretamente com a InfinitePay.
+                  Ao vender, o dinheiro cai direto na sua conta — sem intermediários.
+                </p>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                {/* Recebimento na hora */}
+                <div className="bg-zinc-50 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-[#00D26A] rounded-full p-2 mt-0.5 flex-shrink-0">
+                      <Zap className="w-5 h-5 text-zinc-900" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-zinc-900 text-lg">Recebimento na hora</h4>
+                      <p className="text-zinc-600 text-sm">
+                        Receba em <span className="font-bold text-[#00D26A]">PIX</span> ou <span className="font-bold text-[#00D26A]">Cartão de Crédito</span> instantaneamente. 
+                        Sem esperar 1 semana ou 15 dias — <span className="font-bold">receba na hora</span> todas as vendas.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-zinc-900 mb-3">
-                    Você precisa ter uma conta InfinitePay
-                  </h3>
-                  <p className="text-zinc-600 mb-4 text-base">
-                    Nossa área de membros se integra diretamente com a InfinitePay.
-                    Ao vender, o dinheiro cai direto na sua conta — sem intermediários.
-                  </p>
-                  
-                  {/* Recebimento na hora */}
-                  <div className="bg-zinc-50 rounded-xl p-4 mb-4">
-                    <div className="flex items-start gap-3">
-                      <div className="bg-[#00D26A] rounded-full p-2 mt-0.5">
-                        <Zap className="w-5 h-5 text-zinc-900" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-zinc-900 text-lg">Recebimento na hora</h4>
-                        <p className="text-zinc-600 text-sm">
-                          Receba em <span className="font-bold text-[#00D26A]">PIX</span> ou <span className="font-bold text-[#00D26A]">Cartão de Crédito</span> instantaneamente. 
-                          Sem esperar 1 semana ou 15 dias — <span className="font-bold">receba na hora</span> todas as vendas feitas.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Reembolso */}
-                  <div className="bg-zinc-50 rounded-xl p-4 mb-4">
-                    <div className="flex items-start gap-3">
-                      <div className="bg-zinc-200 rounded-full p-2 mt-0.5">
-                        <Shield className="w-5 h-5 text-zinc-700" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-zinc-900 text-lg">Como funciona o reembolso?</h4>
-                        <p className="text-zinc-600 text-sm">
-                          Você recebe o ticket de reembolso em sua área administrativa. 
-                          <span className="font-bold"> Você controla o seu reembolso</span> — total autonomia sobre suas vendas.
-                        </p>
-                      </div>
+                {/* Reembolso */}
+                <div className="bg-zinc-50 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-zinc-200 rounded-full p-2 mt-0.5 flex-shrink-0">
+                      <Shield className="w-5 h-5 text-zinc-700" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-zinc-900 text-lg">Como funciona o reembolso?</h4>
+                      <p className="text-zinc-600 text-sm">
+                        Você recebe o ticket de reembolso em sua área administrativa. 
+                        <span className="font-bold"> Você controla o seu reembolso</span> — total autonomia.
+                      </p>
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2 bg-[#00D26A] px-4 py-2 rounded-full">
-                      <Zap className="w-4 h-4 text-zinc-900" />
-                      <span className="text-sm font-bold text-zinc-900">Infinit Nitro: 8 segundos</span>
-                    </div>
-                    <div className="flex items-center gap-2 bg-zinc-100 px-4 py-2 rounded-full">
-                      <Shield className="w-4 h-4 text-[#00D26A]" />
-                      <span className="text-sm font-bold text-zinc-700">100% Seguro</span>
-                    </div>
-                  </div>
+              <div className="flex flex-wrap justify-center gap-4">
+                <div className="flex items-center gap-2 bg-[#00D26A] px-4 py-2 rounded-full">
+                  <Zap className="w-4 h-4 text-zinc-900" />
+                  <span className="text-sm font-bold text-zinc-900">Infinit Nitro: 8 segundos</span>
+                </div>
+                <div className="flex items-center gap-2 bg-zinc-100 px-4 py-2 rounded-full">
+                  <Shield className="w-4 h-4 text-[#00D26A]" />
+                  <span className="text-sm font-bold text-zinc-700">100% Seguro</span>
                 </div>
               </div>
             </CardContent>
@@ -492,15 +495,12 @@ const Index = () => {
               <Link key={index} to={product.link} className="group">
                 <Card className="bg-zinc-900 border border-zinc-800 hover:border-[#00D26A]/50 transition-all hover:scale-105">
                   <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center mb-4">
                       <div className="w-12 h-12 bg-[#00D26A]/10 rounded-xl flex items-center justify-center">
                         <Star className="w-6 h-6 text-[#00D26A]" />
                       </div>
-                      <div className="bg-[#00D26A] text-zinc-950 px-4 py-1.5 rounded-full font-bold text-lg">
-                        {product.price}
-                      </div>
                     </div>
-                    <h3 className="text-white font-bold text-xl group-hover:text-[#00D26A] transition-colors mb-1">
+                    <h3 className="text-white font-bold text-xl group-hover:text-[#00D26A] transition-colors mb-2">
                       {product.name}
                     </h3>
                     <p className="text-zinc-400 text-sm mb-4">{product.description}</p>
