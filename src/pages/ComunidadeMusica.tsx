@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Music,
   Music2,
@@ -33,6 +34,7 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
+  LogIn,
 } from 'lucide-react';
 
 // Album covers
@@ -149,6 +151,7 @@ const testimonials = [
 const ComunidadeMusica = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentAlbum, setCurrentAlbum] = useState(0);
+  const navigate = useNavigate();
 
   // Auto-slide album covers
   useEffect(() => {
@@ -182,11 +185,20 @@ const ComunidadeMusica = () => {
 
       {/* Top Bar */}
       <div className="bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 py-2 relative z-10">
-        <p className="text-zinc-900 text-sm font-bold text-center flex items-center justify-center gap-2">
-          <Zap className="w-4 h-4" />
-          PAGUE UMA VEZ, OUÇA PARA SEMPRE
-          <Zap className="w-4 h-4" />
-        </p>
+        <div className="container flex items-center justify-between">
+          <p className="text-zinc-900 text-sm font-bold flex items-center gap-2">
+            <Zap className="w-4 h-4" />
+            PAGUE UMA VEZ, OUÇA PARA SEMPRE
+            <Zap className="w-4 h-4" />
+          </p>
+          <button 
+            onClick={() => navigate('/comunidademusica/login')}
+            className="text-zinc-900 text-sm font-semibold hover:underline flex items-center gap-1"
+          >
+            <LogIn className="w-4 h-4" />
+            Já sou membro
+          </button>
+        </div>
       </div>
 
       {/* Hero Section */}
@@ -264,7 +276,7 @@ const ComunidadeMusica = () => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
-                  onClick={scrollToPrice}
+                  onClick={() => navigate('/comunidademusica/login')}
                   className="bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-zinc-900 font-bold text-lg h-14 px-8 rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all hover:scale-105"
                 >
                   <Headphones className="w-5 h-5 mr-2" />
@@ -651,13 +663,11 @@ const ComunidadeMusica = () => {
               </div>
 
               <Button 
+                onClick={() => navigate('/comunidademusica/login')}
                 className="w-full bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-zinc-900 font-bold text-lg h-14 rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all hover:scale-[1.02]"
-                asChild
               >
-                <a href={KIWIFY_LINK} target="_blank" rel="noopener noreferrer">
-                  <Headphones className="w-5 h-5 mr-2" />
-                  GARANTIR MEU ACESSO
-                </a>
+                <Headphones className="w-5 h-5 mr-2" />
+                GARANTIR MEU ACESSO
               </Button>
 
               <div className="flex items-center justify-center gap-4 mt-6 text-xs text-zinc-500">
@@ -730,13 +740,11 @@ const ComunidadeMusica = () => {
                 Entre para a Comunidade da Música! Spotify + YouTube + Deezer + Apple Music = +15.000 músicas por apenas R$47 (pagamento único)
               </p>
               <Button 
+                onClick={() => navigate('/comunidademusica/login')}
                 className="bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-lg h-14 px-10 rounded-xl shadow-lg hover:scale-105 transition-all"
-                asChild
               >
-                <a href={KIWIFY_LINK} target="_blank" rel="noopener noreferrer">
-                  QUERO MEU ACESSO AGORA
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </a>
+                QUERO MEU ACESSO AGORA
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
           </div>

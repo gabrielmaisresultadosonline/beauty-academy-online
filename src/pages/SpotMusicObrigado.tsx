@@ -8,7 +8,7 @@ import { CheckCircle, Music, Loader2, PartyPopper } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import confetti from 'canvas-confetti';
 
-export default function Obrigado() {
+export default function SpotMusicObrigado() {
   const { user, isLoading, refreshPremiumStatus } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -17,7 +17,7 @@ export default function Obrigado() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      navigate('/auth');
+      navigate('/comunidademusica/login');
     }
   }, [user, isLoading, navigate]);
 
@@ -141,7 +141,7 @@ export default function Obrigado() {
                 </div>
               </div>
               <Button 
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/comunidademusica/dashboard')}
                 className="w-full bg-spotmusic-green hover:bg-spotmusic-green/90 text-spotmusic-dark font-semibold"
               >
                 <Music className="w-4 h-4 mr-2" />

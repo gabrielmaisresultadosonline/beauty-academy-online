@@ -35,7 +35,7 @@ interface Track {
   album_id: string | null;
 }
 
-export default function Admin() {
+export default function SpotMusicAdmin() {
   const { user, isLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -60,9 +60,9 @@ export default function Admin() {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      navigate('/auth');
+      navigate('/comunidademusica/login');
     } else if (!isLoading && !isAdmin) {
-      navigate('/dashboard');
+      navigate('/comunidademusica/dashboard');
     }
   }, [user, isLoading, isAdmin, navigate]);
 
@@ -187,7 +187,7 @@ export default function Admin() {
         <header className="flex items-center gap-4 mb-8">
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/comunidademusica/dashboard')}
             className="text-spotmusic-muted hover:text-spotmusic-foreground"
           >
             <ArrowLeft className="w-5 h-5" />

@@ -20,7 +20,7 @@ const signInSchema = z.object({
   password: z.string().min(1, 'Senha é obrigatória')
 });
 
-export default function Auth() {
+export default function SpotMusicLogin() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fullName, setFullName] = useState('');
@@ -34,7 +34,7 @@ export default function Auth() {
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate('/comunidademusica/dashboard');
     }
   }, [user, navigate]);
 
