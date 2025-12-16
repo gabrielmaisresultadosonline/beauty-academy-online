@@ -131,6 +131,29 @@ const DemoAdmin = () => {
   const [newNoticeTitle, setNewNoticeTitle] = useState("");
   const [newNoticeMessage, setNewNoticeMessage] = useState("");
   const [newNoticeType, setNewNoticeType] = useState<"once" | "always" | "per_access">("once");
+  const [isUploading, setIsUploading] = useState(false);
+
+  // File upload handler - converts to base64 for localStorage storage
+  const handleFileUpload = (file: File, onSuccess: (dataUrl: string) => void, maxSizeMB: number = 50) => {
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      toast.error(`Arquivo muito grande! Máximo ${maxSizeMB}MB`);
+      return;
+    }
+
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      onSuccess(result);
+      setIsUploading(false);
+      toast.success("Arquivo carregado com sucesso!");
+    };
+    reader.onerror = () => {
+      toast.error("Erro ao carregar arquivo");
+      setIsUploading(false);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Default demo modules with marketing content
   const defaultDemoModules: DemoModule[] = [
@@ -648,13 +671,37 @@ const DemoAdmin = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-gray-700">URL da Capa (Link ou Upload até 50MB)</Label>
-                    <Input
-                      value={newModuleCover}
-                      onChange={(e) => setNewModuleCover(e.target.value)}
-                      placeholder="https://exemplo.com/imagem.jpg"
-                      className="border-pink-200 focus:border-pink-400"
-                    />
+                    <Label className="text-gray-700">Capa do Módulo</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={newModuleCover}
+                        onChange={(e) => setNewModuleCover(e.target.value)}
+                        placeholder="Cole um link ou faça upload..."
+                        className="border-pink-200 focus:border-pink-400 flex-1"
+                      />
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, setNewModuleCover, 10);
+                          }}
+                        />
+                        <Button type="button" variant="outline" className="border-pink-200 hover:bg-pink-50" disabled={isUploading}>
+                          <Upload className="w-4 h-4" />
+                        </Button>
+                      </label>
+                    </div>
+                    {newModuleCover && (
+                      <div className="mt-2 relative w-20 h-14 rounded overflow-hidden">
+                        <img src={newModuleCover} alt="Preview" className="w-full h-full object-cover" />
+                        <button onClick={() => setNewModuleCover("")} className="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl">
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -784,26 +831,73 @@ const DemoAdmin = () => {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-gray-700">
-                      {newLessonVideoType === "youtube" ? "URL do Vídeo (YouTube Embed)" : "URL do Arquivo"}
+                      {newLessonVideoType === "youtube" ? "URL do Vídeo (YouTube Embed)" : "Vídeo"}
                     </Label>
-                    <Input
-                      value={newLessonVideo}
-                      onChange={(e) => setNewLessonVideo(e.target.value)}
-                      placeholder={newLessonVideoType === "youtube" ? "https://youtube.com/embed/..." : "https://storage.../video.mp4"}
-                      className="border-pink-200 focus:border-pink-400"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        value={newLessonVideo}
+                        onChange={(e) => setNewLessonVideo(e.target.value)}
+                        placeholder={newLessonVideoType === "youtube" ? "https://youtube.com/embed/..." : "Cole link ou faça upload"}
+                        className="border-pink-200 focus:border-pink-400 flex-1"
+                      />
+                      {newLessonVideoType === "file" && (
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept="video/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFileUpload(file, setNewLessonVideo, 50);
+                            }}
+                          />
+                          <Button type="button" variant="outline" className="border-pink-200 hover:bg-pink-50" disabled={isUploading}>
+                            <Upload className="w-4 h-4" />
+                          </Button>
+                        </label>
+                      )}
+                    </div>
+                    {newLessonVideo && newLessonVideoType === "file" && newLessonVideo.startsWith("data:") && (
+                      <p className="text-xs text-green-600 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" /> Vídeo carregado
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label className="text-gray-700">Capa da Aula (opcional)</Label>
-                    <Input
-                      value={newLessonCover}
-                      onChange={(e) => setNewLessonCover(e.target.value)}
-                      placeholder="https://exemplo.com/capa.jpg"
-                      className="border-pink-200 focus:border-pink-400"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        value={newLessonCover}
+                        onChange={(e) => setNewLessonCover(e.target.value)}
+                        placeholder="Link ou upload..."
+                        className="border-pink-200 focus:border-pink-400 flex-1"
+                      />
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, setNewLessonCover, 10);
+                          }}
+                        />
+                        <Button type="button" variant="outline" className="border-pink-200 hover:bg-pink-50" disabled={isUploading}>
+                          <Upload className="w-4 h-4" />
+                        </Button>
+                      </label>
+                    </div>
+                    {newLessonCover && (
+                      <div className="mt-1 relative w-16 h-10 rounded overflow-hidden">
+                        <img src={newLessonCover} alt="Preview" className="w-full h-full object-cover" />
+                        <button onClick={() => setNewLessonCover("")} className="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl">
+                          <Trash2 className="w-2 h-2" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label className="text-gray-700">Duração</Label>
@@ -1318,13 +1412,37 @@ const DemoAdmin = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-gray-700">URL do Logo</Label>
-                    <Input
-                      value={settings.logoUrl}
-                      onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
-                      placeholder="https://exemplo.com/logo.png"
-                      className="border-pink-200 focus:border-pink-400"
-                    />
+                    <Label className="text-gray-700">Logo</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={settings.logoUrl}
+                        onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
+                        placeholder="Link ou upload..."
+                        className="border-pink-200 focus:border-pink-400 flex-1"
+                      />
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, (url) => setSettings({ ...settings, logoUrl: url }), 5);
+                          }}
+                        />
+                        <Button type="button" variant="outline" className="border-pink-200 hover:bg-pink-50" disabled={isUploading}>
+                          <Upload className="w-4 h-4" />
+                        </Button>
+                      </label>
+                    </div>
+                    {settings.logoUrl && (
+                      <div className="mt-2 relative w-16 h-10 rounded overflow-hidden bg-gray-100 p-1">
+                        <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                        <button onClick={() => setSettings({ ...settings, logoUrl: "" })} className="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl">
+                          <Trash2 className="w-2 h-2" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -1382,13 +1500,38 @@ const DemoAdmin = () => {
                 </div>
                 {settings.welcomeVideoType !== "none" && (
                   <div className="space-y-2">
-                    <Label className="text-gray-700">URL do Vídeo</Label>
-                    <Input
-                      value={settings.welcomeVideoUrl}
-                      onChange={(e) => setSettings({ ...settings, welcomeVideoUrl: e.target.value })}
-                      placeholder={settings.welcomeVideoType === "youtube" ? "https://youtube.com/embed/..." : "https://storage.../video.mp4"}
-                      className="border-pink-200 focus:border-pink-400"
-                    />
+                    <Label className="text-gray-700">
+                      {settings.welcomeVideoType === "youtube" ? "URL do Vídeo (YouTube Embed)" : "Vídeo"}
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={settings.welcomeVideoUrl}
+                        onChange={(e) => setSettings({ ...settings, welcomeVideoUrl: e.target.value })}
+                        placeholder={settings.welcomeVideoType === "youtube" ? "https://youtube.com/embed/..." : "Cole link ou faça upload"}
+                        className="border-pink-200 focus:border-pink-400 flex-1"
+                      />
+                      {settings.welcomeVideoType === "file" && (
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept="video/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleFileUpload(file, (url) => setSettings({ ...settings, welcomeVideoUrl: url }), 50);
+                            }}
+                          />
+                          <Button type="button" variant="outline" className="border-pink-200 hover:bg-pink-50" disabled={isUploading}>
+                            <Upload className="w-4 h-4" />
+                          </Button>
+                        </label>
+                      )}
+                    </div>
+                    {settings.welcomeVideoUrl && settings.welcomeVideoType === "file" && settings.welcomeVideoUrl.startsWith("data:") && (
+                      <p className="text-xs text-green-600 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" /> Vídeo carregado com sucesso
+                      </p>
+                    )}
                   </div>
                 )}
                 <div className="space-y-2">
