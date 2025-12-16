@@ -132,6 +132,94 @@ const DemoAdmin = () => {
   const [newNoticeMessage, setNewNoticeMessage] = useState("");
   const [newNoticeType, setNewNoticeType] = useState<"once" | "always" | "per_access">("once");
 
+  // Default demo modules with marketing content
+  const defaultDemoModules: DemoModule[] = [
+    {
+      id: "demo1",
+      title: "Módulo 1 - Introdução ao Marketing Digital",
+      description: "📌 DEMONSTRAÇÃO - Aqui você vai colocar seu conteúdo! Neste módulo você aprenderá os fundamentos do marketing.",
+      coverUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+      showPlayButton: true,
+      showDescription: true,
+      lessons: [
+        { id: "l1-1", title: "Aula 1 - Bem-vindo ao Curso", description: "Conteúdo de teste - substitua pelo seu vídeo", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "10:00" },
+        { id: "l1-2", title: "Aula 2 - O que é Marketing Digital", description: "Conteúdo de teste - substitua pelo seu vídeo", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "15:00" },
+        { id: "l1-3", title: "Aula 3 - Primeiros Passos", description: "Conteúdo de teste - substitua pelo seu vídeo", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "12:00" },
+      ]
+    },
+    {
+      id: "demo2",
+      title: "Módulo 2 - Redes Sociais",
+      description: "📌 DEMONSTRAÇÃO - Este é um conteúdo de teste! Aprenda a dominar Instagram, Facebook, TikTok e mais.",
+      coverUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=80",
+      showPlayButton: true,
+      showDescription: true,
+      lessons: [
+        { id: "l2-1", title: "Aula 1 - Instagram para Negócios", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "20:00" },
+        { id: "l2-2", title: "Aula 2 - Facebook Ads", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "25:00" },
+      ]
+    },
+    {
+      id: "demo3",
+      title: "Módulo 3 - Copywriting",
+      description: "📌 DEMONSTRAÇÃO - Substitua este texto pelo seu! Domine a arte de escrever textos que vendem.",
+      coverUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80",
+      showPlayButton: true,
+      showDescription: true,
+      lessons: [
+        { id: "l3-1", title: "Aula 1 - Fundamentos do Copy", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "18:00" },
+        { id: "l3-2", title: "Aula 2 - Headlines que Convertem", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "22:00" },
+        { id: "l3-3", title: "Aula 3 - Gatilhos Mentais", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "30:00" },
+      ]
+    },
+    {
+      id: "demo4",
+      title: "Módulo 4 - Tráfego Pago",
+      description: "📌 DEMONSTRAÇÃO - Coloque seu conteúdo aqui! Aprenda a criar anúncios que geram resultados.",
+      coverUrl: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&q=80",
+      showPlayButton: true,
+      showDescription: true,
+      lessons: [
+        { id: "l4-1", title: "Aula 1 - Google Ads Básico", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "35:00" },
+        { id: "l4-2", title: "Aula 2 - Meta Ads Avançado", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "40:00" },
+      ]
+    },
+    {
+      id: "demo5",
+      title: "Módulo 5 - Funis de Vendas",
+      description: "📌 DEMONSTRAÇÃO - Este módulo é apenas exemplo! Construa funis que convertem visitantes em clientes.",
+      coverUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+      showPlayButton: true,
+      showDescription: true,
+      lessons: [
+        { id: "l5-1", title: "Aula 1 - O que é um Funil", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "15:00" },
+        { id: "l5-2", title: "Aula 2 - Páginas de Captura", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "28:00" },
+        { id: "l5-3", title: "Aula 3 - Email Marketing", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "25:00" },
+      ]
+    },
+    {
+      id: "demo6",
+      title: "Módulo 6 - Bônus Exclusivos",
+      description: "📌 DEMONSTRAÇÃO - Personalize com seu conteúdo! Material extra e recursos especiais para alunos.",
+      coverUrl: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
+      showPlayButton: true,
+      showDescription: true,
+      lessons: [
+        { id: "l6-1", title: "Bônus 1 - Templates Prontos", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "10:00" },
+        { id: "l6-2", title: "Bônus 2 - Ferramentas Gratuitas", description: "Conteúdo de teste", videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", videoType: "youtube", coverUrl: "", showCover: false, showDescription: true, duration: "12:00" },
+      ]
+    },
+  ];
+
+  const defaultDemoButtons: DemoButton[] = [
+    { id: "btn1", text: "📥 BAIXAR MATERIAL DE APOIO", url: "#", color: "#F59E0B", position: "after", moduleId: "demo1" },
+    { id: "btn2", text: "💬 ENTRAR NO GRUPO VIP", url: "#", color: "#10B981", position: "after", moduleId: "demo3" },
+  ];
+
+  const defaultDemoNotices: DemoNotice[] = [
+    { id: "notice1", title: "🎉 Bem-vindo à Demonstração!", message: "Esta é uma área de membros de exemplo. Você pode adicionar seus próprios módulos, aulas, botões e muito mais!", type: "once", active: true },
+  ];
+
   useEffect(() => {
     const isAuth = localStorage.getItem("demo_authenticated");
     if (!isAuth) {
@@ -144,10 +232,31 @@ const DemoAdmin = () => {
     const savedNotices = localStorage.getItem("demo_notices");
     const savedButtons = localStorage.getItem("demo_buttons");
     
-    if (savedModules) setModules(JSON.parse(savedModules));
-    if (savedSettings) setSettings({ ...settings, ...JSON.parse(savedSettings) });
-    if (savedNotices) setNotices(JSON.parse(savedNotices));
-    if (savedButtons) setButtons(JSON.parse(savedButtons));
+    // Load saved data or use defaults
+    if (savedModules) {
+      setModules(JSON.parse(savedModules));
+    } else {
+      setModules(defaultDemoModules);
+      localStorage.setItem("demo_modules", JSON.stringify(defaultDemoModules));
+    }
+    
+    if (savedSettings) {
+      setSettings({ ...settings, ...JSON.parse(savedSettings) });
+    }
+    
+    if (savedNotices) {
+      setNotices(JSON.parse(savedNotices));
+    } else {
+      setNotices(defaultDemoNotices);
+      localStorage.setItem("demo_notices", JSON.stringify(defaultDemoNotices));
+    }
+    
+    if (savedButtons) {
+      setButtons(JSON.parse(savedButtons));
+    } else {
+      setButtons(defaultDemoButtons);
+      localStorage.setItem("demo_buttons", JSON.stringify(defaultDemoButtons));
+    }
   }, [navigate]);
 
   const saveModules = (newModules: DemoModule[]) => {
