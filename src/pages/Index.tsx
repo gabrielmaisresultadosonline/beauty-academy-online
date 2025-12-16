@@ -409,32 +409,32 @@ const Index = () => {
       {/* InfinitePay Requirement */}
       <section className="py-16 bg-zinc-950">
         <div className="max-w-4xl mx-auto px-4">
-          <Card className="bg-zinc-900 border border-zinc-800 overflow-hidden">
+          <Card className="bg-white border-0 overflow-hidden shadow-2xl">
             <CardContent className="p-8 md:p-10">
               <div className="flex flex-col md:flex-row items-center gap-8">
                 <div className="flex-shrink-0">
                   <img 
                     src={infinitepayLogo} 
                     alt="InfinitePay" 
-                    className="h-20 w-auto"
+                    className="h-24 w-auto"
                   />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-3">
+                  <h3 className="text-2xl font-bold text-zinc-900 mb-3">
                     Você precisa ter uma conta InfinitePay
                   </h3>
-                  <p className="text-zinc-400 mb-4">
+                  <p className="text-zinc-600 mb-4 text-base">
                     Nossa área de membros se integra diretamente com a InfinitePay.
                     Ao vender, o dinheiro cai direto na sua conta — sem intermediários.
                   </p>
                   <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2 bg-[#00D26A]/10 px-3 py-1.5 rounded-full">
-                      <Zap className="w-4 h-4 text-[#00D26A]" />
-                      <span className="text-sm font-semibold text-[#00D26A]">Infinit Nitro: 8 segundos</span>
+                    <div className="flex items-center gap-2 bg-[#00D26A] px-4 py-2 rounded-full">
+                      <Zap className="w-4 h-4 text-zinc-900" />
+                      <span className="text-sm font-bold text-zinc-900">Infinit Nitro: 8 segundos</span>
                     </div>
-                    <div className="flex items-center gap-2 bg-[#00D26A]/10 px-3 py-1.5 rounded-full">
+                    <div className="flex items-center gap-2 bg-zinc-100 px-4 py-2 rounded-full">
                       <Shield className="w-4 h-4 text-[#00D26A]" />
-                      <span className="text-sm font-semibold text-[#00D26A]">100% Seguro</span>
+                      <span className="text-sm font-bold text-zinc-700">100% Seguro</span>
                     </div>
                   </div>
                 </div>
