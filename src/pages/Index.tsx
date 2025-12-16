@@ -18,7 +18,6 @@ import {
   Sparkles,
   BadgeCheck,
   Play,
-  Bot,
   Rocket,
   TrendingUp
 } from "lucide-react";
@@ -105,46 +104,13 @@ const Index = () => {
           </h1>
 
           {/* Subheadline */}
-          <div className="mb-8">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
-              Sua <span className="text-[#00D26A]">Área de Membros</span> e página de vendas pronta
-            </h2>
-            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/40 px-5 py-2.5 mb-4">
-              <Bot className="w-5 h-5 text-purple-400" />
-              <span className="text-sm text-purple-400 font-bold tracking-wide">Criada por I.A • Inteligência Artificial</span>
-            </div>
-          </div>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-8 tracking-tight">
+            Sua <span className="text-[#00D26A]">Área de Membros</span> e página de vendas pronta em até <span className="text-yellow-400">24 horas</span>
+          </h2>
 
-          {/* Subheadline Features */}
-          <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-2 sm:gap-4 mb-8">
-            <span className="text-lg sm:text-xl font-bold text-white tracking-tight">Sem taxas por venda</span>
-            <span className="hidden sm:block text-zinc-700">•</span>
-            <span className="text-lg sm:text-xl font-black text-yellow-400 tracking-tight">Recebimento na hora</span>
-            <span className="hidden sm:block text-zinc-700">•</span>
-            <span className="text-lg sm:text-xl font-bold text-white tracking-tight">100% do lucro é seu</span>
-          </div>
-
-          <p className="text-lg sm:text-xl text-zinc-400 mb-8 max-w-3xl mx-auto leading-relaxed font-medium tracking-tight">
-            Receba <span className="text-[#00D26A] font-bold">100% de cada venda</span> direto na sua conta InfinitePay.
-            <br className="hidden sm:block" />
-            <span className="sm:hidden"> </span>Criamos seu site completo em até <span className="text-[#00D26A] font-bold">24 horas</span>.
-          </p>
-
-          <p className="text-base sm:text-lg text-zinc-500 mb-10 max-w-2xl mx-auto font-medium tracking-tight">
+          <p className="text-base sm:text-lg text-zinc-400 mb-10 max-w-2xl mx-auto font-medium tracking-tight">
             Você só vai precisar <span className="text-white font-bold">adicionar o conteúdo</span> depois em sua área de membros.
           </p>
-
-          {/* Instant Payment Badge */}
-          <div className="inline-flex items-center gap-4 sm:gap-5 bg-gradient-to-r from-yellow-500/15 to-[#00D26A]/10 border-2 border-yellow-400/40 px-6 sm:px-10 py-4 sm:py-5 mb-10">
-            <div className="relative flex-shrink-0">
-              <Zap className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-400" />
-              <div className="absolute inset-0 bg-yellow-400/40 blur-2xl animate-glow-pulse" />
-            </div>
-            <div className="text-left">
-              <p className="text-yellow-400 font-black text-xl sm:text-2xl tracking-tight">RECEBA EM 8 SEGUNDOS</p>
-              <p className="text-zinc-400 text-sm sm:text-base font-semibold tracking-tight">Infinit Nitro • Instantâneo na sua conta</p>
-            </div>
-          </div>
 
           {/* CTA Button */}
           <div className="mb-10">
