@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -49,6 +49,16 @@
     --shadow-soft: 0 4px 20px -4px hsl(340, 82%, 52%, 0.15);
     --shadow-card: 0 8px 30px -8px hsl(0, 0%, 0%, 0.1);
     --shadow-glow: 0 0 40px hsl(340, 82%, 52%, 0.3);
+
+    /* SpotMusic Theme */
+    --spotmusic-dark: 0 0% 7%;
+    --spotmusic-darker: 0 0% 4%;
+    --spotmusic-card: 0 0% 12%;
+    --spotmusic-border: 0 0% 18%;
+    --spotmusic-foreground: 0 0% 95%;
+    --spotmusic-muted: 0 0% 55%;
+    --spotmusic-green: 141 73% 42%;
+    --spotmusic-amber: 38 92% 50%;
   }
 
   .dark {
@@ -152,5 +162,58 @@
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
     border-right: 8px solid hsl(142, 70%, 95%);
+  }
+
+  /* SpotMusic utilities */
+  .bg-spotmusic-dark {
+    background-color: hsl(var(--spotmusic-dark));
+  }
+  .bg-spotmusic-darker {
+    background-color: hsl(var(--spotmusic-darker));
+  }
+  .bg-spotmusic-card {
+    background-color: hsl(var(--spotmusic-card));
+  }
+  .border-spotmusic-border {
+    border-color: hsl(var(--spotmusic-border));
+  }
+  .text-spotmusic-foreground {
+    color: hsl(var(--spotmusic-foreground));
+  }
+  .text-spotmusic-muted {
+    color: hsl(var(--spotmusic-muted));
+  }
+  .text-spotmusic-green {
+    color: hsl(var(--spotmusic-green));
+  }
+  .text-spotmusic-amber {
+    color: hsl(var(--spotmusic-amber));
+  }
+  .bg-spotmusic-green {
+    background-color: hsl(var(--spotmusic-green));
+  }
+  .bg-spotmusic-amber {
+    background-color: hsl(var(--spotmusic-amber));
+  }
+  .text-spotmusic-dark {
+    color: hsl(var(--spotmusic-dark));
+  }
+  .placeholder\:text-spotmusic-muted::placeholder {
+    color: hsl(var(--spotmusic-muted));
+  }
+  .hover\:bg-spotmusic-green\/90:hover {
+    background-color: hsl(var(--spotmusic-green) / 0.9);
+  }
+  .hover\:text-spotmusic-green:hover {
+    color: hsl(var(--spotmusic-green));
+  }
+  .hover\:text-spotmusic-foreground:hover {
+    color: hsl(var(--spotmusic-foreground));
+  }
+  .hover\:bg-spotmusic-card:hover {
+    background-color: hsl(var(--spotmusic-card));
+  }
+  .hover\:bg-spotmusic-card\/80:hover {
+    background-color: hsl(var(--spotmusic-card) / 0.8);
   }
 }
