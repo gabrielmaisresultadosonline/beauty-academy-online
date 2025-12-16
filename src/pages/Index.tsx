@@ -145,24 +145,24 @@ const Index = () => {
       {/* Special Message for Beginners */}
       <section className="py-16 sm:py-20 bg-gradient-to-b from-zinc-950 to-zinc-900/50">
         <div className="max-w-5xl mx-auto px-4">
-          <Card className="bg-gradient-to-r from-[#00D26A]/10 to-purple-500/10 border-2 border-[#00D26A]/30 overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#00D26A]/5 via-transparent to-purple-500/5" />
+          <Card className="bg-zinc-900 border-2 border-[#00D26A]/50 overflow-hidden relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#00D26A]/10 via-transparent to-transparent" />
             <CardContent className="p-8 sm:p-12 relative z-10">
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
                 <div className="flex-shrink-0">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#00D26A]/20 flex items-center justify-center">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#00D26A]/20 flex items-center justify-center border border-[#00D26A]/30">
                     <Rocket className="w-10 h-10 sm:w-12 sm:h-12 text-[#00D26A]" />
                   </div>
                 </div>
                 <div className="text-center md:text-left">
-                  <div className="inline-flex items-center gap-2 bg-yellow-500/20 border border-yellow-400/40 px-4 py-1.5 mb-4">
-                    <Star className="w-4 h-4 text-yellow-400" />
-                    <span className="text-xs text-yellow-400 font-bold uppercase tracking-wide">Especial para você que está iniciando</span>
+                  <div className="inline-flex items-center gap-2 bg-[#00D26A]/20 border border-[#00D26A]/50 px-4 py-1.5 mb-4">
+                    <Star className="w-4 h-4 text-[#00D26A]" />
+                    <span className="text-xs text-[#00D26A] font-bold uppercase tracking-wide">Especial para você que está iniciando</span>
                   </div>
                   <h3 className="text-2xl sm:text-3xl font-black text-white mb-4 tracking-tight">
                     Sem taxas de pagamento, você consegue <span className="text-[#00D26A]">investir mais</span>
                   </h3>
-                  <p className="text-zinc-400 text-base sm:text-lg font-medium leading-relaxed">
+                  <p className="text-zinc-300 text-base sm:text-lg font-medium leading-relaxed">
                     Com <span className="text-[#00D26A] font-bold">0% de taxas</span>, todo o dinheiro das suas vendas pode ser reinvestido em <span className="text-white font-bold">tráfego pago</span> e <span className="text-white font-bold">estratégias de marketing</span>. Cresça mais rápido do que seus concorrentes.
                   </p>
                   <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
