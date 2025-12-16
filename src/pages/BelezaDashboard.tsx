@@ -37,6 +37,7 @@ export default function BelezaDashboard() {
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showCertificate, setShowCertificate] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -359,59 +360,92 @@ export default function BelezaDashboard() {
               Bem-vinda ao Curso, {profile?.full_name?.split(' ')[0]}! 🎉
             </h1>
 
-            {/* Certificate Section */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border-2 border-amber-200">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-amber-400 to-yellow-500 rounded-full flex items-center justify-center">
-                  <Award className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">Seu Certificado</h2>
-                  <p className="text-sm text-gray-600">Certificado de Conclusão incluso</p>
-                </div>
-              </div>
+            {/* Certificate Tab - Small */}
+            <div className="mb-6">
+              <button
+                onClick={() => setShowCertificate(!showCertificate)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  enrollment?.certificate_issued_at 
+                    ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                    : enrollment?.certificate_photo_url 
+                      ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                      : 'bg-pink-100 text-pink-700 hover:bg-pink-200'
+                }`}
+              >
+                <Award className="w-4 h-4" />
+                {enrollment?.certificate_issued_at 
+                  ? 'Certificado Pronto' 
+                  : enrollment?.certificate_photo_url 
+                    ? 'Aguardando Certificado'
+                    : 'Certificado'}
+                <ChevronRight className={`w-4 h-4 transition-transform ${showCertificate ? 'rotate-90' : ''}`} />
+              </button>
 
-              {enrollment?.certificate_issued_at ? (
-                // Certificate issued
-                <div className="bg-green-50 rounded-xl p-6 text-center">
-                  <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-green-700 mb-2">Certificado Emitido!</h3>
-                  <p className="text-green-600 mb-4">
-                    Emitido em {new Date(enrollment.certificate_issued_at).toLocaleDateString('pt-BR')}
-                  </p>
-                  {enrollment.certificate_url && (
-                    <a
-                      href={enrollment.certificate_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full transition-colors"
-                    >
-                      <Award className="w-5 h-5" />
-                      Baixar Certificado
-                    </a>
-                  )}
-                </div>
-              ) : enrollment?.certificate_photo_url ? (
-                // Photo uploaded, waiting for certificate
-                <div className="bg-amber-50 rounded-xl p-6">
-                  <div className="flex flex-col md:flex-row items-center gap-6">
-                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-amber-300">
-                      <img 
-                        src={enrollment.certificate_photo_url} 
-                        alt="Sua foto" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="text-center md:text-left">
-                      <h3 className="text-lg font-bold text-amber-700 mb-2">
-                        Foto Enviada com Sucesso!
-                      </h3>
-                      <p className="text-amber-600">
-                        Aguarde a emissão do seu certificado. Você será notificada quando estiver pronto.
+              {/* Expandable Certificate Section */}
+              {showCertificate && (
+                <div className="mt-4 bg-white rounded-xl shadow-md p-5 border border-gray-100 max-w-md">
+                  {enrollment?.certificate_issued_at ? (
+                    <div className="text-center">
+                      <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto mb-2" />
+                      <h3 className="font-bold text-green-700 mb-1">Certificado Emitido!</h3>
+                      <p className="text-sm text-green-600 mb-3">
+                        {new Date(enrollment.certificate_issued_at).toLocaleDateString('pt-BR')}
                       </p>
-                      <label className="mt-4 inline-flex items-center gap-2 text-sm text-amber-700 hover:text-amber-800 cursor-pointer">
-                        <Camera className="w-4 h-4" />
-                        Enviar outra foto
+                      {enrollment.certificate_url && (
+                        <a
+                          href={enrollment.certificate_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium px-4 py-2 rounded-full"
+                        >
+                          <Award className="w-4 h-4" />
+                          Baixar
+                        </a>
+                      )}
+                    </div>
+                  ) : enrollment?.certificate_photo_url ? (
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-300 flex-shrink-0">
+                        <img 
+                          src={enrollment.certificate_photo_url} 
+                          alt="Sua foto" 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-amber-700">Foto enviada!</p>
+                        <p className="text-xs text-amber-600">Aguardando emissão</p>
+                        <label className="mt-2 inline-flex items-center gap-1 text-xs text-amber-600 hover:text-amber-700 cursor-pointer">
+                          <Camera className="w-3 h-3" />
+                          Trocar foto
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePhotoUpload}
+                            className="hidden"
+                            disabled={uploadingPhoto}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <Camera className="w-10 h-10 text-pink-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-600 mb-3">
+                        Envie sua foto para o certificado
+                      </p>
+                      <label className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white text-sm font-medium px-4 py-2 rounded-full cursor-pointer">
+                        {uploadingPhoto ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Enviando...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4" />
+                            Enviar Foto
+                          </>
+                        )}
                         <input
                           type="file"
                           accept="image/*"
@@ -421,39 +455,7 @@ export default function BelezaDashboard() {
                         />
                       </label>
                     </div>
-                  </div>
-                </div>
-              ) : (
-                // No photo yet
-                <div className="bg-pink-50 rounded-xl p-6 text-center">
-                  <Camera className="w-16 h-16 text-pink-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    Envie sua foto para o certificado
-                  </h3>
-                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                    Para emitirmos seu certificado personalizado, precisamos de uma foto sua. 
-                    Escolha uma foto profissional de boa qualidade.
-                  </p>
-                  <label className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold px-8 py-4 rounded-full cursor-pointer transition-all transform hover:scale-105">
-                    {uploadingPhoto ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Enviando...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-5 h-5" />
-                        Enviar Minha Foto
-                      </>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoUpload}
-                      className="hidden"
-                      disabled={uploadingPhoto}
-                    />
-                  </label>
+                  )}
                 </div>
               )}
             </div>
