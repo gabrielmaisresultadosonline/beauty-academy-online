@@ -22,7 +22,8 @@ import {
   BarChart3,
   Users,
   Settings,
-  Save
+  Save,
+  CreditCard
 } from 'lucide-react';
 
 interface Album {
@@ -63,9 +64,10 @@ export default function SpotMusicAdmin() {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
 
-  // Pixel settings
+  // Settings
   const [pixelCode, setPixelCode] = useState('');
-  const [savingPixel, setSavingPixel] = useState(false);
+  const [paymentLink, setPaymentLink] = useState('');
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const coverInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
@@ -99,7 +101,7 @@ export default function SpotMusicAdmin() {
       fetchAlbums();
       fetchTracks();
       fetchProfiles();
-      loadPixelSettings();
+      loadSettings();
     }
   }, [isAdmin]);
 
@@ -130,31 +132,35 @@ export default function SpotMusicAdmin() {
     if (data) setProfiles(data);
   };
 
-  const loadPixelSettings = async () => {
+  const loadSettings = async () => {
     const { data } = await supabase
       .from('platform_settings')
-      .select('facebook_pixel_code')
+      .select('facebook_pixel_code, infinitepay_link')
       .eq('product_slug', 'comunidademusica')
       .maybeSingle();
     
-    if (data?.facebook_pixel_code) {
-      setPixelCode(data.facebook_pixel_code);
+    if (data) {
+      setPixelCode(data.facebook_pixel_code || '');
+      setPaymentLink(data.infinitepay_link || '');
     }
   };
 
-  const savePixelSettings = async () => {
-    setSavingPixel(true);
+  const saveSettings = async () => {
+    setSavingSettings(true);
     const { error } = await supabase
       .from('platform_settings')
-      .update({ facebook_pixel_code: pixelCode })
+      .update({ 
+        facebook_pixel_code: pixelCode,
+        infinitepay_link: paymentLink
+      })
       .eq('product_slug', 'comunidademusica');
 
     if (error) {
-      toast({ title: "Erro ao salvar pixel", variant: "destructive" });
+      toast({ title: "Erro ao salvar configurações", variant: "destructive" });
     } else {
-      toast({ title: "Pixel salvo com sucesso!" });
+      toast({ title: "Configurações salvas com sucesso!" });
     }
-    setSavingPixel(false);
+    setSavingSettings(false);
   };
 
   const uploadCoverImage = async (file: File): Promise<string | null> => {
@@ -779,6 +785,37 @@ export default function SpotMusicAdmin() {
           <TabsContent value="settings" className="space-y-6">
             <h2 className="text-xl font-bold text-spotmusic-foreground">Configurações</h2>
             
+            {/* Payment Link */}
+            <Card className="bg-spotmusic-card border-spotmusic-border">
+              <CardHeader>
+                <CardTitle className="text-spotmusic-foreground flex items-center gap-2">
+                  <CreditCard className="w-5 h-5" />
+                  Link de Pagamento InfinitePay
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-spotmusic-muted">
+                  Cole o link completo do InfinitePay para receber pagamentos. Gere o link no painel do InfinitePay.
+                </p>
+                <Input
+                  value={paymentLink}
+                  onChange={(e) => setPaymentLink(e.target.value)}
+                  placeholder="https://checkout.infinitepay.io/seuusuario?items=[...]"
+                  className="font-mono text-xs bg-spotmusic-dark border-spotmusic-border text-spotmusic-foreground"
+                />
+                <div className="bg-spotmusic-green/10 border border-spotmusic-green/30 rounded-lg p-4">
+                  <p className="text-sm font-medium text-spotmusic-green mb-2">URL de Redirecionamento (Obrigado)</p>
+                  <p className="text-xs text-spotmusic-foreground font-mono bg-spotmusic-dark p-2 rounded border border-spotmusic-border">
+                    https://acessar.click/comunidademusica/obrigado
+                  </p>
+                  <p className="text-xs text-spotmusic-muted mt-2">
+                    Configure esta URL no campo "redirect_url" do seu link InfinitePay.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Facebook Pixel */}
             <Card className="bg-spotmusic-card border-spotmusic-border">
               <CardHeader>
                 <CardTitle className="text-spotmusic-foreground flex items-center gap-2">
@@ -796,18 +833,19 @@ export default function SpotMusicAdmin() {
                   placeholder={`<!-- Meta Pixel Code -->\n<script>...</script>\n<noscript>...</noscript>\n<!-- End Meta Pixel Code -->`}
                   className="font-mono text-xs min-h-[200px] bg-spotmusic-dark border-spotmusic-border text-spotmusic-foreground"
                 />
-                <Button onClick={savePixelSettings} disabled={savingPixel} className="bg-spotmusic-green hover:bg-spotmusic-green/90 text-spotmusic-dark">
-                  {savingPixel ? (
-                    <>Salvando...</>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      Salvar Pixel
-                    </>
-                  )}
-                </Button>
               </CardContent>
             </Card>
+
+            <Button onClick={saveSettings} disabled={savingSettings} className="bg-spotmusic-green hover:bg-spotmusic-green/90 text-spotmusic-dark">
+              {savingSettings ? (
+                <>Salvando...</>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Salvar Configurações
+                </>
+              )}
+            </Button>
           </TabsContent>
         </Tabs>
       </div>
