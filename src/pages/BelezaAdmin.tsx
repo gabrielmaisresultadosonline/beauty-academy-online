@@ -37,6 +37,7 @@ interface Enrollment {
   user_id: string;
   is_premium: boolean;
   created_at: string;
+  premium_activated_at?: string;
   certificate_photo_url?: string;
   certificate_issued_at?: string;
   certificate_url?: string;
@@ -46,12 +47,21 @@ interface Enrollment {
   };
 }
 
+interface Payment {
+  id: string;
+  user_id: string;
+  amount: number;
+  status: string;
+  created_at: string;
+}
+
 export default function BelezaAdmin() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [modules, setModules] = useState<Module[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   
   // Settings
   const [pixelCode, setPixelCode] = useState('');
@@ -115,18 +125,20 @@ export default function BelezaAdmin() {
   };
 
   const loadData = async () => {
-    const [modulesRes, lessonsRes, enrollmentsRes] = await Promise.all([
+    const [modulesRes, lessonsRes, enrollmentsRes, paymentsRes] = await Promise.all([
       supabase.from('course_modules').select('*').order('order_index'),
       supabase.from('course_lessons').select('*').order('order_index'),
       supabase.from('course_enrollments').select(`
         *,
         profiles:user_id (full_name, email)
-      `).order('created_at', { ascending: false })
+      `).order('created_at', { ascending: false }),
+      supabase.from('course_payments').select('*').order('created_at', { ascending: false })
     ]);
 
     setModules(modulesRes.data || []);
     setLessons(lessonsRes.data || []);
     setEnrollments(enrollmentsRes.data as any || []);
+    setPayments(paymentsRes.data || []);
     setIsLoading(false);
   };
 
@@ -573,38 +585,113 @@ export default function BelezaAdmin() {
           <TabsContent value="students">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Alunos Inscritos</h2>
             
+            {/* Stats */}
+            <div className="grid md:grid-cols-4 gap-4 mb-6">
+              <Card className="bg-white">
+                <CardContent className="pt-6 text-center">
+                  <p className="text-3xl font-bold text-gray-900">{enrollments.length}</p>
+                  <p className="text-sm text-gray-500">Total</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-white border-green-200">
+                <CardContent className="pt-6 text-center">
+                  <p className="text-3xl font-bold text-green-600">{enrollments.filter(e => e.is_premium).length}</p>
+                  <p className="text-sm text-gray-500">Premium</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-white border-orange-200">
+                <CardContent className="pt-6 text-center">
+                  <p className="text-3xl font-bold text-orange-600">{enrollments.filter(e => !e.is_premium).length}</p>
+                  <p className="text-sm text-gray-500">Pendentes</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-white border-blue-200">
+                <CardContent className="pt-6 text-center">
+                  <p className="text-3xl font-bold text-blue-600">{payments.filter(p => p.status === 'completed').length}</p>
+                  <p className="text-sm text-gray-500">Pagamentos</p>
+                </CardContent>
+              </Card>
+            </div>
+            
             <div className="bg-white rounded-xl shadow-md overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-pink-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cadastro</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pagamento</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {enrollments.map((enrollment) => (
-                      <tr key={enrollment.id}>
-                        <td className="px-6 py-4 text-sm text-gray-900">
-                          {(enrollment.profiles as any)?.full_name || '-'}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {(enrollment.profiles as any)?.email || '-'}
-                        </td>
-                        <td className="px-6 py-4">
-                          {enrollment.is_premium ? (
-                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Premium</span>
-                          ) : (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">Grátis</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
-                          {new Date(enrollment.created_at).toLocaleDateString('pt-BR')}
-                        </td>
-                      </tr>
-                    ))}
+                    {enrollments.map((enrollment) => {
+                      const userPayment = payments.find(p => p.user_id === enrollment.user_id && p.status === 'completed');
+                      return (
+                        <tr key={enrollment.id} className={enrollment.is_premium ? 'bg-green-50/30' : ''}>
+                          <td className="px-4 py-4 text-sm font-medium text-gray-900">
+                            {(enrollment.profiles as any)?.full_name || '-'}
+                          </td>
+                          <td className="px-4 py-4 text-sm text-gray-600">
+                            {(enrollment.profiles as any)?.email || '-'}
+                          </td>
+                          <td className="px-4 py-4">
+                            {enrollment.is_premium ? (
+                              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+                                ✓ Premium
+                              </span>
+                            ) : (
+                              <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                                Pendente
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 text-sm text-gray-500">
+                            {new Date(enrollment.created_at).toLocaleDateString('pt-BR')}
+                          </td>
+                          <td className="px-4 py-4 text-sm">
+                            {userPayment ? (
+                              <div className="text-green-600">
+                                <p className="font-medium">R$ {userPayment.amount}</p>
+                                <p className="text-xs">{new Date(userPayment.created_at).toLocaleDateString('pt-BR')}</p>
+                              </div>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4">
+                            {!enrollment.is_premium && (
+                              <Button
+                                size="sm"
+                                className="bg-green-500 hover:bg-green-600 text-xs"
+                                onClick={async () => {
+                                  const { error } = await supabase
+                                    .from('course_enrollments')
+                                    .update({ 
+                                      is_premium: true, 
+                                      premium_activated_at: new Date().toISOString() 
+                                    })
+                                    .eq('id', enrollment.id);
+                                  if (!error) {
+                                    toast({ title: "Premium ativado!" });
+                                    loadData();
+                                  }
+                                }}
+                              >
+                                Ativar Premium
+                              </Button>
+                            )}
+                            {enrollment.is_premium && enrollment.premium_activated_at && (
+                              <span className="text-xs text-gray-400">
+                                Ativado em {new Date(enrollment.premium_activated_at).toLocaleDateString('pt-BR')}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
