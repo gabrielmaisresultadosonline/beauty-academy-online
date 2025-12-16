@@ -125,19 +125,24 @@ export default function BelezaAdmin() {
   };
 
   const loadData = async () => {
-    const [modulesRes, lessonsRes, enrollmentsRes, paymentsRes] = await Promise.all([
+    const [modulesRes, lessonsRes, enrollmentsRes, paymentsRes, profilesRes] = await Promise.all([
       supabase.from('course_modules').select('*').order('order_index'),
       supabase.from('course_lessons').select('*').order('order_index'),
-      supabase.from('course_enrollments').select(`
-        *,
-        profiles:user_id (full_name, email)
-      `).order('created_at', { ascending: false }),
-      supabase.from('course_payments').select('*').order('created_at', { ascending: false })
+      supabase.from('course_enrollments').select('*').order('created_at', { ascending: false }),
+      supabase.from('course_payments').select('*').order('created_at', { ascending: false }),
+      supabase.from('profiles').select('user_id, full_name, email')
     ]);
+
+    // Combine enrollments with profiles
+    const profilesMap = new Map((profilesRes.data || []).map(p => [p.user_id, p]));
+    const enrollmentsWithProfiles = (enrollmentsRes.data || []).map(e => ({
+      ...e,
+      profiles: profilesMap.get(e.user_id) || null
+    }));
 
     setModules(modulesRes.data || []);
     setLessons(lessonsRes.data || []);
-    setEnrollments(enrollmentsRes.data as any || []);
+    setEnrollments(enrollmentsWithProfiles as any);
     setPayments(paymentsRes.data || []);
     setIsLoading(false);
   };
