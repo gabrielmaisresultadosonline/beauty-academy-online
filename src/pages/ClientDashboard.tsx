@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Zap, CreditCard, LogOut, CheckCircle, Clock, ArrowRight, FileText, Send, AlertTriangle, Calendar, Lock, Edit } from "lucide-react";
+import { Zap, CreditCard, LogOut, CheckCircle, Clock, ArrowRight, FileText, Send, AlertTriangle, Calendar, Lock, Edit, Check } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface ClientData {
