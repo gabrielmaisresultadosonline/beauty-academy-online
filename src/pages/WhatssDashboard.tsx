@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,12 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { 
-  MessageSquare, 
-  QrCode, 
-  Wifi, 
-  WifiOff, 
-  Settings, 
+import {
+  MessageSquare,
+  QrCode,
+  Wifi,
+  WifiOff,
+  Settings,
   RefreshCw,
   Check,
   Loader2,
@@ -20,7 +19,6 @@ import {
   Trash2,
   Save,
   AlertTriangle,
-  ExternalLink
 } from "lucide-react";
 
 interface ConnectionInfo {
@@ -31,18 +29,42 @@ interface ConnectionInfo {
   phoneNumber?: string;
 }
 
-// Configuração padrão para o servidor acessar.click
-// Use http://localhost:8080 se estiver acessando da própria VPS
-const DEFAULT_API_URL = "http://localhost:8080";
+// Detecta se está rodando no preview do Lovable
+const isLovablePreview =
+  window.location.hostname.includes("lovableproject.com") ||
+  window.location.hostname.includes("lovable.app");
+
+// Em produção (no seu domínio), use um proxy no Nginx: https://SEU_DOMINIO/evo -> http://127.0.0.1:8080
+const getDefaultApiUrl = () => {
+  try {
+    return `${window.location.origin}/evo`;
+  } catch {
+    return "";
+  }
+};
+
+const DEFAULT_API_URL = getDefaultApiUrl();
 const DEFAULT_API_KEY = "lov_evo_2024_X7kM9pL2qR5tY8wZ";
 
-// Detecta se está rodando no Lovable preview
-const isLovablePreview = window.location.hostname.includes('lovableproject.com') || 
-                          window.location.hostname.includes('lovable.app');
-
 const WhatssDashboard = () => {
-  // API Configuration - pré-configurado para acessar.click
-  const [apiUrl, setApiUrl] = useState(() => localStorage.getItem("evo_api_url") || DEFAULT_API_URL);
+  // API Configuration
+  const [apiUrl, setApiUrl] = useState(() => {
+    const stored = localStorage.getItem("evo_api_url");
+    if (!stored) return DEFAULT_API_URL;
+
+    const hostname = window.location.hostname;
+    const isLocal = hostname === "localhost" || hostname === "127.0.0.1";
+    const isHttpsPage = window.location.protocol === "https:";
+
+    // Se o usuário salvou localhost, isso aponta para o computador dele (não para a VPS)
+    if (!isLocal && stored.includes("localhost")) return DEFAULT_API_URL;
+
+    // Se a página é HTTPS e a API está em HTTP, o navegador bloqueia (Failed to fetch)
+    if (!isLocal && isHttpsPage && stored.startsWith("http://")) return DEFAULT_API_URL;
+
+    return stored;
+  });
+
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("evo_api_key") || DEFAULT_API_KEY);
   const [isConfigSaved, setIsConfigSaved] = useState(false);
   const [isTestingConnection, setIsTestingConnection] = useState(false);
@@ -423,15 +445,27 @@ const WhatssDashboard = () => {
           <Alert className="mb-6 bg-amber-900/30 border-amber-600/50">
             <AlertTriangle className="h-4 w-4 text-amber-400" />
             <AlertDescription className="text-amber-200">
-              <strong>Atenção:</strong> Este dashboard precisa ser acessado diretamente da sua VPS para funcionar. 
-              O preview do Lovable não consegue se conectar à Evolution API devido a restrições de segurança do navegador (CORS).
+              <strong>Atenção:</strong> No preview do Lovable a conexão com a Evolution API falha por restrições do navegador.
               <br />
-              <span className="text-amber-400 font-medium">
-                Acesse: https://acessar.click/whatss após fazer o deploy.
-              </span>
+              <span className="text-amber-400 font-medium">Acesse no seu domínio após o deploy.</span>
             </AlertDescription>
           </Alert>
         )}
+
+        {/* Alerta de HTTPS -> HTTP (Mixed Content) */}
+        {!isLovablePreview && window.location.protocol === "https:" && apiUrl.startsWith("http://") && (
+          <Alert className="mb-6 bg-amber-900/30 border-amber-600/50">
+            <AlertTriangle className="h-4 w-4 text-amber-400" />
+            <AlertDescription className="text-amber-200">
+              <strong>Bloqueio do navegador:</strong> seu site está em <b>HTTPS</b> e a API está em <b>HTTP</b>.
+              Isso causa <b>Failed to fetch</b>.
+              <br />
+              Use a URL <span className="text-amber-400 font-medium">{window.location.origin}/evo</span> e configure o proxy do Nginx.
+              (Veja o arquivo <b>HOSTINGER_NGINX_EVOLUTION_PROXY.md</b> no seu servidor.)
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="grid gap-6 lg:grid-cols-2">
           {/* API Configuration Card */}
           <Card className="bg-gray-900/50 border-emerald-800/30 backdrop-blur-sm">
@@ -449,7 +483,7 @@ const WhatssDashboard = () => {
                 <Label htmlFor="apiUrl" className="text-gray-300">URL da API</Label>
                 <Input
                   id="apiUrl"
-                  placeholder="https://seu-servidor.com ou http://localhost:8080"
+                  placeholder={`${window.location.origin}/evo`}
                   value={apiUrl}
                   onChange={(e) => setApiUrl(e.target.value)}
                   className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500"
