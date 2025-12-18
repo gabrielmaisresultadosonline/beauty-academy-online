@@ -68,6 +68,11 @@ serve(async (req) => {
         method = 'GET';
         break;
 
+      case 'restart-instance':
+        endpoint = `/instance/restart/${instanceName}`;
+        method = 'PUT';
+        break;
+
       case 'logout':
         endpoint = `/instance/logout/${instanceName}`;
         method = 'DELETE';
