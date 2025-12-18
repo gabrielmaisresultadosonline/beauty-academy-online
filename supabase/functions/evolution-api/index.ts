@@ -52,8 +52,10 @@ serve(async (req) => {
       case 'create-instance':
         endpoint = '/instance/create';
         body = {
-          instanceName: instanceName,
-          qrcode: true
+          instanceName,
+          qrcode: true,
+          // Evolution API exige "integration"; para QR Code (WhatsApp Web) o valor padrão é BAILEYS.
+          integration: data?.integration ?? 'WHATSAPP-BAILEYS',
         };
         break;
 
@@ -69,7 +71,7 @@ serve(async (req) => {
 
       case 'logout':
         endpoint = `/instance/logout/${instanceName}`;
-        method = 'DELETE';
+        method = 'POST';
         break;
 
       case 'delete-instance':
