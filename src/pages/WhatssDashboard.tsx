@@ -96,6 +96,15 @@ const WhatssDashboard = () => {
   const [existingInstances, setExistingInstances] = useState<any[]>([]);
   const [isLoadingInstances, setIsLoadingInstances] = useState(false);
 
+  // Debug state
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugLogs, setDebugLogs] = useState<Array<{ time: string; type: string; data: any }>>([]);
+
+  const addDebugLog = (type: string, data: any) => {
+    const time = new Date().toLocaleTimeString();
+    setDebugLogs((prev) => [...prev.slice(-19), { time, type, data }]);
+  };
+
   // Check if config exists on load
   useEffect(() => {
     if (apiUrl && apiKey && !isLovablePreview) {
@@ -315,6 +324,7 @@ const WhatssDashboard = () => {
         if (qrResponse.ok) {
           const qrData = await qrResponse.json();
           console.log("QR Response:", qrData);
+          addDebugLog("connect", qrData);
 
           const qrValue = extractQrValue(qrData);
           if (qrValue) {
@@ -336,6 +346,7 @@ const WhatssDashboard = () => {
         if (stateResponse.ok) {
           const stateData = await stateResponse.json();
           console.log("State:", stateData);
+          addDebugLog("state", stateData);
 
           if (stateData.instance?.state === "open") {
             setIsPollingQR(false);
@@ -798,6 +809,84 @@ const WhatssDashboard = () => {
               )}
             </CardContent>
           </Card>
+        </div>
+
+        {/* Debug Panel */}
+        <div className="mt-6">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowDebug(!showDebug)}
+            className="border-gray-700 text-gray-400 hover:bg-gray-800 mb-4"
+          >
+            {showDebug ? "Ocultar Debug" : "Mostrar Debug"}
+          </Button>
+
+          {showDebug && (
+            <Card className="bg-gray-900/80 border-amber-800/40 backdrop-blur-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-amber-400 text-sm">
+                  <Settings className="h-4 w-4" />
+                  Painel de Debug
+                </CardTitle>
+                <CardDescription className="text-gray-500 text-xs">
+                  Últimas respostas da Evolution API (connect &amp; connectionState)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 max-h-64 overflow-y-auto text-xs font-mono">
+                  {debugLogs.length === 0 ? (
+                    <p className="text-gray-500">Nenhum log ainda. Crie uma instância para ver as respostas.</p>
+                  ) : (
+                    debugLogs.map((log, i) => (
+                      <div
+                        key={i}
+                        className={`p-2 rounded border ${
+                          log.type === "connect"
+                            ? "bg-blue-900/20 border-blue-800/40"
+                            : "bg-purple-900/20 border-purple-800/40"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-gray-500">{log.time}</span>
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[10px] uppercase ${
+                              log.type === "connect"
+                                ? "bg-blue-600/30 text-blue-300"
+                                : "bg-purple-600/30 text-purple-300"
+                            }`}
+                          >
+                            {log.type}
+                          </span>
+                          {log.data?.count === 0 && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-red-600/30 text-red-300">
+                              count:0 (sem QR)
+                            </span>
+                          )}
+                          {log.data?.instance?.state && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-600/30 text-emerald-300">
+                              state: {log.data.instance.state}
+                            </span>
+                          )}
+                        </div>
+                        <pre className="text-gray-400 whitespace-pre-wrap break-all">
+                          {JSON.stringify(log.data, null, 2)}
+                        </pre>
+                      </div>
+                    ))
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setDebugLogs([])}
+                  className="mt-2 text-gray-500 hover:text-gray-300"
+                >
+                  Limpar logs
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
     </div>
