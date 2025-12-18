@@ -107,20 +107,33 @@ export const WhatsAppConnections = () => {
 
       if (dbError) throw dbError;
 
-      // 3. Get QR Code
+      // 3. Get QR Code with polling/retry
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for instance to be ready
       
-      const qrResponse = await callEvolutionAPI('get-qrcode', instanceName);
-      console.log('QR Response:', qrResponse);
+      // Poll for QR code
+      let qrBase64: string | null = null;
+      for (let attempt = 1; attempt <= 8; attempt++) {
+        console.log(`[Create] QR poll attempt ${attempt}/8`);
+        try {
+          const qrResponse = await callEvolutionAPI('get-qrcode', instanceName);
+          console.log('QR Response:', qrResponse);
 
-      let qrBase64 = null;
-      if (qrResponse?.base64) {
-        qrBase64 = qrResponse.base64;
-      } else if (qrResponse?.qrcode?.base64) {
-        qrBase64 = qrResponse.qrcode.base64;
-      } else if (qrResponse?.code) {
-        // If we get a code instead of base64, generate QR from code
-        qrBase64 = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrResponse.code)}`;
+          if (qrResponse?.base64) {
+            qrBase64 = qrResponse.base64;
+          } else if (qrResponse?.qrcode?.base64) {
+            qrBase64 = qrResponse.qrcode.base64;
+          } else if (qrResponse?.code) {
+            qrBase64 = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrResponse.code)}`;
+          }
+          
+          if (qrBase64) break;
+        } catch (err) {
+          console.log(`[Create] QR attempt ${attempt} failed:`, err);
+        }
+        
+        if (attempt < 8) {
+          await new Promise(resolve => setTimeout(resolve, 1500 + attempt * 500));
+        }
       }
 
       if (qrBase64) {
@@ -129,6 +142,8 @@ export const WhatsAppConnections = () => {
           .from("whatsapp_connections")
           .update({ qr_code: qrBase64 })
           .eq("id", dbConnection.id);
+      } else {
+        toast.warning("QR Code não disponível ainda. Use 'Atualizar QR'.");
       }
 
       setCurrentInstanceId(dbConnection.id);
@@ -193,39 +208,101 @@ export const WhatsAppConnections = () => {
     }, 120000);
   };
 
+  const pollForQRCode = async (instanceName: string, maxAttempts = 10): Promise<string | null> => {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      console.log(`[QR Poll] Attempt ${attempt}/${maxAttempts} for ${instanceName}`);
+      
+      try {
+        const qrResponse = await callEvolutionAPI('get-qrcode', instanceName);
+        console.log(`[QR Poll] Response:`, qrResponse);
+        
+        // Check for QR code in various formats
+        let qrBase64 = null;
+        if (qrResponse?.base64) {
+          qrBase64 = qrResponse.base64;
+        } else if (qrResponse?.qrcode?.base64) {
+          qrBase64 = qrResponse.qrcode.base64;
+        } else if (qrResponse?.code) {
+          // If we get a code string, use external QR generator
+          qrBase64 = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrResponse.code)}`;
+        }
+        
+        if (qrBase64) {
+          return qrBase64;
+        }
+      } catch (error) {
+        console.log(`[QR Poll] Attempt ${attempt} failed:`, error);
+      }
+      
+      // Wait before next attempt (increasing delay)
+      if (attempt < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 1500 + attempt * 500));
+      }
+    }
+    return null;
+  };
+
+  const ensureInstanceExists = async (instanceName: string): Promise<boolean> => {
+    try {
+      // Check if instance exists by getting status
+      const statusResponse = await callEvolutionAPI('get-status', instanceName);
+      console.log('[ensureInstance] Status:', statusResponse);
+      return true;
+    } catch (error: any) {
+      console.log('[ensureInstance] Instance not found, creating...', error.message);
+      
+      // Instance doesn't exist, create it
+      try {
+        await callEvolutionAPI('create-instance', instanceName);
+        // Wait for instance to initialize
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        return true;
+      } catch (createError) {
+        console.error('[ensureInstance] Failed to create:', createError);
+        return false;
+      }
+    }
+  };
+
   const refreshQRCode = async (connection: Connection) => {
+    const toastId = toast.loading("Atualizando QR Code...");
+    
     try {
       const sessionData = connection.session_data as any;
       const instanceName = sessionData?.instanceName;
       
       if (!instanceName) {
-        toast.error("Instância não encontrada");
+        toast.error("Instância não encontrada", { id: toastId });
         return;
       }
 
-      const qrResponse = await callEvolutionAPI('get-qrcode', instanceName);
-      
-      let qrBase64 = null;
-      if (qrResponse?.base64) {
-        qrBase64 = qrResponse.base64;
-      } else if (qrResponse?.qrcode?.base64) {
-        qrBase64 = qrResponse.qrcode.base64;
+      // Ensure instance exists (create if needed)
+      const instanceReady = await ensureInstanceExists(instanceName);
+      if (!instanceReady) {
+        toast.error("Erro ao preparar instância", { id: toastId });
+        return;
       }
+
+      // Poll for QR code with retries
+      const qrBase64 = await pollForQRCode(instanceName);
 
       if (qrBase64) {
         await supabase
           .from("whatsapp_connections")
-          .update({ qr_code: qrBase64 })
+          .update({ qr_code: qrBase64, status: "waiting_qr" })
           .eq("id", connection.id);
 
-        toast.success("QR Code atualizado!");
+        toast.success("QR Code atualizado!", { id: toastId });
         fetchConnections();
         
-        // Start polling again
+        // Start polling for connection status
         startStatusPolling(connection.id, instanceName);
+      } else {
+        toast.error("Não foi possível obter o QR Code. Tente novamente.", { id: toastId });
       }
     } catch (error: any) {
-      toast.error(error.message || "Erro ao atualizar QR Code");
+      console.error('[refreshQRCode] Error:', error);
+      toast.error(error.message || "Erro ao atualizar QR Code", { id: toastId });
     }
   };
 
