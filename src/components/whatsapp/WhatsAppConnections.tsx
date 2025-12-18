@@ -92,13 +92,8 @@ export const WhatsAppConnections = () => {
       const createResponse = await callEvolutionAPI('create-instance', instanceName);
       console.log('Create response:', createResponse);
 
-      // Force restart to trigger QR generation (Evolution sometimes stays at count:0)
-      try {
-        await callEvolutionAPI('restart-instance', instanceName);
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-      } catch (e) {
-        console.log('[Create] restart-instance failed (ignored):', e);
-      }
+      // Wait a bit for instance to initialize before polling QR
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // 2. Save to database
       const { data: dbConnection, error: dbError } = await supabase
@@ -291,12 +286,12 @@ export const WhatsAppConnections = () => {
         return;
       }
 
-      // Force restart to re-trigger QR generation (avoid endless {count:0})
+      // Logout + reconnect to force new QR generation (restart endpoint doesn't exist in v2.2.3)
       try {
-        await callEvolutionAPI('restart-instance', instanceName);
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        await callEvolutionAPI('logout', instanceName);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       } catch (e) {
-        console.log('[Refresh] restart-instance failed (ignored):', e);
+        console.log('[Refresh] logout failed (ignored):', e);
       }
 
       // Poll for QR code with retries
