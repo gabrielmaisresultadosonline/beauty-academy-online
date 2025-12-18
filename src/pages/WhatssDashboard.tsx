@@ -28,10 +28,14 @@ interface ConnectionInfo {
   phoneNumber?: string;
 }
 
+// Configuração padrão para o servidor acessar.click
+const DEFAULT_API_URL = "http://72.62.9.229:8080";
+const DEFAULT_API_KEY = "lov_evo_2024_X7kM9pL2qR5tY8wZ";
+
 const WhatssDashboard = () => {
-  // API Configuration
-  const [apiUrl, setApiUrl] = useState(() => localStorage.getItem("evo_api_url") || "");
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem("evo_api_key") || "");
+  // API Configuration - pré-configurado para acessar.click
+  const [apiUrl, setApiUrl] = useState(() => localStorage.getItem("evo_api_url") || DEFAULT_API_URL);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem("evo_api_key") || DEFAULT_API_KEY);
   const [isConfigSaved, setIsConfigSaved] = useState(false);
   const [isTestingConnection, setIsTestingConnection] = useState(false);
 
