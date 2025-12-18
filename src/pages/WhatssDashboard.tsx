@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import { Helmet } from "react-helmet-async";
+import * as QRCodeLib from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -45,6 +47,21 @@ const getDefaultApiUrl = () => {
 
 const DEFAULT_API_URL = getDefaultApiUrl();
 const DEFAULT_API_KEY = "lov_evo_2024_X7kM9pL2qR5tY8wZ";
+
+const isProbablyBase64 = (value: string) => /^[A-Za-z0-9+/=]+$/.test(value) && value.length > 200;
+
+const normalizeQrToDataUrl = async (value: string) => {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("data:image")) return trimmed;
+  if (isProbablyBase64(trimmed)) return `data:image/png;base64,${trimmed}`;
+
+  // Quando a API retorna o conteúdo do QR (texto), geramos a imagem no frontend
+  return await QRCodeLib.toDataURL(trimmed, { margin: 1, width: 256 });
+};
+
+const extractQrValue = (data: any): string | null => {
+  return (data?.base64 ?? data?.qrcode?.base64 ?? data?.code ?? data?.qrcode?.code ?? null) as string | null;
+};
 
 const WhatssDashboard = () => {
   // API Configuration
@@ -251,9 +268,10 @@ const WhatssDashboard = () => {
       const createData = await createResponse.json();
       console.log("Create response:", createData);
 
-      // Check if QR code is in response
-      if (createData.qrcode?.base64) {
-        setQrCode(createData.qrcode.base64);
+      const qrValue = extractQrValue(createData);
+      if (qrValue) {
+        const dataUrl = await normalizeQrToDataUrl(qrValue);
+        setQrCode(dataUrl);
         toast.success("QR Code gerado! Escaneie com seu WhatsApp");
         startPollingStatus();
       } else {
@@ -298,9 +316,10 @@ const WhatssDashboard = () => {
           const qrData = await qrResponse.json();
           console.log("QR Response:", qrData);
 
-          if (qrData.base64 || qrData.qrcode?.base64) {
-            const qrBase64 = qrData.base64 || qrData.qrcode?.base64;
-            setQrCode(qrBase64);
+          const qrValue = extractQrValue(qrData);
+          if (qrValue) {
+            const dataUrl = await normalizeQrToDataUrl(qrValue);
+            setQrCode(dataUrl);
             setIsPollingQR(false);
             toast.success("QR Code gerado!");
             startPollingStatus();
@@ -423,7 +442,13 @@ const WhatssDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-950 via-gray-900 to-gray-950">
+    <>
+      <Helmet>
+        <title>Conectar WhatsApp via QR Code | Acessar.click</title>
+        <meta name="description" content="Dashboard para conectar WhatsApp ao Web WhatsApp via Evolution API: gerar QR Code, escanear e salvar conexão." />
+        <link rel="canonical" href="https://acessar.click/whatss" />
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-950 via-gray-900 to-gray-950">
       {/* Header */}
       <header className="border-b border-emerald-800/30 bg-black/20 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
@@ -663,7 +688,7 @@ const WhatssDashboard = () => {
                 {qrCode ? (
                   <div className="p-4 bg-white rounded-xl">
                     <img
-                      src={qrCode.startsWith("data:") ? qrCode : `data:image/png;base64,${qrCode}`}
+                      src={qrCode}
                       alt="QR Code"
                       className="w-56 h-56"
                     />
@@ -776,6 +801,7 @@ const WhatssDashboard = () => {
         </div>
       </main>
     </div>
+    </>
   );
 };
 
