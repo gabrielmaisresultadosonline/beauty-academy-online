@@ -80,7 +80,11 @@ export const WhatsAppConnections = () => {
     setCreating(true);
     setQrCodeData(null);
 
-    const instanceName = `${newConnectionName.replace(/\s+/g, '_')}_${Date.now()}`;
+    const instanceName = `${newConnectionName
+      .trim()
+      .replace(/[^a-zA-Z0-9_-]+/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_+|_+$/g, "")}_${Date.now()}`;
 
     try {
       // 1. Create instance in Evolution API

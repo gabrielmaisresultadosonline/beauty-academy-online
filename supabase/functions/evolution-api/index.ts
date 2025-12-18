@@ -128,14 +128,39 @@ serve(async (req) => {
       console.log(`[Evolution API] Body:`, JSON.stringify(body));
     }
 
-    const response = await fetch(url, fetchOptions);
-    const responseData = await response.json();
+    const controller = new AbortController();
+    const timeoutMs = 12000;
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    let response: Response;
+    try {
+      response = await fetch(url, { ...fetchOptions, signal: controller.signal });
+    } catch (e: unknown) {
+      const isAbort = e instanceof Error && (e as Error).name === 'AbortError';
+      if (isAbort) {
+        throw new Error(`Timeout ao conectar na Evolution API (${timeoutMs}ms). Verifique se a API está online/publica.`);
+      }
+      throw e;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    const rawText = await response.text();
+    let responseData: any = null;
+    try {
+      responseData = rawText ? JSON.parse(rawText) : null;
+    } catch {
+      responseData = { raw: rawText };
+    }
 
     console.log(`[Evolution API] Response status: ${response.status}`);
-    console.log(`[Evolution API] Response:`, JSON.stringify(responseData));
+    console.log(`[Evolution API] Response:`, typeof responseData === 'string' ? responseData : JSON.stringify(responseData));
 
     if (!response.ok) {
-      throw new Error(responseData.message || `API error: ${response.status}`);
+      const msg = (responseData && (responseData.message || responseData.error))
+        ? (responseData.message || responseData.error)
+        : `API error: ${response.status}`;
+      throw new Error(msg);
     }
 
     return new Response(JSON.stringify(responseData), {
