@@ -65,12 +65,41 @@ export const WhatsAppConnections = () => {
     };
   }, [user]);
 
-  const callEvolutionAPI = async (action: string, instanceName: string, data?: any) => {
-    const { data: response, error } = await supabase.functions.invoke('evolution-api', {
-      body: { action, instanceName, data }
-    });
+  const callEvolutionAPI = async (
+    action: string,
+    instanceName: string,
+    data?: any
+  ) => {
+    const { data: response, error } = await supabase.functions.invoke(
+      "evolution-api",
+      {
+        body: { action, instanceName, data },
+      }
+    );
 
-    if (error) throw error;
+    if (error) {
+      const anyErr = error as any;
+      let message = error.message || "Erro ao chamar o backend";
+
+      // Tenta extrair o corpo JSON do erro para mostrar uma mensagem real (ex: Not Found, Unauthorized, etc.)
+      try {
+        const ctx = anyErr?.context;
+        if (ctx && typeof ctx.text === "function") {
+          const text = await ctx.text();
+          try {
+            const parsed = text ? JSON.parse(text) : null;
+            message = parsed?.error || parsed?.message || message;
+          } catch {
+            message = text || message;
+          }
+        }
+      } catch {
+        // ignore
+      }
+
+      throw new Error(message);
+    }
+
     if (response?.error) throw new Error(response.error);
     return response;
   };
@@ -88,12 +117,9 @@ export const WhatsAppConnections = () => {
 
     try {
       // 1. Create instance in Evolution API
-      console.log('Creating instance:', instanceName);
-      const createResponse = await callEvolutionAPI('create-instance', instanceName);
-      console.log('Create response:', createResponse);
-
-      // Wait a bit for instance to initialize before polling QR
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log("Creating instance:", instanceName);
+      const createResponse = await callEvolutionAPI("create-instance", instanceName);
+      console.log("Create response:", createResponse);
 
       // 2. Save to database
       const { data: dbConnection, error: dbError } = await supabase
@@ -103,7 +129,7 @@ export const WhatsAppConnections = () => {
           name: newConnectionName,
           status: "waiting_qr",
           qr_code: null,
-          session_data: { instanceName }
+          session_data: { instanceName },
         })
         .select()
         .single();
@@ -111,9 +137,10 @@ export const WhatsAppConnections = () => {
       if (dbError) throw dbError;
 
       // 3. Get QR Code with polling/retry
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for instance to be ready
+      // (Na Evolution, é comum demorar 10-60s até o QR realmente aparecer)
+      await new Promise((resolve) => setTimeout(resolve, 2500));
 
-      const qrBase64 = await pollForQRCode(instanceName, 12);
+      const qrBase64 = await pollForQRCode(instanceName, 24);
 
       if (qrBase64) {
         setQrCodeData(qrBase64);
@@ -124,7 +151,11 @@ export const WhatsAppConnections = () => {
 
         toast.success("QR Code gerado! Escaneie com seu WhatsApp.");
       } else {
-        toast.warning("QR Code não disponível ainda. Use 'Atualizar QR'.");
+        // Importante: não travar o modal caso ainda não tenha QR.
+        // Fecha o modal e deixa o usuário usar "Atualizar QR" no card.
+        toast.warning("QR Code ainda não apareceu. Clique em 'Atualizar QR'.");
+        setShowModal(false);
+        setNewConnectionName("");
       }
 
       setCurrentInstanceId(dbConnection.id);
@@ -134,8 +165,9 @@ export const WhatsAppConnections = () => {
 
       fetchConnections();
     } catch (error: any) {
-      console.error('Error creating connection:', error);
+      console.error("Error creating connection:", error);
       toast.error(error.message || "Erro ao criar conexão");
+    } finally {
       setCreating(false);
     }
   };
@@ -147,19 +179,19 @@ export const WhatsAppConnections = () => {
 
     pollingRef.current = setInterval(async () => {
       try {
-        const statusResponse = await callEvolutionAPI('get-status', instanceName);
-        console.log('Status response:', statusResponse);
+        const statusResponse = await callEvolutionAPI("get-status", instanceName);
+        console.log("Status response:", statusResponse);
 
         const state = statusResponse?.state || statusResponse?.instance?.state;
-        
-        if (state === 'open' || state === 'connected') {
+
+        if (state === "open" || state === "connected") {
           // Connected successfully
           await supabase
             .from("whatsapp_connections")
-            .update({ 
+            .update({
               status: "connected",
               qr_code: null,
-              phone_number: statusResponse?.instance?.owner || null
+              phone_number: statusResponse?.instance?.owner || null,
             })
             .eq("id", connectionId);
 
@@ -174,7 +206,7 @@ export const WhatsAppConnections = () => {
           fetchConnections();
         }
       } catch (error) {
-        console.error('Error polling status:', error);
+        console.error("Error polling status:", error);
       }
     }, 3000);
 
@@ -188,35 +220,49 @@ export const WhatsAppConnections = () => {
     }, 120000);
   };
 
-  const pollForQRCode = async (instanceName: string, maxAttempts = 10): Promise<string | null> => {
+  const pollForQRCode = async (
+    instanceName: string,
+    maxAttempts = 10
+  ): Promise<string | null> => {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       console.log(`[QR Poll] Attempt ${attempt}/${maxAttempts} for ${instanceName}`);
-      
+
       try {
-        const qrResponse = await callEvolutionAPI('get-qrcode', instanceName);
+        const qrResponse = await callEvolutionAPI("get-qrcode", instanceName);
         console.log(`[QR Poll] Response:`, qrResponse);
-        
-        // Check for QR code in various formats
-        let qrBase64 = null;
-        if (qrResponse?.base64) {
-          qrBase64 = qrResponse.base64;
-        } else if (qrResponse?.qrcode?.base64) {
-          qrBase64 = qrResponse.qrcode.base64;
-        } else if (qrResponse?.code) {
-          // If we get a code string, use external QR generator
-          qrBase64 = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrResponse.code)}`;
-        }
-        
-        if (qrBase64) {
-          return qrBase64;
+
+        // A Evolution pode retornar { count: 0 } enquanto ainda está gerando.
+        const count =
+          typeof qrResponse?.count === "number"
+            ? qrResponse.count
+            : typeof qrResponse?.qrcode?.count === "number"
+              ? qrResponse.qrcode.count
+              : undefined;
+
+        if (count === 0) {
+          // ainda não tem QR
+        } else {
+          // Check for QR code in various formats
+          let qrBase64: string | null = null;
+          if (qrResponse?.base64) {
+            qrBase64 = qrResponse.base64;
+          } else if (qrResponse?.qrcode?.base64) {
+            qrBase64 = qrResponse.qrcode.base64;
+          } else if (qrResponse?.qrcode?.code) {
+            qrBase64 = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrResponse.qrcode.code)}`;
+          } else if (qrResponse?.code) {
+            qrBase64 = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrResponse.code)}`;
+          }
+
+          if (qrBase64) return qrBase64;
         }
       } catch (error) {
         console.log(`[QR Poll] Attempt ${attempt} failed:`, error);
       }
-      
-      // Wait before next attempt (increasing delay)
+
+      // Wait before next attempt
       if (attempt < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 1500 + attempt * 500));
+        await new Promise((resolve) => setTimeout(resolve, 2000));
       }
     }
     return null;
