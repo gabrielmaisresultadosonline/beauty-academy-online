@@ -55,7 +55,7 @@ const App = () => (
             <Route path="/demonstracao" element={<DemoLogin />} />
             <Route path="/demonstracao/admin" element={<DemoAdmin />} />
             <Route path="/demonstracao/membro" element={<DemoMembro />} />
-            <Route path="/crmwhatsapp" element={<CRMWhatsApp />} />
+            <Route path="/crmwhatspp" element={<CRMWhatsApp />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
