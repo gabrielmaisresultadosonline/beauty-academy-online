@@ -92,6 +92,14 @@ export const WhatsAppConnections = () => {
       const createResponse = await callEvolutionAPI('create-instance', instanceName);
       console.log('Create response:', createResponse);
 
+      // Force restart to trigger QR generation (Evolution sometimes stays at count:0)
+      try {
+        await callEvolutionAPI('restart-instance', instanceName);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      } catch (e) {
+        console.log('[Create] restart-instance failed (ignored):', e);
+      }
+
       // 2. Save to database
       const { data: dbConnection, error: dbError } = await supabase
         .from("whatsapp_connections")
