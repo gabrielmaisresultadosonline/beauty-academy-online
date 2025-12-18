@@ -53,8 +53,7 @@ serve(async (req) => {
         endpoint = '/instance/create';
         body = {
           instanceName: instanceName,
-          qrcode: true,
-          integration: 'WHATSAPP-BAILEYS'
+          qrcode: true
         };
         break;
 
@@ -69,9 +68,6 @@ serve(async (req) => {
         break;
 
       case 'logout':
-        endpoint = `/instance/logout/${instanceName}`;
-        method = 'DELETE';
-        break;
         endpoint = `/instance/logout/${instanceName}`;
         method = 'DELETE';
         break;
