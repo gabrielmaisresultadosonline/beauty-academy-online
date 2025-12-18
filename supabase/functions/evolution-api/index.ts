@@ -158,9 +158,15 @@ serve(async (req) => {
     console.log(`[Evolution API] Response:`, typeof responseData === 'string' ? responseData : JSON.stringify(responseData));
 
     if (!response.ok) {
-      const msg = (responseData && (responseData.message || responseData.error))
-        ? (responseData.message || responseData.error)
-        : `API error: ${response.status}`;
+      const topMessage = Array.isArray(responseData?.message)
+        ? responseData.message.join(', ')
+        : responseData?.message;
+
+      const nestedMessage = Array.isArray(responseData?.response?.message)
+        ? responseData.response.message.join(', ')
+        : responseData?.response?.message;
+
+      const msg = topMessage || responseData?.error || nestedMessage || `API error: ${response.status}`;
       throw new Error(msg);
     }
 
