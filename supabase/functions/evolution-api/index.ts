@@ -71,7 +71,7 @@ serve(async (req) => {
 
       case 'logout':
         endpoint = `/instance/logout/${instanceName}`;
-        method = 'POST';
+        method = 'DELETE';
         break;
 
       case 'delete-instance':
