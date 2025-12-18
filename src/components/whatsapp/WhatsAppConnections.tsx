@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
   Trash2,
   RefreshCw,
   X,
+  Loader2,
 } from "lucide-react";
 
 interface Connection {
@@ -23,6 +24,7 @@ interface Connection {
   status: string;
   qr_code: string | null;
   created_at: string;
+  session_data: any;
 }
 
 export const WhatsAppConnections = () => {
@@ -32,6 +34,9 @@ export const WhatsAppConnections = () => {
   const [showModal, setShowModal] = useState(false);
   const [newConnectionName, setNewConnectionName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [qrCodeData, setQrCodeData] = useState<string | null>(null);
+  const [currentInstanceId, setCurrentInstanceId] = useState<string | null>(null);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchConnections = async () => {
     if (!user) return;
@@ -53,41 +58,192 @@ export const WhatsAppConnections = () => {
 
   useEffect(() => {
     fetchConnections();
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+      }
+    };
   }, [user]);
+
+  const callEvolutionAPI = async (action: string, instanceName: string, data?: any) => {
+    const { data: response, error } = await supabase.functions.invoke('evolution-api', {
+      body: { action, instanceName, data }
+    });
+
+    if (error) throw error;
+    if (response?.error) throw new Error(response.error);
+    return response;
+  };
 
   const createConnection = async () => {
     if (!user || !newConnectionName.trim()) return;
     setCreating(true);
+    setQrCodeData(null);
+
+    const instanceName = `${newConnectionName.replace(/\s+/g, '_')}_${Date.now()}`;
 
     try {
-      // Generate a fake QR code for demo purposes
-      const fakeQR = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=whatsapp-crm-${Date.now()}`;
-      
-      const { error } = await supabase.from("whatsapp_connections").insert({
-        user_id: user.id,
-        name: newConnectionName,
-        status: "waiting_qr",
-        qr_code: fakeQR,
-      });
+      // 1. Create instance in Evolution API
+      console.log('Creating instance:', instanceName);
+      const createResponse = await callEvolutionAPI('create-instance', instanceName);
+      console.log('Create response:', createResponse);
 
-      if (error) throw error;
-      toast.success("Conexão criada! Escaneie o QR Code.");
-      setShowModal(false);
-      setNewConnectionName("");
+      // 2. Save to database
+      const { data: dbConnection, error: dbError } = await supabase
+        .from("whatsapp_connections")
+        .insert({
+          user_id: user.id,
+          name: newConnectionName,
+          status: "waiting_qr",
+          qr_code: null,
+          session_data: { instanceName }
+        })
+        .select()
+        .single();
+
+      if (dbError) throw dbError;
+
+      // 3. Get QR Code
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for instance to be ready
+      
+      const qrResponse = await callEvolutionAPI('get-qrcode', instanceName);
+      console.log('QR Response:', qrResponse);
+
+      let qrBase64 = null;
+      if (qrResponse?.base64) {
+        qrBase64 = qrResponse.base64;
+      } else if (qrResponse?.qrcode?.base64) {
+        qrBase64 = qrResponse.qrcode.base64;
+      } else if (qrResponse?.code) {
+        // If we get a code instead of base64, generate QR from code
+        qrBase64 = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrResponse.code)}`;
+      }
+
+      if (qrBase64) {
+        setQrCodeData(qrBase64);
+        await supabase
+          .from("whatsapp_connections")
+          .update({ qr_code: qrBase64 })
+          .eq("id", dbConnection.id);
+      }
+
+      setCurrentInstanceId(dbConnection.id);
+      toast.success("QR Code gerado! Escaneie com seu WhatsApp.");
+
+      // 4. Start polling for connection status
+      startStatusPolling(dbConnection.id, instanceName);
+
       fetchConnections();
     } catch (error: any) {
+      console.error('Error creating connection:', error);
       toast.error(error.message || "Erro ao criar conexão");
-    } finally {
       setCreating(false);
     }
   };
 
-  const deleteConnection = async (id: string) => {
+  const startStatusPolling = (connectionId: string, instanceName: string) => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+    }
+
+    pollingRef.current = setInterval(async () => {
+      try {
+        const statusResponse = await callEvolutionAPI('get-status', instanceName);
+        console.log('Status response:', statusResponse);
+
+        const state = statusResponse?.state || statusResponse?.instance?.state;
+        
+        if (state === 'open' || state === 'connected') {
+          // Connected successfully
+          await supabase
+            .from("whatsapp_connections")
+            .update({ 
+              status: "connected",
+              qr_code: null,
+              phone_number: statusResponse?.instance?.owner || null
+            })
+            .eq("id", connectionId);
+
+          toast.success("WhatsApp conectado com sucesso!");
+          clearInterval(pollingRef.current!);
+          pollingRef.current = null;
+          setShowModal(false);
+          setCreating(false);
+          setQrCodeData(null);
+          setCurrentInstanceId(null);
+          setNewConnectionName("");
+          fetchConnections();
+        }
+      } catch (error) {
+        console.error('Error polling status:', error);
+      }
+    }, 3000);
+
+    // Stop polling after 2 minutes
+    setTimeout(() => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        setCreating(false);
+      }
+    }, 120000);
+  };
+
+  const refreshQRCode = async (connection: Connection) => {
     try {
+      const sessionData = connection.session_data as any;
+      const instanceName = sessionData?.instanceName;
+      
+      if (!instanceName) {
+        toast.error("Instância não encontrada");
+        return;
+      }
+
+      const qrResponse = await callEvolutionAPI('get-qrcode', instanceName);
+      
+      let qrBase64 = null;
+      if (qrResponse?.base64) {
+        qrBase64 = qrResponse.base64;
+      } else if (qrResponse?.qrcode?.base64) {
+        qrBase64 = qrResponse.qrcode.base64;
+      }
+
+      if (qrBase64) {
+        await supabase
+          .from("whatsapp_connections")
+          .update({ qr_code: qrBase64 })
+          .eq("id", connection.id);
+
+        toast.success("QR Code atualizado!");
+        fetchConnections();
+        
+        // Start polling again
+        startStatusPolling(connection.id, instanceName);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao atualizar QR Code");
+    }
+  };
+
+  const deleteConnection = async (connection: Connection) => {
+    try {
+      const sessionData = connection.session_data as any;
+      const instanceName = sessionData?.instanceName;
+
+      // Delete from Evolution API if instance exists
+      if (instanceName) {
+        try {
+          await callEvolutionAPI('delete-instance', instanceName);
+        } catch (e) {
+          console.log('Instance may not exist in Evolution API');
+        }
+      }
+
+      // Delete from database
       const { error } = await supabase
         .from("whatsapp_connections")
         .delete()
-        .eq("id", id);
+        .eq("id", connection.id);
 
       if (error) throw error;
       toast.success("Conexão removida!");
@@ -97,18 +253,24 @@ export const WhatsAppConnections = () => {
     }
   };
 
-  const simulateConnect = async (id: string) => {
+  const disconnectWhatsApp = async (connection: Connection) => {
     try {
-      const { error } = await supabase
-        .from("whatsapp_connections")
-        .update({ status: "connected", phone_number: "+55 11 99999-9999" })
-        .eq("id", id);
+      const sessionData = connection.session_data as any;
+      const instanceName = sessionData?.instanceName;
 
-      if (error) throw error;
-      toast.success("WhatsApp conectado!");
+      if (instanceName) {
+        await callEvolutionAPI('logout', instanceName);
+      }
+
+      await supabase
+        .from("whatsapp_connections")
+        .update({ status: "disconnected", qr_code: null, phone_number: null })
+        .eq("id", connection.id);
+
+      toast.success("WhatsApp desconectado!");
       fetchConnections();
     } catch (error: any) {
-      toast.error(error.message || "Erro ao conectar");
+      toast.error(error.message || "Erro ao desconectar");
     }
   };
 
@@ -129,13 +291,30 @@ export const WhatsAppConnections = () => {
     );
   };
 
+  const renderQRCode = (qrCode: string | null) => {
+    if (!qrCode) return null;
+    
+    // Check if it's a base64 image
+    if (qrCode.startsWith('data:image')) {
+      return <img src={qrCode} alt="QR Code" className="w-full h-48 object-contain" />;
+    }
+    
+    // Check if it's a URL
+    if (qrCode.startsWith('http')) {
+      return <img src={qrCode} alt="QR Code" className="w-full h-48 object-contain" />;
+    }
+    
+    // Assume it's raw base64, add data URI prefix
+    return <img src={`data:image/png;base64,${qrCode}`} alt="QR Code" className="w-full h-48 object-contain" />;
+  };
+
   return (
     <div className="p-8 space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Conexões WhatsApp</h1>
-          <p className="text-gray-400">Gerencie suas sessões do WhatsApp</p>
+          <p className="text-gray-400">Gerencie suas sessões do WhatsApp via Evolution API</p>
         </div>
         <Button
           onClick={() => setShowModal(true)}
@@ -151,7 +330,7 @@ export const WhatsAppConnections = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
             <div key={i} className="bg-[#111814]/80 rounded-2xl p-6 animate-pulse">
-              <div className="h-40 bg-gray-700 rounded-xl mb-4" />
+              <div className="h-48 bg-gray-700 rounded-xl mb-4" />
               <div className="h-4 bg-gray-700 rounded w-3/4 mb-2" />
               <div className="h-3 bg-gray-700 rounded w-1/2" />
             </div>
@@ -182,14 +361,10 @@ export const WhatsAppConnections = () => {
               {/* QR Code Area */}
               {connection.status === "waiting_qr" && connection.qr_code ? (
                 <div className="bg-white rounded-xl p-4 mb-4">
-                  <img
-                    src={connection.qr_code}
-                    alt="QR Code"
-                    className="w-full h-40 object-contain"
-                  />
+                  {renderQRCode(connection.qr_code)}
                 </div>
               ) : (
-                <div className="bg-[#0a0f0d] rounded-xl p-4 mb-4 h-48 flex items-center justify-center">
+                <div className="bg-[#0a0f0d] rounded-xl p-4 mb-4 h-56 flex items-center justify-center">
                   <Smartphone className={`w-16 h-16 ${connection.status === "connected" ? "text-[#25D366]" : "text-gray-600"}`} />
                 </div>
               )}
@@ -208,16 +383,26 @@ export const WhatsAppConnections = () => {
                 <div className="flex gap-2 pt-2">
                   {connection.status === "waiting_qr" && (
                     <Button
-                      onClick={() => simulateConnect(connection.id)}
+                      onClick={() => refreshQRCode(connection)}
                       size="sm"
                       className="flex-1 bg-[#25D366]/20 text-[#25D366] hover:bg-[#25D366]/30"
                     >
                       <RefreshCw className="w-4 h-4 mr-1" />
-                      Simular Conexão
+                      Atualizar QR
+                    </Button>
+                  )}
+                  {connection.status === "connected" && (
+                    <Button
+                      onClick={() => disconnectWhatsApp(connection)}
+                      size="sm"
+                      className="flex-1 bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30"
+                    >
+                      <WifiOff className="w-4 h-4 mr-1" />
+                      Desconectar
                     </Button>
                   )}
                   <Button
-                    onClick={() => deleteConnection(connection.id)}
+                    onClick={() => deleteConnection(connection)}
                     size="sm"
                     variant="ghost"
                     className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
@@ -238,42 +423,69 @@ export const WhatsAppConnections = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-white">Nova Conexão</h2>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setQrCodeData(null);
+                  setCreating(false);
+                  setNewConnectionName("");
+                  if (pollingRef.current) {
+                    clearInterval(pollingRef.current);
+                  }
+                }}
                 className="text-gray-400 hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="connectionName" className="text-gray-300">
-                  Nome da conexão
-                </Label>
-                <Input
-                  id="connectionName"
-                  placeholder="Ex: WhatsApp Principal"
-                  value={newConnectionName}
-                  onChange={(e) => setNewConnectionName(e.target.value)}
-                  className="mt-2 bg-[#0a0f0d] border-[#25D366]/20 text-white"
-                />
+            {qrCodeData ? (
+              <div className="space-y-4">
+                <div className="bg-white rounded-xl p-4">
+                  {renderQRCode(qrCodeData)}
+                </div>
+                <p className="text-center text-gray-400 text-sm">
+                  Escaneie o QR Code com seu WhatsApp
+                </p>
+                <div className="flex items-center justify-center gap-2 text-[#25D366]">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-sm">Aguardando conexão...</span>
+                </div>
               </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="connectionName" className="text-gray-300">
+                    Nome da conexão
+                  </Label>
+                  <Input
+                    id="connectionName"
+                    placeholder="Ex: WhatsApp Principal"
+                    value={newConnectionName}
+                    onChange={(e) => setNewConnectionName(e.target.value)}
+                    className="mt-2 bg-[#0a0f0d] border-[#25D366]/20 text-white"
+                    disabled={creating}
+                  />
+                </div>
 
-              <Button
-                onClick={createConnection}
-                disabled={creating || !newConnectionName.trim()}
-                className="w-full bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#22c55e] hover:to-[#0f766e] text-white"
-              >
-                {creating ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <QrCode className="w-4 h-4 mr-2" />
-                    Gerar QR Code
-                  </>
-                )}
-              </Button>
-            </div>
+                <Button
+                  onClick={createConnection}
+                  disabled={creating || !newConnectionName.trim()}
+                  className="w-full bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#22c55e] hover:to-[#0f766e] text-white"
+                >
+                  {creating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Gerando QR Code...
+                    </>
+                  ) : (
+                    <>
+                      <QrCode className="w-4 h-4 mr-2" />
+                      Gerar QR Code
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
