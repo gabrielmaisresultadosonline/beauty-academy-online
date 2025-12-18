@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { 
   MessageSquare, 
@@ -17,7 +18,9 @@ import {
   Loader2,
   Smartphone,
   Trash2,
-  Save
+  Save,
+  AlertTriangle,
+  ExternalLink
 } from "lucide-react";
 
 interface ConnectionInfo {
@@ -29,8 +32,13 @@ interface ConnectionInfo {
 }
 
 // Configuração padrão para o servidor acessar.click
-const DEFAULT_API_URL = "http://72.62.9.229:8080";
+// Use http://localhost:8080 se estiver acessando da própria VPS
+const DEFAULT_API_URL = "http://localhost:8080";
 const DEFAULT_API_KEY = "lov_evo_2024_X7kM9pL2qR5tY8wZ";
+
+// Detecta se está rodando no Lovable preview
+const isLovablePreview = window.location.hostname.includes('lovableproject.com') || 
+                          window.location.hostname.includes('lovable.app');
 
 const WhatssDashboard = () => {
   // API Configuration - pré-configurado para acessar.click
@@ -51,7 +59,7 @@ const WhatssDashboard = () => {
 
   // Check if config exists on load
   useEffect(() => {
-    if (apiUrl && apiKey) {
+    if (apiUrl && apiKey && !isLovablePreview) {
       setIsConfigSaved(true);
       fetchInstances();
     }
@@ -410,6 +418,20 @@ const WhatssDashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Alerta para preview do Lovable */}
+        {isLovablePreview && (
+          <Alert className="mb-6 bg-amber-900/30 border-amber-600/50">
+            <AlertTriangle className="h-4 w-4 text-amber-400" />
+            <AlertDescription className="text-amber-200">
+              <strong>Atenção:</strong> Este dashboard precisa ser acessado diretamente da sua VPS para funcionar. 
+              O preview do Lovable não consegue se conectar à Evolution API devido a restrições de segurança do navegador (CORS).
+              <br />
+              <span className="text-amber-400 font-medium">
+                Acesse: https://acessar.click/whatss após fazer o deploy.
+              </span>
+            </AlertDescription>
+          </Alert>
+        )}
         <div className="grid gap-6 lg:grid-cols-2">
           {/* API Configuration Card */}
           <Card className="bg-gray-900/50 border-emerald-800/30 backdrop-blur-sm">
