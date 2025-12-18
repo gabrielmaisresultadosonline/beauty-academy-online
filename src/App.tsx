@@ -24,6 +24,7 @@ import DemoLogin from "./pages/DemoLogin";
 import DemoAdmin from "./pages/DemoAdmin";
 import DemoMembro from "./pages/DemoMembro";
 import CRMWhatsApp from "./pages/CRMWhatsApp";
+import WhatsAppCRM from "./pages/WhatsAppCRM";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/demonstracao/admin" element={<DemoAdmin />} />
             <Route path="/demonstracao/membro" element={<DemoMembro />} />
             <Route path="/crmwhats" element={<CRMWhatsApp />} />
+            <Route path="/whatsppcrm" element={<WhatsAppCRM />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
