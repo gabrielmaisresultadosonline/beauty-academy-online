@@ -5,7 +5,27 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const EVOLUTION_API_URL = Deno.env.get('EVOLUTION_API_URL');
+// Format IPv6 addresses correctly (wrap in brackets)
+const formatApiUrl = (url: string): string => {
+  if (!url) return url;
+  
+  // Check if it's an IPv6 address without brackets
+  // IPv6 pattern: contains multiple colons and doesn't have brackets
+  const ipv6Pattern = /^(https?:\/\/)([a-fA-F0-9:]+):(\d+)(.*)$/;
+  const match = url.match(ipv6Pattern);
+  
+  if (match) {
+    const [, protocol, ipv6, port, path] = match;
+    // Check if it looks like IPv6 (has multiple colons in the host part)
+    if ((ipv6.match(/:/g) || []).length > 1) {
+      return `${protocol}[${ipv6}]:${port}${path}`;
+    }
+  }
+  
+  return url;
+};
+
+const EVOLUTION_API_URL = formatApiUrl(Deno.env.get('EVOLUTION_API_URL') || '');
 const EVOLUTION_API_KEY = Deno.env.get('EVOLUTION_API_KEY');
 
 serve(async (req) => {
@@ -18,7 +38,7 @@ serve(async (req) => {
     const { action, instanceName, data } = await req.json();
     
     console.log(`[Evolution API] Action: ${action}, Instance: ${instanceName}`);
-    console.log(`[Evolution API] URL: ${EVOLUTION_API_URL}`);
+    console.log(`[Evolution API] Formatted URL: ${EVOLUTION_API_URL}`);
 
     if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY) {
       throw new Error('Evolution API credentials not configured');
