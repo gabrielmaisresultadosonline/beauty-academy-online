@@ -291,8 +291,16 @@ export const WhatsAppConnections = () => {
         return;
       }
 
+      // Force restart to re-trigger QR generation (avoid endless {count:0})
+      try {
+        await callEvolutionAPI('restart-instance', instanceName);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      } catch (e) {
+        console.log('[Refresh] restart-instance failed (ignored):', e);
+      }
+
       // Poll for QR code with retries
-      const qrBase64 = await pollForQRCode(instanceName);
+      const qrBase64 = await pollForQRCode(instanceName, 12);
 
       if (qrBase64) {
         await supabase
