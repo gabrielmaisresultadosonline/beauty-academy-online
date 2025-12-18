@@ -111,33 +111,9 @@ export const WhatsAppConnections = () => {
       if (dbError) throw dbError;
 
       // 3. Get QR Code with polling/retry
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for instance to be ready
-      
-      // Poll for QR code
-      let qrBase64: string | null = null;
-      for (let attempt = 1; attempt <= 8; attempt++) {
-        console.log(`[Create] QR poll attempt ${attempt}/8`);
-        try {
-          const qrResponse = await callEvolutionAPI('get-qrcode', instanceName);
-          console.log('QR Response:', qrResponse);
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for instance to be ready
 
-          if (qrResponse?.base64) {
-            qrBase64 = qrResponse.base64;
-          } else if (qrResponse?.qrcode?.base64) {
-            qrBase64 = qrResponse.qrcode.base64;
-          } else if (qrResponse?.code) {
-            qrBase64 = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrResponse.code)}`;
-          }
-          
-          if (qrBase64) break;
-        } catch (err) {
-          console.log(`[Create] QR attempt ${attempt} failed:`, err);
-        }
-        
-        if (attempt < 8) {
-          await new Promise(resolve => setTimeout(resolve, 1500 + attempt * 500));
-        }
-      }
+      const qrBase64 = await pollForQRCode(instanceName, 12);
 
       if (qrBase64) {
         setQrCodeData(qrBase64);
@@ -145,12 +121,13 @@ export const WhatsAppConnections = () => {
           .from("whatsapp_connections")
           .update({ qr_code: qrBase64 })
           .eq("id", dbConnection.id);
+
+        toast.success("QR Code gerado! Escaneie com seu WhatsApp.");
       } else {
         toast.warning("QR Code não disponível ainda. Use 'Atualizar QR'.");
       }
 
       setCurrentInstanceId(dbConnection.id);
-      toast.success("QR Code gerado! Escaneie com seu WhatsApp.");
 
       // 4. Start polling for connection status
       startStatusPolling(dbConnection.id, instanceName);
