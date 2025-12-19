@@ -910,14 +910,19 @@ const WhatssDashboard = () => {
                           >
                             {log.type}
                           </span>
-                          {log.data?.count === 0 && (
+                          {!log.ok && (
                             <span className="px-1.5 py-0.5 rounded text-[10px] bg-red-600/30 text-red-300">
+                              {log.status} (erro)
+                            </span>
+                          )}
+                          {(log.data as any)?.count === 0 && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-orange-600/30 text-orange-300">
                               count:0 (sem QR)
                             </span>
                           )}
-                          {log.data?.instance?.state && (
+                          {(log.data as any)?.instance?.state && (
                             <span className="px-1.5 py-0.5 rounded text-[10px] bg-emerald-600/30 text-emerald-300">
-                              state: {log.data.instance.state}
+                              state: {(log.data as any).instance.state}
                             </span>
                           )}
                         </div>
