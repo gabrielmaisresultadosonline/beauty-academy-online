@@ -309,10 +309,10 @@ const WhatssDashboard = () => {
         const dataUrl = await normalizeQrToDataUrl(qrValue);
         setQrCode(dataUrl);
         toast.success("QR Code gerado! Escaneie com seu WhatsApp");
-        startPollingStatus();
+        startPollingStatus(instanceName);
       } else {
         // Start polling for QR
-        startPollingQR();
+        startPollingQR(instanceName);
       }
 
     } catch (error: any) {
@@ -325,145 +325,161 @@ const WhatssDashboard = () => {
   };
 
   // Poll for QR code
-  const startPollingQR = useCallback(() => {
-    setIsPollingQR(true);
-    let attempts = 0;
-    const maxAttempts = 30;
-
-    const pollQR = async () => {
-      if (attempts >= maxAttempts) {
-        setIsPollingQR(false);
-        toast.error("Tempo esgotado. Tente novamente.");
-        setConnectionStatus("disconnected");
+  const startPollingQR = useCallback(
+    (targetInstanceName: string) => {
+      const name = targetInstanceName?.trim();
+      if (!name) {
+        toast.error("Selecione uma instância válida para gerar o QR Code");
         return;
       }
 
-      attempts++;
-      console.log(`[QR Poll] Attempt ${attempts}/${maxAttempts}`);
+      setInstanceName(name);
+      setIsPollingQR(true);
+      let attempts = 0;
+      const maxAttempts = 30;
 
-      try {
-        // Try to get QR code
-        const connectUrl = `${apiUrl}/instance/connect/${instanceName}`;
-        const qrResponse = await fetch(connectUrl, {
-          method: "GET",
-          headers: { "apikey": apiKey },
-        });
-
-        const qrBody = await readResponseBody(qrResponse);
-        console.log("QR Response:", qrBody);
-        addDebugLog({
-          type: "connect",
-          url: connectUrl,
-          status: qrResponse.status,
-          ok: qrResponse.ok,
-          data: qrBody,
-        });
-
-        if (qrResponse.ok && qrBody && typeof qrBody === "object") {
-          const qrValue = extractQrValue(qrBody);
-          if (qrValue) {
-            const dataUrl = await normalizeQrToDataUrl(qrValue);
-            setQrCode(dataUrl);
-            setIsPollingQR(false);
-            toast.success("QR Code gerado!");
-            startPollingStatus();
-            return;
-          }
+      const pollQR = async () => {
+        if (attempts >= maxAttempts) {
+          setIsPollingQR(false);
+          toast.error("Tempo esgotado. Tente novamente.");
+          setConnectionStatus("disconnected");
+          return;
         }
 
-        // Check connection state
-        const stateUrl = `${apiUrl}/instance/connectionState/${instanceName}`;
-        const stateResponse = await fetch(stateUrl, {
-          method: "GET",
-          headers: { "apikey": apiKey },
-        });
+        attempts++;
+        console.log(`[QR Poll] Attempt ${attempts}/${maxAttempts}`);
 
-        const stateBody = await readResponseBody(stateResponse);
-        console.log("State:", stateBody);
-        addDebugLog({
-          type: "state",
-          url: stateUrl,
-          status: stateResponse.status,
-          ok: stateResponse.ok,
-          data: stateBody,
-        });
+        try {
+          // Try to get QR code
+          const connectUrl = `${apiUrl}/instance/connect/${name}`;
+          const qrResponse = await fetch(connectUrl, {
+            method: "GET",
+            headers: { apikey: apiKey },
+          });
 
-        if (stateResponse.ok && stateBody && typeof stateBody === "object") {
-          const stateData = stateBody as any;
-          if (stateData.instance?.state === "open") {
-            setIsPollingQR(false);
-            setConnectionStatus("connected");
-            await fetchConnectionInfo(instanceName);
-            toast.success("WhatsApp conectado!");
-            return;
+          const qrBody = await readResponseBody(qrResponse);
+          console.log("QR Response:", qrBody);
+          addDebugLog({
+            type: "connect",
+            url: connectUrl,
+            status: qrResponse.status,
+            ok: qrResponse.ok,
+            data: qrBody,
+          });
+
+          if (qrResponse.ok && qrBody && typeof qrBody === "object") {
+            const qrValue = extractQrValue(qrBody);
+            if (qrValue) {
+              const dataUrl = await normalizeQrToDataUrl(qrValue);
+              setQrCode(dataUrl);
+              setIsPollingQR(false);
+              toast.success("QR Code gerado!");
+              startPollingStatus(name);
+              return;
+            }
           }
+
+          // Check connection state
+          const stateUrl = `${apiUrl}/instance/connectionState/${name}`;
+          const stateResponse = await fetch(stateUrl, {
+            method: "GET",
+            headers: { apikey: apiKey },
+          });
+
+          const stateBody = await readResponseBody(stateResponse);
+          console.log("State:", stateBody);
+          addDebugLog({
+            type: "state",
+            url: stateUrl,
+            status: stateResponse.status,
+            ok: stateResponse.ok,
+            data: stateBody,
+          });
+
+          if (stateResponse.ok && stateBody && typeof stateBody === "object") {
+            const stateData = stateBody as any;
+            if (stateData.instance?.state === "open") {
+              setIsPollingQR(false);
+              setConnectionStatus("connected");
+              await fetchConnectionInfo(name);
+              toast.success("WhatsApp conectado!");
+              return;
+            }
+          }
+
+          // Continue polling
+          setTimeout(pollQR, 2000);
+        } catch (error) {
+          console.error("QR poll error:", error);
+          setTimeout(pollQR, 2000);
         }
+      };
 
-        // Continue polling
-        setTimeout(pollQR, 2000);
-      } catch (error) {
-        console.error("QR poll error:", error);
-        setTimeout(pollQR, 2000);
-      }
-    };
-
-    pollQR();
-  }, [apiUrl, apiKey, instanceName]);
+      pollQR();
+    },
+    [apiUrl, apiKey],
+  );
 
   // Poll connection status after QR is shown
-  const startPollingStatus = useCallback(() => {
-    let attempts = 0;
-    const maxAttempts = 60; // 2 minutes
+  const startPollingStatus = useCallback(
+    (targetInstanceName: string) => {
+      const name = targetInstanceName?.trim();
+      if (!name) return;
 
-    const pollStatus = async () => {
-      if (attempts >= maxAttempts) {
-        toast.error("Tempo esgotado para escanear o QR Code");
-        setQrCode(null);
-        setConnectionStatus("disconnected");
-        return;
-      }
+      let attempts = 0;
+      const maxAttempts = 60; // 2 minutes
 
-      attempts++;
-
-      try {
-        const stateUrl = `${apiUrl}/instance/connectionState/${instanceName}`;
-        const response = await fetch(stateUrl, {
-          method: "GET",
-          headers: { "apikey": apiKey },
-        });
-
-        const body = await readResponseBody(response);
-        console.log("Status poll:", body);
-        addDebugLog({
-          type: "state",
-          url: stateUrl,
-          status: response.status,
-          ok: response.ok,
-          data: body,
-        });
-
-        if (response.ok && body && typeof body === "object") {
-          const data = body as any;
-
-          if (data.instance?.state === "open") {
-            setQrCode(null);
-            setConnectionStatus("connected");
-            await fetchConnectionInfo(instanceName);
-            await fetchInstances();
-            toast.success("WhatsApp conectado com sucesso!");
-            return;
-          }
+      const pollStatus = async () => {
+        if (attempts >= maxAttempts) {
+          toast.error("Tempo esgotado para escanear o QR Code");
+          setQrCode(null);
+          setConnectionStatus("disconnected");
+          return;
         }
 
-        setTimeout(pollStatus, 2000);
-      } catch (error) {
-        console.error("Status poll error:", error);
-        setTimeout(pollStatus, 2000);
-      }
-    };
+        attempts++;
 
-    pollStatus();
-  }, [apiUrl, apiKey, instanceName]);
+        try {
+          const stateUrl = `${apiUrl}/instance/connectionState/${name}`;
+          const response = await fetch(stateUrl, {
+            method: "GET",
+            headers: { apikey: apiKey },
+          });
+
+          const body = await readResponseBody(response);
+          console.log("Status poll:", body);
+          addDebugLog({
+            type: "state",
+            url: stateUrl,
+            status: response.status,
+            ok: response.ok,
+            data: body,
+          });
+
+          if (response.ok && body && typeof body === "object") {
+            const data = body as any;
+
+            if (data.instance?.state === "open") {
+              setQrCode(null);
+              setConnectionStatus("connected");
+              await fetchConnectionInfo(name);
+              await fetchInstances();
+              toast.success("WhatsApp conectado com sucesso!");
+              return;
+            }
+          }
+
+          setTimeout(pollStatus, 2000);
+        } catch (error) {
+          console.error("Status poll error:", error);
+          setTimeout(pollStatus, 2000);
+        }
+      };
+
+      pollStatus();
+    },
+    [apiUrl, apiKey],
+  );
 
   // Delete instance
   const deleteInstance = async (name: string) => {
@@ -828,10 +844,7 @@ const WhatssDashboard = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => {
-                                setInstanceName(name);
-                                startPollingQR();
-                              }}
+                              onClick={() => startPollingQR(name)}
                               className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-900/20"
                             >
                               <QrCode className="h-4 w-4" />
