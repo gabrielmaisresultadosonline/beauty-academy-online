@@ -97,12 +97,39 @@ const WhatssDashboard = () => {
   const [isLoadingInstances, setIsLoadingInstances] = useState(false);
 
   // Debug state
-  const [showDebug, setShowDebug] = useState(false);
-  const [debugLogs, setDebugLogs] = useState<Array<{ time: string; type: string; data: any }>>([]);
+  type DebugLog = {
+    time: string;
+    type: "connect" | "state";
+    url: string;
+    status: number;
+    ok: boolean;
+    data: unknown;
+  };
 
-  const addDebugLog = (type: string, data: any) => {
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugLogs, setDebugLogs] = useState<DebugLog[]>([]);
+
+  const addDebugLog = (log: Omit<DebugLog, "time">) => {
     const time = new Date().toLocaleTimeString();
-    setDebugLogs((prev) => [...prev.slice(-19), { time, type, data }]);
+    setDebugLogs((prev) => [...prev.slice(-19), { time, ...log }]);
+  };
+
+  const readResponseBody = async (res: Response): Promise<unknown> => {
+    const contentType = res.headers.get("content-type") || "";
+
+    try {
+      if (contentType.includes("application/json")) {
+        return await res.json();
+      }
+    } catch {
+      // ignore
+    }
+
+    try {
+      return await res.text();
+    } catch {
+      return null;
+    }
   };
 
   // Check if config exists on load
@@ -316,17 +343,24 @@ const WhatssDashboard = () => {
 
       try {
         // Try to get QR code
-        const qrResponse = await fetch(`${apiUrl}/instance/connect/${instanceName}`, {
+        const connectUrl = `${apiUrl}/instance/connect/${instanceName}`;
+        const qrResponse = await fetch(connectUrl, {
           method: "GET",
-          headers: { "apikey": apiKey }
+          headers: { "apikey": apiKey },
         });
 
-        if (qrResponse.ok) {
-          const qrData = await qrResponse.json();
-          console.log("QR Response:", qrData);
-          addDebugLog("connect", qrData);
+        const qrBody = await readResponseBody(qrResponse);
+        console.log("QR Response:", qrBody);
+        addDebugLog({
+          type: "connect",
+          url: connectUrl,
+          status: qrResponse.status,
+          ok: qrResponse.ok,
+          data: qrBody,
+        });
 
-          const qrValue = extractQrValue(qrData);
+        if (qrResponse.ok && qrBody && typeof qrBody === "object") {
+          const qrValue = extractQrValue(qrBody);
           if (qrValue) {
             const dataUrl = await normalizeQrToDataUrl(qrValue);
             setQrCode(dataUrl);
@@ -338,16 +372,24 @@ const WhatssDashboard = () => {
         }
 
         // Check connection state
-        const stateResponse = await fetch(`${apiUrl}/instance/connectionState/${instanceName}`, {
+        const stateUrl = `${apiUrl}/instance/connectionState/${instanceName}`;
+        const stateResponse = await fetch(stateUrl, {
           method: "GET",
-          headers: { "apikey": apiKey }
+          headers: { "apikey": apiKey },
         });
 
-        if (stateResponse.ok) {
-          const stateData = await stateResponse.json();
-          console.log("State:", stateData);
-          addDebugLog("state", stateData);
+        const stateBody = await readResponseBody(stateResponse);
+        console.log("State:", stateBody);
+        addDebugLog({
+          type: "state",
+          url: stateUrl,
+          status: stateResponse.status,
+          ok: stateResponse.ok,
+          data: stateBody,
+        });
 
+        if (stateResponse.ok && stateBody && typeof stateBody === "object") {
+          const stateData = stateBody as any;
           if (stateData.instance?.state === "open") {
             setIsPollingQR(false);
             setConnectionStatus("connected");
@@ -384,14 +426,24 @@ const WhatssDashboard = () => {
       attempts++;
 
       try {
-        const response = await fetch(`${apiUrl}/instance/connectionState/${instanceName}`, {
+        const stateUrl = `${apiUrl}/instance/connectionState/${instanceName}`;
+        const response = await fetch(stateUrl, {
           method: "GET",
-          headers: { "apikey": apiKey }
+          headers: { "apikey": apiKey },
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Status poll:", data);
+        const body = await readResponseBody(response);
+        console.log("Status poll:", body);
+        addDebugLog({
+          type: "state",
+          url: stateUrl,
+          status: response.status,
+          ok: response.ok,
+          data: body,
+        });
+
+        if (response.ok && body && typeof body === "object") {
+          const data = body as any;
 
           if (data.instance?.state === "open") {
             setQrCode(null);
